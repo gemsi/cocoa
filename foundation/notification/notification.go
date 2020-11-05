@@ -39,7 +39,6 @@ func (n *NSNotification) Name() string {
 		cstr := C.Notification_Name(n.Ptr())
 		name := C.GoString(cstr)
 		n.name = &name
-		C.free(unsafe.Pointer(cstr))
 	}
 	return *n.name
 }

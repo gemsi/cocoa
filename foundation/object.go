@@ -4,7 +4,9 @@ package foundation
 // #cgo LDFLAGS: -framework Cocoa
 // #import "object.h"
 import "C"
-import "unsafe"
+import (
+	"unsafe"
+)
 
 // interface for all NSObject type
 type Object interface {

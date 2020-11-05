@@ -5,7 +5,6 @@ void TextField_SetBezeled(void* ptr, int bezeled);
 void TextField_SetEditable(void* ptr, int editable);
 void TextField_SetSelectable(void* ptr, int selectable);
 void TextField_SetDrawsBackground(void* ptr, int draws);
-void TextField_SetStringValue(void* ptr, const char* value);
 void* TextField_TextColor(void* ptr);
 void TextField_SetTextColor(void* ptr, void* colorPtr);
 void* TextField_BackgroundColor(void* ptr);

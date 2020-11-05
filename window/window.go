@@ -6,7 +6,7 @@ package window
 import "C"
 import (
 	"github.com/hsiafan/cocoa/foundation/notification"
-	"sync"
+	"github.com/hsiafan/cocoa/internal"
 	"unsafe"
 
 	"github.com/hsiafan/cocoa"
@@ -15,19 +15,6 @@ import (
 	"github.com/hsiafan/cocoa/responder"
 	"github.com/hsiafan/cocoa/view"
 )
-
-// event - different window delegate Events
-type event int
-
-const (
-	didResize        event = 0
-	didMove          event = 1
-	didMiniaturize   event = 2
-	didDeminiaturize event = 3
-)
-
-// EventHandler - handler functions that accepts the updated window as parameter
-type EventHandler func(notification notification.Notification)
 
 // Window is interface for NSWindow
 type Window interface {
@@ -42,38 +29,33 @@ type Window interface {
 	AddView(view view.View)
 	// Update forces the whole window to repaint
 	Update()
-	OnDidResize(fn EventHandler)
-	OnDidMiniaturize(fn EventHandler)
-	OnDidDeminiaturize(fn EventHandler)
-	OnDidMove(fn EventHandler)
+	DidResize(fn notification.Handler)
+	DidMiniaturize(fn notification.Handler)
+	DidDeminiaturize(fn notification.Handler)
+	DidMove(fn notification.Handler)
 	Frame() foundation.Rect
 }
 
 var _ Window = (*NSWindow)(nil)
 
-var currentId int64
-var windows = make(map[int64]*NSWindow)
-var lock sync.RWMutex
+var resource = internal.NewResourceRegistry()
 
 // New constructs and returns a new window.
 func New(x, y, width, height int) Window {
-	ptr := C.Window_New(C.int(x), C.int(y), C.int(width), C.int(height))
-	wnd := &NSWindow{
-		callbacks:   make(map[event]EventHandler),
+	id := resource.NextId()
+
+	ptr := C.Window_New(C.int(x), C.int(y), C.int(width), C.int(height), C.int(id))
+	window := &NSWindow{
+		handlers:    internal.NewHandlerRegistry(),
 		NSResponder: *responder.Make(ptr),
 	}
-	lock.Lock()
-	currentId++
-	id := currentId
-	windows[id] = wnd
-	lock.Unlock()
-	C.Window_SetDelegate(wnd.Ptr(), C.int(id))
-	cocoa.AddDeallocHook(wnd, func() {
-		lock.Lock()
-		delete(windows, id)
-		lock.Unlock()
+
+	resource.Store(id, window)
+
+	cocoa.AddDeallocHook(window, func() {
+		resource.Delete(id)
 	})
-	return wnd
+	return window
 }
 
 // NewRect constructs and returns a new window.
@@ -82,12 +64,12 @@ func NewRect(r foundation.Rect) Window {
 }
 
 type NSWindow struct {
-	title     string
-	x         int
-	y         int
-	w         int
-	h         int
-	callbacks map[event]EventHandler
+	title    string
+	x        int
+	y        int
+	w        int
+	h        int
+	handlers *internal.HandlerRegistry
 	responder.NSResponder
 }
 
@@ -120,31 +102,35 @@ func (w *NSWindow) Update() {
 	C.Window_Update(w.Ptr())
 }
 
-func (w *NSWindow) OnDidResize(fn EventHandler) {
-	w.callbacks[didResize] = fn
+const (
+	didResize        internal.Event = 0
+	didMove          internal.Event = 1
+	didMiniaturize   internal.Event = 2
+	didDeminiaturize internal.Event = 3
+)
+
+func (w *NSWindow) DidResize(handler notification.Handler) {
+	w.handlers.Add(didResize, handler)
 }
 
-func (w *NSWindow) OnDidMiniaturize(fn EventHandler) {
-	w.callbacks[didMiniaturize] = fn
+func (w *NSWindow) DidMiniaturize(handler notification.Handler) {
+	w.handlers.Add(didMiniaturize, handler)
 }
 
-func (w *NSWindow) OnDidDeminiaturize(fn EventHandler) {
-	w.callbacks[didDeminiaturize] = fn
+func (w *NSWindow) DidDeminiaturize(handler notification.Handler) {
+	w.handlers.Add(didDeminiaturize, handler)
 }
 
-func (w *NSWindow) OnDidMove(fn EventHandler) {
-	w.callbacks[didMove] = fn
+func (w *NSWindow) DidMove(handler notification.Handler) {
+	w.handlers.Add(didMove, handler)
 }
 
 //export onWindowEvent
 func onWindowEvent(id C.int, notificationPtr unsafe.Pointer, eventType C.int) {
-	event := event(eventType)
-	lock.Lock()
-	window := windows[int64(id)]
-	lock.Unlock()
+	event := internal.Event(eventType)
+	window := resource.Get(int64(id)).(*NSWindow)
 
-	handler := window.callbacks[event]
-	if handler != nil {
+	for _, handler := range window.handlers.Get(event) {
 		handler(notification.MakeNotification(notificationPtr, window))
 	}
 }

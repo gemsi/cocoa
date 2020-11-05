@@ -16,14 +16,15 @@ type View interface {
 	responder.Responder
 	// SuperView return super view of this view
 	SuperView() View
-	// SetFrame set frame for this view
+	// SetFrameRect set frame for this view
 	SetFrameRect(frame foundation.Rect)
-	// SetFrame2 set frame for this view
+	// SetFrame set frame for this view
 	SetFrame(x, y, width, height int)
 }
 
 var _ View = (*NSView)(nil)
 
+// NSView is cocoa NSView
 type NSView struct {
 	responder.NSResponder
 }

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/application"
 	"github.com/hsiafan/cocoa/button"
 	"github.com/hsiafan/cocoa/color"
+	"github.com/hsiafan/cocoa/foundation/notification"
 	"github.com/hsiafan/cocoa/indicator"
 	"github.com/hsiafan/cocoa/textfield"
 	"github.com/hsiafan/cocoa/window"
@@ -17,17 +19,19 @@ func main() {
 	w.SetTitle("Test widgets")
 
 	// text
-	tf := textfield.New()
-	tf.SetFrame(10, 100, 200, 25)
-	w.AddView(tf)
+	textField := textfield.New()
+	textField.SetFrame(10, 100, 200, 25)
+	w.AddView(textField)
+	textField.TextDidChange(func(notification notification.Notification) {
+		fmt.Println(textField.StringValue())
+	})
 
 	// button
 	btn := button.New()
 	btn.SetTitle("click me")
 	btn.SetAction(func() {
 		btn.SetTitle("clicked")
-		tf.SetStringValue("button clicked")
-		tf.SetTextColor(color.RedColor())
+		textField.SetTextColor(color.RedColor())
 	})
 	btn.SetFrame(10, 160, 80, 25)
 	w.AddView(btn)

@@ -15,6 +15,9 @@ var deallocHookId int64
 
 // AddDeallocHook add cocoa object dealloc hook
 func AddDeallocHook(obj foundation.Object, hook func()) {
+	if obj.Ptr() == nil {
+		panic("cocoa pointer is nil")
+	}
 	deallocHookLock.Lock()
 	deallocHookId++
 	id := deallocHookId

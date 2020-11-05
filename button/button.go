@@ -5,7 +5,7 @@ package button
 // #import "button.h"
 import "C"
 import (
-	"sync"
+	"github.com/hsiafan/cocoa/internal"
 	"unsafe"
 
 	"github.com/hsiafan/cocoa"
@@ -53,22 +53,7 @@ func (btn *NSButton) SetBezelStyle(style BezelStyle) {
 	C.Button_SetBezelStyle(btn.Ptr(), C.int(style))
 }
 
-var currentId int64
-var buttonsLock sync.RWMutex
-var buttons = make(map[int64]*NSButton)
-
-//export onButtonClicked
-func onButtonClicked(id C.int) {
-	buttonID := int64(id)
-	buttonsLock.RLock()
-	button := buttons[buttonID]
-	buttonsLock.RUnlock()
-
-	onClick := button.onClick
-	if onClick != nil {
-		onClick()
-	}
-}
+var resources = internal.NewResourceRegistry()
 
 // NewButton constructs a new button
 func New() Button {
@@ -76,15 +61,10 @@ func New() Button {
 	btn := &NSButton{
 		NSControl: *control.Make(ptr),
 	}
-	buttonsLock.Lock()
-	currentId++
-	id := currentId
-	buttons[id] = btn
-	buttonsLock.Unlock()
+	id := resources.NextId()
+	resources.Store(id, btn)
 	cocoa.AddDeallocHook(btn, func() {
-		buttonsLock.Lock()
-		delete(buttons, id)
-		buttonsLock.Unlock()
+		resources.Delete(id)
 	})
 	C.Button_SetTarget(btn.Ptr(), C.int(id))
 	btn.SetBezelStyle(BezelStyleRounded)
@@ -103,4 +83,15 @@ func (btn *NSButton) SizeToFit() {
 
 func (btn *NSButton) SetAction(fn func()) {
 	btn.onClick = fn
+}
+
+//export onButtonClicked
+func onButtonClicked(id C.int) {
+	buttonID := int64(id)
+	button := resources.Get(buttonID).(*NSButton)
+
+	onClick := button.onClick
+	if onClick != nil {
+		onClick()
+	}
 }

@@ -1,8 +1,12 @@
 #import "text_field.h"
+#import "text_field_delegate.h"
 #include "_cgo_export.h"
 
 void* TextField_New(int id) {
     NSTextField* textField = [[[NSTextField alloc] init] autorelease];
+    TextFieldDelegate* textFieldDelegate = [[TextFieldDelegate alloc] init];
+    [textFieldDelegate setGoID:id];
+    [textField setDelegate:textFieldDelegate];
     return (void*)textField;
 }
 
@@ -24,11 +28,6 @@ void TextField_SetSelectable(void* ptr, int selectable) {
 void TextField_SetDrawsBackground(void* ptr, int draws) {
     NSTextField* textField = (NSTextField*)ptr;
     [textField setDrawsBackground:draws==0?NO:YES];
-}
-
-void TextField_SetStringValue(void* ptr, const char* value) {
-    NSTextField* textField = (NSTextField*)ptr;
-    [textField setStringValue:[NSString stringWithUTF8String:value]];
 }
 
 void* TextField_TextColor(void* ptr) {

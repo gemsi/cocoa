@@ -1,3 +1,14 @@
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/hsiafan/glow v1.2.2 h1:McwTReDcs6VRQX6aM6TXPTn7USMyRXRT4gz39EKkDlY=
+github.com/hsiafan/glow v1.2.2/go.mod h1:J7J3Im10qZi2jXik5mC/C2LX/4a8FsMY44h8MBIQP1A=
 github.com/hsiafan/gocoa v0.0.0-20201105041755-d104f410e356 h1:9+A8qe+TeK1avIZhF6BqEst/Oyjb+WtF95tEq68JSX0=
 github.com/hsiafan/gocoa v0.0.0-20201105041755-d104f410e356/go.mod h1:OqUXuO1OmlF/XeJ5LSKTZTBBoJ5pZNNqis1r4rMDsC0=
 github.com/mojbro/gocoa v0.0.0-20190904055300-0379751ad0a4/go.mod h1:CwYtDl7ZIiyBU1/84Wr/JqNYPP8dDK9ffGknG2znkao=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
+golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
