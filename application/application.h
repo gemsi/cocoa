@@ -1,4 +1,4 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
 void InitSharedApplication();
 void RunApplication();

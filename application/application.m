@@ -1,6 +1,26 @@
+#import <Cocoa/Cocoa.h>
 #import "application.h"
-#import "appdelegate.h"
 #include "_cgo_export.h"
+
+@interface AppDelegate : NSObject <NSApplicationDelegate>
+
+@end
+
+@implementation AppDelegate
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    callOnApplicationDidFinishLaunchingHandler();
+}
+
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
+    return YES;
+}
+
+@end
 
 AppDelegate *cocoa_applicationDelegate = nil;
 

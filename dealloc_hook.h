@@ -1,5 +1,5 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
 
-void Dealloc_AddHook(void* ptr, int hookId);
+void Dealloc_AddHook(void* ptr, long hookId);
 

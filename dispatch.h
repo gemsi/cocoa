@@ -1,3 +1,3 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
-void Dispatch_RunOnUIThread(int id);
+void Dispatch_RunOnUIThread(long id);

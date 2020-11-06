@@ -1,3 +1,4 @@
+#import <Cocoa/Cocoa.h>
 #import "notification.h"
 #include "_cgo_export.h"
 #import <objc/runtime.h>

@@ -20,8 +20,8 @@ type Notification interface {
 
 var _ Notification = (*NSNotification)(nil)
 
-// MakeNotification create new Notification, from native pointer of NSNotification, and the sender object
-func MakeNotification(ptr unsafe.Pointer, object foundation.Object) *NSNotification {
+// Make create new Notification, from native pointer of NSNotification, and the sender object
+func Make(ptr unsafe.Pointer, object foundation.Object) *NSNotification {
 	return &NSNotification{
 		NSObject: *foundation.MakeObject(ptr),
 		object:   object,

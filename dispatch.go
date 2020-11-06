@@ -21,12 +21,11 @@ func RunOnUIThread(task func()) {
 	id := currentTaskId
 	tasks[id] = task
 	taskLock.Unlock()
-	C.Dispatch_RunOnUIThread(C.int(id))
+	C.Dispatch_RunOnUIThread(C.long(id))
 }
 
 //export runTask
-func runTask(cid C.int) {
-	id := int64(cid)
+func runTask(id int64) {
 
 	taskLock.RLock()
 	task := tasks[id]

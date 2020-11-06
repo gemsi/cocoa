@@ -1,4 +1,4 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
 void* Color_NewColorWithDeviceRed(double red, double green, double blue, double alpha);
 

@@ -1,12 +1,41 @@
+#import <Cocoa/Cocoa.h>
 #import "text_field.h"
-#import "text_field_delegate.h"
 #include "_cgo_export.h"
 
-void* TextField_New(int id) {
-    NSTextField* textField = [[[NSTextField alloc] init] autorelease];
-    TextFieldDelegate* textFieldDelegate = [[TextFieldDelegate alloc] init];
-    [textFieldDelegate setGoID:id];
-    [textField setDelegate:textFieldDelegate];
+@interface GoTextField : NSTextField <NSTextFieldDelegate>
+
+@property (assign) long goID;
+
+@end
+
+@implementation GoTextField
+
+- (void)controlTextDidChange:(NSNotification*)notification {
+	onTextDidChange([self goID], notification);
+}
+
+- (BOOL)becomeFirstResponder {
+	BOOL rc = [super becomeFirstResponder];
+	if (rc) {
+	    onBecameFirstResponder([self goID]);
+	}
+	return rc;
+}
+
+- (void)controlTextDidEndEditing:(NSNotification*)notification {
+	onTextDidEndEditing([self goID], notification);
+}
+
+- (void)onEnterKey:(id)sender {
+	onEnterKey([self goID], sender);
+}
+
+@end
+
+void* TextField_New(long id) {
+    GoTextField* textField = [[[GoTextField alloc] init] autorelease];
+    [textField setGoID:id];
+    [textField setDelegate:textField];
     return (void*)textField;
 }
 

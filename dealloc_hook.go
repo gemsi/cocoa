@@ -23,7 +23,7 @@ func AddDeallocHook(obj foundation.Object, hook func()) {
 	id := deallocHookId
 	deallocHooks[id] = hook
 	deallocHookLock.Unlock()
-	C.Dealloc_AddHook(obj.Ptr(), C.int(id))
+	C.Dealloc_AddHook(obj.Ptr(), C.long(id))
 }
 
 //export runDeallocHook

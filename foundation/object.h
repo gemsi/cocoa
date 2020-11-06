@@ -1,3 +1,3 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
 void Object_Dealloc(void* ptr);

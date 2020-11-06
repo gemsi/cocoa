@@ -1,17 +1,45 @@
+#import <Cocoa/Cocoa.h>
 #import "window.h"
-#import "window_delegate.h"
 #include "_cgo_export.h"
 
+@interface GoNSWindow : NSWindow <NSWindowDelegate>
 
-void* Window_New(int x, int y, int width, int height, int goID) {
-    NSRect windowRect = NSMakeRect(x, y, width, height);
-    id window = [[NSWindow alloc] initWithContentRect:windowRect 
+@property (assign) long goID;
+
+@end
+
+@implementation GoNSWindow
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (void)windowDidResize:(NSNotification *)notification {
+    onWindowDidResize([self goID], notification);
+}
+
+- (void)windowDidMove:(NSNotification *)notification {
+    onWindowDidMove([self goID], notification);
+}
+
+- (void)windowDidMiniaturize:(NSNotification *)notification {
+    onWindowDidMiniaturize([self goID], notification);
+}
+
+- (void)windowDidDeminiaturize:(NSNotification *)notification {
+    onWindowDidDeminiaturize([self goID], notification);
+}
+
+@end
+
+
+void* Window_New(long goID, NSRect rect) {
+    GoNSWindow* window = [[GoNSWindow alloc] initWithContentRect:rect
         styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable)
         backing:NSBackingStoreBuffered
         defer:NO];
-    WindowDelegate* windowDelegate = [[WindowDelegate alloc] init];
-    [windowDelegate setGoID:goID];
-    [window setDelegate:windowDelegate];
+    [window setGoID:goID];
+    [window setDelegate:window];
     [window autorelease];
     return window;
 
@@ -46,4 +74,9 @@ void Window_Update(void *ptr) {
 NSRect Window_Frame(void *ptr) {
     NSWindow* window = (NSWindow*)ptr;
     return [window frame];
+}
+
+void Window_SetFrame(void *ptr, NSRect rect, int display) {
+    NSWindow* window = (NSWindow*)ptr;
+    [window setFrame:rect display:display==1];
 }

@@ -1,3 +1,4 @@
+#import <Cocoa/Cocoa.h>
 #import "object.h"
 #include "_cgo_export.h"
 

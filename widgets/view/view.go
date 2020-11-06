@@ -5,7 +5,7 @@ package view
 // #include "view.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/foundation/geometry"
 	"unsafe"
 
 	"github.com/hsiafan/cocoa/interaction/responder"
@@ -16,10 +16,10 @@ type View interface {
 	responder.Responder
 	// SuperView return super view of this view
 	SuperView() View
-	// SetFrameRect set frame for this view
-	SetFrameRect(frame foundation.Rect)
 	// SetFrame set frame for this view
-	SetFrame(x, y, width, height int)
+	SetFrame(frame geometry.Rect)
+	// Frame return the frame of this View
+	Frame() geometry.Rect
 }
 
 var _ View = (*NSView)(nil)
@@ -38,10 +38,18 @@ func (*NSView) SuperView() View {
 	return nil
 }
 
-func (btn *NSView) SetFrameRect(frame foundation.Rect) {
-	C.View_SetFrame(btn.Ptr(), C.int(frame.X), C.int(frame.Y), C.int(frame.Width), C.int(frame.Height))
+func (btn *NSView) SetFrame(frame geometry.Rect) {
+	C.View_SetFrame(btn.Ptr(), toNSRect(frame))
 }
 
-func (btn *NSView) SetFrame(x, y, width, height int) {
-	C.View_SetFrame(btn.Ptr(), C.int(x), C.int(y), C.int(width), C.int(height))
+func (btn *NSView) Frame() geometry.Rect {
+	nsFrame := C.View_Frame(btn.Ptr())
+	return toRect(nsFrame)
+}
+
+func toNSRect(rect geometry.Rect) C.NSRect {
+	return *(*C.NSRect)(unsafe.Pointer(&rect))
+}
+func toRect(nsRect C.NSRect) geometry.Rect {
+	return *(*geometry.Rect)(unsafe.Pointer(&nsRect))
 }

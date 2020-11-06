@@ -5,6 +5,8 @@ package button
 // #import "button.h"
 import "C"
 import (
+	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/interaction/responder"
 	"github.com/hsiafan/cocoa/internal"
 	"unsafe"
 
@@ -13,7 +15,7 @@ import (
 	"github.com/hsiafan/cocoa/widgets/control"
 )
 
-type BezelStyle int
+type BezelStyle uint32
 
 const (
 	BezelStyleRounded           BezelStyle = 1
@@ -34,8 +36,8 @@ const (
 // Button represents a button control that can trigger actions.
 type Button interface {
 	control.Control
-	// SetAction set the action when trigger the button
-	SetAction(fn func())
+	// Clicked set the action when trigger the button
+	SetAction(handler responder.Action)
 	// SetTitle sets the title of the button, which is the text displayed on the button.
 	SetTitle(title string)
 	SizeToFit()
@@ -46,27 +48,26 @@ var _ Button = (*NSButton)(nil)
 
 type NSButton struct {
 	control.NSControl
-	onClick func()
+	action responder.Action
 }
 
 func (btn *NSButton) SetBezelStyle(style BezelStyle) {
-	C.Button_SetBezelStyle(btn.Ptr(), C.int(style))
+	C.Button_SetBezelStyle(btn.Ptr(), C.uint(style))
 }
 
 var resources = internal.NewResourceRegistry()
 
 // NewButton constructs a new button
 func New() Button {
-	ptr := C.Button_New()
+	id := resources.NextId()
+	ptr := C.Button_New(C.long(id))
 	btn := &NSButton{
 		NSControl: *control.Make(ptr),
 	}
-	id := resources.NextId()
 	resources.Store(id, btn)
 	cocoa.AddDeallocHook(btn, func() {
 		resources.Delete(id)
 	})
-	C.Button_SetTarget(btn.Ptr(), C.int(id))
 	btn.SetBezelStyle(BezelStyleRounded)
 	return btn
 }
@@ -81,17 +82,14 @@ func (btn *NSButton) SizeToFit() {
 	C.Button_SizeToFit(btn.Ptr())
 }
 
-func (btn *NSButton) SetAction(fn func()) {
-	btn.onClick = fn
+func (btn *NSButton) SetAction(action responder.Action) {
+	btn.action = action
 }
 
-//export onButtonClicked
-func onButtonClicked(id C.int) {
-	buttonID := int64(id)
-	button := resources.Get(buttonID).(*NSButton)
-
-	onClick := button.onClick
-	if onClick != nil {
-		onClick()
+//export onButtonAction
+func onButtonAction(id int64, sender unsafe.Pointer) {
+	button := resources.Get(id).(*NSButton)
+	if button.action != nil {
+		button.action(foundation.MakeObject(sender))
 	}
 }

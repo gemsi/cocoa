@@ -19,6 +19,16 @@ type Control interface {
 	SetStringValue(value string)
 	// StringValue return the string value
 	StringValue() string
+	//
+	//SetDoubleValue(value float64)
+	//DoubleValue() float64
+	//
+	//SetFloatValue(value float32)
+	//FloatValue() float32
+	//
+	//SetIntValue(value int)
+	//IntValue() int
+
 }
 
 type NSControl struct {

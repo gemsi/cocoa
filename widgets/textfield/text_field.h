@@ -1,6 +1,6 @@
-#import <Cocoa/Cocoa.h>
+#import <stdlib.h>
 
-void* TextField_New(int id);
+void* TextField_New(long id);
 void TextField_SetBezeled(void* ptr, int bezeled);
 void TextField_SetEditable(void* ptr, int editable);
 void TextField_SetSelectable(void* ptr, int selectable);

@@ -1,3 +1,4 @@
+#import <Cocoa/Cocoa.h>
 #import "control.h"
 
 void Control_SetStringValue(void* ptr, const char* value) {

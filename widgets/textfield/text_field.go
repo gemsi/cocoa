@@ -6,6 +6,7 @@ package textfield
 import "C"
 import (
 	"github.com/hsiafan/cocoa"
+	"github.com/hsiafan/cocoa/foundation"
 	"github.com/hsiafan/cocoa/foundation/notification"
 	c "github.com/hsiafan/cocoa/graphics/color"
 	"github.com/hsiafan/cocoa/internal"
@@ -22,8 +23,6 @@ type TextField interface {
 	SetEditable(editable bool)
 	// SetSelectable set if the text can be selectable
 	SetSelectable(selectable bool)
-	// SetAsLabel set the styles of this text-field, so it act as a Label
-	SetAsLabel()
 	// TextColor return text color
 	TextColor() c.Color
 	// SetTextColor set text color
@@ -33,27 +32,29 @@ type TextField interface {
 	// SetBackgroundColor set background color
 	SetBackgroundColor(color c.Color)
 	// TextDidChange set handler for text change
-	TextDidChange(handler notification.Handler)
+	TextDidChange(handler func(notification.Notification))
 	// TextDidEndEditing set handler for text edit finished
-	TextDidEndEditing(handler notification.Handler)
+	TextDidEndEditing(handler func(notification.Notification))
 }
 
 var _ TextField = (*NSTextField)(nil)
 
 type NSTextField struct {
 	control.NSControl
-	handlers *internal.HandlerRegistry
+	textDidChange        func(notification.Notification)
+	textDidEndEditing    func(notification.Notification)
+	becameFirstResponder func()
+	onEnterKey           func(sender foundation.Object)
 }
 
 var resources = internal.NewResourceRegistry()
 
 func New() TextField {
 	id := resources.NextId()
-	ptr := C.TextField_New(C.int(id))
+	ptr := C.TextField_New(C.long(id))
 
 	textField := &NSTextField{
 		NSControl: *control.Make(ptr),
-		handlers:  internal.NewHandlerRegistry(),
 	}
 
 	resources.Store(id, textField)
@@ -65,11 +66,14 @@ func New() TextField {
 	return textField
 }
 
-func (f *NSTextField) SetAsLabel() {
-	f.SetBezeled(false)
-	f.SetDrawsBackground(false)
-	f.SetEditable(false)
-	f.SetSelectable(false)
+// NewLabel create a text field, which looks like a Label
+func NewLabel() TextField {
+	tf := New()
+	tf.SetBezeled(false)
+	tf.SetDrawsBackground(false)
+	tf.SetEditable(false)
+	tf.SetSelectable(false)
+	return tf
 }
 
 func (f *NSTextField) SetDrawsBackground(draws bool) {
@@ -106,26 +110,50 @@ func (f *NSTextField) SetBackgroundColor(color c.Color) {
 	C.TextField_SetBackgroundColor(f.Ptr(), color.Ptr())
 }
 
-const (
-	controlTextDidChange     internal.HandlerType = 0
-	controlTextDidEndEditing internal.HandlerType = 1
-)
-
-func (f *NSTextField) TextDidChange(handler notification.Handler) {
-	f.handlers.Add(controlTextDidChange, handler)
+func (f *NSTextField) TextDidChange(handler func(notification.Notification)) {
+	f.textDidChange = handler
 }
 
-func (f *NSTextField) TextDidEndEditing(handler notification.Handler) {
-	f.handlers.Add(controlTextDidEndEditing, handler)
+func (f *NSTextField) TextDidEndEditing(handler func(notification.Notification)) {
+	f.textDidEndEditing = handler
 }
 
-//export onTextFieldEvent
-func onTextFieldEvent(id C.int, notificationPtr unsafe.Pointer, eventType C.int) {
-	event := internal.HandlerType(eventType)
-	textField := resources.Get(int64(id)).(*NSTextField)
+func (f *NSTextField) onBecameFirstResponder(handler func()) {
+	f.becameFirstResponder = handler
+}
 
-	handlers := textField.handlers.Get(event)
-	for _, handler := range handlers {
-		handler(notification.MakeNotification(notificationPtr, textField))
+func (f *NSTextField) OnEnterKey(handler func(sender foundation.Object)) {
+	f.onEnterKey = handler
+}
+
+//export onTextDidChange
+func onTextDidChange(id int64, notificationPtr unsafe.Pointer) {
+	f := resources.Get(id).(*NSTextField)
+	if f.textDidChange != nil {
+		f.textDidChange(notification.Make(notificationPtr, f))
+	}
+}
+
+//export onTextDidEndEditing
+func onTextDidEndEditing(id int64, notificationPtr unsafe.Pointer) {
+	f := resources.Get(id).(*NSTextField)
+	if f.textDidEndEditing != nil {
+		f.textDidEndEditing(notification.Make(notificationPtr, f))
+	}
+}
+
+//export onBecameFirstResponder
+func onBecameFirstResponder(id int64) {
+	f := resources.Get(id).(*NSTextField)
+	if f.becameFirstResponder != nil {
+		f.becameFirstResponder()
+	}
+}
+
+//export onEnterKey
+func onEnterKey(id int64, sender unsafe.Pointer) {
+	f := resources.Get(id).(*NSTextField)
+	if f.onEnterKey != nil {
+		f.onEnterKey(foundation.MakeObject(sender))
 	}
 }
