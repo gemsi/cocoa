@@ -8,7 +8,7 @@ import (
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 
-	"github.com/hsiafan/cocoa/responder"
+	"github.com/hsiafan/cocoa/interaction/responder"
 )
 
 // View is interface for all NSView type

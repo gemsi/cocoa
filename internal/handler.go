@@ -5,24 +5,24 @@ import (
 	"sync"
 )
 
-// Event for delegate Events
-type Event int
+// HandlerType for delegate Events
+type HandlerType int
 
 // HandlerRegistry make it easy to handle event
 type HandlerRegistry struct {
-	events map[Event][]notification.Handler
+	events map[HandlerType][]notification.Handler
 	lock   sync.RWMutex
 }
 
 // NewHandlerRegistry create new HandlerRegistry
 func NewHandlerRegistry() *HandlerRegistry {
 	return &HandlerRegistry{
-		events: make(map[Event][]notification.Handler),
+		events: make(map[HandlerType][]notification.Handler),
 	}
 }
 
 // Add add new handler
-func (r *HandlerRegistry) Add(event Event, handler notification.Handler) {
+func (r *HandlerRegistry) Add(event HandlerType, handler notification.Handler) {
 	if handler == nil {
 		panic("handler is nil")
 	}
@@ -36,7 +36,7 @@ func (r *HandlerRegistry) Add(event Event, handler notification.Handler) {
 }
 
 // Get all handlers of the event
-func (r *HandlerRegistry) Get(event Event) []notification.Handler {
+func (r *HandlerRegistry) Get(event HandlerType) []notification.Handler {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	return r.events[event]

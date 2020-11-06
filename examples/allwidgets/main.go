@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/application"
-	"github.com/hsiafan/cocoa/button"
-	"github.com/hsiafan/cocoa/color"
 	"github.com/hsiafan/cocoa/foundation/notification"
-	"github.com/hsiafan/cocoa/indicator"
-	"github.com/hsiafan/cocoa/textfield"
-	"github.com/hsiafan/cocoa/window"
+	"github.com/hsiafan/cocoa/graphics/color"
+	"github.com/hsiafan/cocoa/widgets/button"
+	"github.com/hsiafan/cocoa/widgets/indicator"
+	"github.com/hsiafan/cocoa/widgets/textfield"
+	"github.com/hsiafan/cocoa/widgets/window"
 	"time"
 )
 

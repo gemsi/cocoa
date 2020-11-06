@@ -6,7 +6,7 @@ package indicator
 import "C"
 import (
 	"github.com/hsiafan/cocoa/internal"
-	"github.com/hsiafan/cocoa/view"
+	"github.com/hsiafan/cocoa/widgets/view"
 )
 
 // ProgressIndicator wrap cocoa NSProcessIndicator

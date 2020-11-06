@@ -7,7 +7,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/hsiafan/cocoa/view"
+	"github.com/hsiafan/cocoa/widgets/view"
 )
 
 // Control wrap a cocoa NSControl

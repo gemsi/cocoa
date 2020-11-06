@@ -6,10 +6,10 @@ package textfield
 import "C"
 import (
 	"github.com/hsiafan/cocoa"
-	c "github.com/hsiafan/cocoa/color"
-	"github.com/hsiafan/cocoa/control"
 	"github.com/hsiafan/cocoa/foundation/notification"
+	c "github.com/hsiafan/cocoa/graphics/color"
 	"github.com/hsiafan/cocoa/internal"
+	"github.com/hsiafan/cocoa/widgets/control"
 	"unsafe"
 )
 
@@ -107,8 +107,8 @@ func (f *NSTextField) SetBackgroundColor(color c.Color) {
 }
 
 const (
-	controlTextDidChange     internal.Event = 0
-	controlTextDidEndEditing internal.Event = 1
+	controlTextDidChange     internal.HandlerType = 0
+	controlTextDidEndEditing internal.HandlerType = 1
 )
 
 func (f *NSTextField) TextDidChange(handler notification.Handler) {
@@ -121,7 +121,7 @@ func (f *NSTextField) TextDidEndEditing(handler notification.Handler) {
 
 //export onTextFieldEvent
 func onTextFieldEvent(id C.int, notificationPtr unsafe.Pointer, eventType C.int) {
-	event := internal.Event(eventType)
+	event := internal.HandlerType(eventType)
 	textField := resources.Get(int64(id)).(*NSTextField)
 
 	handlers := textField.handlers.Get(event)

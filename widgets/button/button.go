@@ -10,7 +10,7 @@ import (
 
 	"github.com/hsiafan/cocoa"
 
-	"github.com/hsiafan/cocoa/control"
+	"github.com/hsiafan/cocoa/widgets/control"
 )
 
 type BezelStyle int

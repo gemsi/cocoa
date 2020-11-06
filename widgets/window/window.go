@@ -12,8 +12,8 @@ import (
 	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 
-	"github.com/hsiafan/cocoa/responder"
-	"github.com/hsiafan/cocoa/view"
+	"github.com/hsiafan/cocoa/interaction/responder"
+	"github.com/hsiafan/cocoa/widgets/view"
 )
 
 // Window is interface for NSWindow
@@ -103,10 +103,10 @@ func (w *NSWindow) Update() {
 }
 
 const (
-	didResize        internal.Event = 0
-	didMove          internal.Event = 1
-	didMiniaturize   internal.Event = 2
-	didDeminiaturize internal.Event = 3
+	didResize        internal.HandlerType = 0
+	didMove          internal.HandlerType = 1
+	didMiniaturize   internal.HandlerType = 2
+	didDeminiaturize internal.HandlerType = 3
 )
 
 func (w *NSWindow) DidResize(handler notification.Handler) {
@@ -127,7 +127,7 @@ func (w *NSWindow) DidMove(handler notification.Handler) {
 
 //export onWindowEvent
 func onWindowEvent(id C.int, notificationPtr unsafe.Pointer, eventType C.int) {
-	event := internal.Event(eventType)
+	event := internal.HandlerType(eventType)
 	window := resource.Get(int64(id)).(*NSWindow)
 
 	for _, handler := range window.handlers.Get(event) {

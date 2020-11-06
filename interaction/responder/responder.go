@@ -3,8 +3,8 @@ package responder
 import (
 	"unsafe"
 
-	"github.com/hsiafan/cocoa/event"
 	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/interaction/event"
 )
 
 // Responder wrap cocoa NSResponder
