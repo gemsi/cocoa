@@ -2,24 +2,16 @@
 #import "text_field.h"
 #include "_cgo_export.h"
 
-@interface GoTextField : NSTextField <NSTextFieldDelegate>
+@interface GoTextFieldDelegate : NSObject <NSTextFieldDelegate>
 
 @property (assign) long goID;
 
 @end
 
-@implementation GoTextField
+@implementation GoTextFieldDelegate
 
 - (void)controlTextDidChange:(NSNotification*)notification {
 	onTextDidChange([self goID], notification);
-}
-
-- (BOOL)becomeFirstResponder {
-	BOOL rc = [super becomeFirstResponder];
-	if (rc) {
-	    onBecameFirstResponder([self goID]);
-	}
-	return rc;
 }
 
 - (void)controlTextDidEndEditing:(NSNotification*)notification {
@@ -33,9 +25,22 @@
 @end
 
 void* TextField_New(long id) {
-    GoTextField* textField = [[[GoTextField alloc] init] autorelease];
-    [textField setGoID:id];
-    [textField setDelegate:textField];
+    NSTextField* textField = [[[NSTextField alloc] init] autorelease];
+    [textField.cell setWraps:NO];
+    [textField.cell setScrollable:YES];
+    GoTextFieldDelegate* delegate = [[GoTextFieldDelegate alloc] init];
+    [delegate setGoID:id];
+    [textField setDelegate:delegate];
+    return (void*)textField;
+}
+
+void* SecureTextField_New(long id) {
+    NSSecureTextField* textField = [[[NSSecureTextField alloc] init] autorelease];
+    [textField.cell setWraps:NO];
+    [textField.cell setScrollable:YES];
+    GoTextFieldDelegate* delegate = [[GoTextFieldDelegate alloc] init];
+    [delegate setGoID:id];
+    [textField setDelegate:delegate];
     return (void*)textField;
 }
 

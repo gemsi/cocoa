@@ -35,20 +35,33 @@ type TextField interface {
 	TextDidChange(handler func(notification.Notification))
 	// TextDidEndEditing set handler for text edit finished
 	TextDidEndEditing(handler func(notification.Notification))
+
+	getTextDidChange() func(notification.Notification)
+	getTextDidEndEditing() func(notification.Notification)
+	getOnEnterKey() func(sender foundation.Object)
+}
+
+// SecureTextField wrap for NSSecureTextField
+type SecureTextField interface {
+	TextField
 }
 
 var _ TextField = (*NSTextField)(nil)
 
 type NSTextField struct {
 	control.NSControl
-	textDidChange        func(notification.Notification)
-	textDidEndEditing    func(notification.Notification)
-	becameFirstResponder func()
-	onEnterKey           func(sender foundation.Object)
+	textDidChange     func(notification.Notification)
+	textDidEndEditing func(notification.Notification)
+	onEnterKey        func(sender foundation.Object)
+}
+
+type NSSecureTextField struct {
+	NSTextField
 }
 
 var resources = internal.NewResourceRegistry()
 
+// New create new TextField
 func New() TextField {
 	id := resources.NextId()
 	ptr := C.TextField_New(C.long(id))
@@ -64,6 +77,38 @@ func New() TextField {
 	})
 
 	return textField
+}
+
+// NewSecure create new TextField
+func NewSecure() SecureTextField {
+	id := resources.NextId()
+	ptr := C.SecureTextField_New(C.long(id))
+
+	textField := &NSSecureTextField{
+		NSTextField: NSTextField{
+			NSControl: *control.Make(ptr),
+		},
+	}
+
+	resources.Store(id, textField)
+
+	cocoa.AddDeallocHook(textField, func() {
+		resources.Delete(id)
+	})
+
+	return textField
+}
+
+func (f *NSTextField) getTextDidChange() func(notification.Notification) {
+	return f.textDidChange
+}
+
+func (f *NSTextField) getTextDidEndEditing() func(notification.Notification) {
+	return f.textDidEndEditing
+}
+
+func (f *NSTextField) getOnEnterKey() func(sender foundation.Object) {
+	return f.onEnterKey
 }
 
 // NewLabel create a text field, which looks like a Label
@@ -118,42 +163,30 @@ func (f *NSTextField) TextDidEndEditing(handler func(notification.Notification))
 	f.textDidEndEditing = handler
 }
 
-func (f *NSTextField) onBecameFirstResponder(handler func()) {
-	f.becameFirstResponder = handler
-}
-
 func (f *NSTextField) OnEnterKey(handler func(sender foundation.Object)) {
 	f.onEnterKey = handler
 }
 
 //export onTextDidChange
 func onTextDidChange(id int64, notificationPtr unsafe.Pointer) {
-	f := resources.Get(id).(*NSTextField)
-	if f.textDidChange != nil {
-		f.textDidChange(notification.Make(notificationPtr, f))
+	f := resources.Get(id).(TextField)
+	if f.getTextDidChange() != nil {
+		f.getTextDidChange()(notification.Make(notificationPtr, f))
 	}
 }
 
 //export onTextDidEndEditing
 func onTextDidEndEditing(id int64, notificationPtr unsafe.Pointer) {
-	f := resources.Get(id).(*NSTextField)
-	if f.textDidEndEditing != nil {
-		f.textDidEndEditing(notification.Make(notificationPtr, f))
-	}
-}
-
-//export onBecameFirstResponder
-func onBecameFirstResponder(id int64) {
-	f := resources.Get(id).(*NSTextField)
-	if f.becameFirstResponder != nil {
-		f.becameFirstResponder()
+	f := resources.Get(id).(TextField)
+	if f.getTextDidEndEditing() != nil {
+		f.getTextDidEndEditing()(notification.Make(notificationPtr, f))
 	}
 }
 
 //export onEnterKey
 func onEnterKey(id int64, sender unsafe.Pointer) {
-	f := resources.Get(id).(*NSTextField)
-	if f.onEnterKey != nil {
-		f.onEnterKey(foundation.MakeObject(sender))
+	f := resources.Get(id).(TextField)
+	if f.getOnEnterKey() != nil {
+		f.getOnEnterKey()(foundation.MakeObject(sender))
 	}
 }

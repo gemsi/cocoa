@@ -78,5 +78,5 @@ NSRect Window_Frame(void *ptr) {
 
 void Window_SetFrame(void *ptr, NSRect rect, int display) {
     NSWindow* window = (NSWindow*)ptr;
-    [window setFrame:rect display:display==1];
+    [window setFrame:rect display:display==1?YES:NO];
 }

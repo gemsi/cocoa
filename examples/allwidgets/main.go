@@ -41,12 +41,12 @@ func main() {
 
 	// text
 	tf := textfield.New()
-	tf.SetFrame(geometry.MkRect(10, 100, 200, 25))
+	tf.SetFrame(geometry.MkRect(10, 100, 150, 25))
 	w.AddView(tf)
 
 	// label
 	label := textfield.NewLabel()
-	label.SetFrame(geometry.MkRect(220, 100, 200, 25))
+	label.SetFrame(geometry.MkRect(170, 100, 150, 25))
 	w.AddView(label)
 	tf.TextDidChange(func(notification.Notification) {
 		cocoa.RunOnUIThread(func() {
@@ -56,6 +56,11 @@ func main() {
 	btn.SetAction(func(sender foundation.Object) {
 		label.SetTextColor(color.RedColor())
 	})
+
+	// password
+	stf := textfield.NewSecure()
+	stf.SetFrame(geometry.MkRect(340, 100, 150, 25))
+	w.AddView(stf)
 
 	// progress indicator
 	progressIndicator := indicator.New()
