@@ -121,19 +121,19 @@ func NewLabel() TextField {
 }
 
 func (f *NSTextField) SetDrawsBackground(draws bool) {
-	C.TextField_SetDrawsBackground(f.Ptr(), C.int(internal.BoolToInt(draws)))
+	C.TextField_SetDrawsBackground(f.Ptr(), C.bool(draws))
 }
 
 func (f *NSTextField) SetEditable(editable bool) {
-	C.TextField_SetEditable(f.Ptr(), C.int(internal.BoolToInt(editable)))
+	C.TextField_SetEditable(f.Ptr(), C.bool(editable))
 }
 
 func (f *NSTextField) SetSelectable(selectable bool) {
-	C.TextField_SetSelectable(f.Ptr(), C.int(internal.BoolToInt(selectable)))
+	C.TextField_SetSelectable(f.Ptr(), C.bool(selectable))
 }
 
 func (f *NSTextField) SetBezeled(bezeled bool) {
-	C.TextField_SetBezeled(f.Ptr(), C.int(internal.BoolToInt(bezeled)))
+	C.TextField_SetBezeled(f.Ptr(), C.bool(bezeled))
 }
 
 func (f *NSTextField) TextColor() c.Color {

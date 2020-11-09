@@ -68,7 +68,7 @@ type NSWindow struct {
 }
 
 func (w *NSWindow) SetFrame(rect geometry.Rect, display bool) {
-	C.Window_SetFrame(w.Ptr(), toNSRect(rect), C.int(internal.BoolToInt(display)))
+	C.Window_SetFrame(w.Ptr(), toNSRect(rect), C.bool(display))
 }
 
 func (w *NSWindow) Frame() geometry.Rect {

@@ -6,7 +6,6 @@ package indicator
 import "C"
 import (
 	"github.com/hsiafan/cocoa/appkit/view"
-	"github.com/hsiafan/cocoa/internal"
 )
 
 // ProgressIndicator wrap cocoa NSProcessIndicator
@@ -79,20 +78,19 @@ func (indicator *NSProgressIndicator) IncrementBy(inc float64) {
 }
 
 func (indicator *NSProgressIndicator) IsIndeterminate() bool {
-	value := C.ProgressIndicator_IsIndeterminate(indicator.Ptr())
-	return value == 1
+	return bool(C.ProgressIndicator_IsIndeterminate(indicator.Ptr()))
 }
 
 func (indicator *NSProgressIndicator) SetIndeterminate(value bool) {
-	C.ProgressIndicator_SetIndeterminate(indicator.Ptr(), C.int(internal.BoolToInt(value)))
+	C.ProgressIndicator_SetIndeterminate(indicator.Ptr(), C.bool(value))
 }
 
 func (indicator *NSProgressIndicator) SetDisplayedWhenStopped(value bool) {
-	C.ProgressIndicator_SetDisplayedWhenStopped(indicator.Ptr(), C.int(internal.BoolToInt(value)))
+	C.ProgressIndicator_SetDisplayedWhenStopped(indicator.Ptr(), C.bool(value))
 }
 
 func (indicator *NSProgressIndicator) SetHidden(hidden bool) {
-	C.ProgressIndicator_SetHidden(indicator.Ptr(), C.int(internal.BoolToInt(hidden)))
+	C.ProgressIndicator_SetHidden(indicator.Ptr(), C.bool(hidden))
 }
 
 func (indicator *NSProgressIndicator) Remove() {

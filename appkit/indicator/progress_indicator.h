@@ -1,4 +1,5 @@
 #import <stdlib.h>
+#import <stdbool.h>
 
 void* ProgressIndicator_New();
 
@@ -16,12 +17,12 @@ void ProgressIndicator_IncrementBy(void* ptr, double value);
 
 double ProgressIndicator_Value(void* ptr);
 
-void ProgressIndicator_SetIndeterminate(void* ptr, int value);
+void ProgressIndicator_SetIndeterminate(void* ptr, bool value);
 
-int ProgressIndicator_IsIndeterminate(void* ptr);
+bool ProgressIndicator_IsIndeterminate(void* ptr);
 
-void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, int value);
+void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool value);
 
-void ProgressIndicator_SetHidden(void* ptr, int hidden);
+void ProgressIndicator_SetHidden(void* ptr, bool hidden);
 
 void ProgressIndicator_Remove(void* ptr);

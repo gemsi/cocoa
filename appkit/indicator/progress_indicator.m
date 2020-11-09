@@ -54,28 +54,25 @@ double ProgressIndicator_Value(void* ptr) {
     return [indicator doubleValue];
 }
 
-void ProgressIndicator_SetIndeterminate(void* ptr, int value) {
+void ProgressIndicator_SetIndeterminate(void* ptr, bool value) {
     NSProgressIndicator* indicator = (NSProgressIndicator*)ptr;
-    [indicator setIndeterminate: value > 0?YES:NO];
+    [indicator setIndeterminate: value];
 }
 
-int ProgressIndicator_IsIndeterminate(void* ptr) {
+bool ProgressIndicator_IsIndeterminate(void* ptr) {
     NSProgressIndicator* indicator = (NSProgressIndicator*)ptr;
-    if ([indicator isIndeterminate]) {
-        return 1;
-    }
-    return 0;
+    return [indicator isIndeterminate];
 }
 
-void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, int value) {
+void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool value) {
     NSProgressIndicator* indicator = (NSProgressIndicator*)ptr;
-    [indicator setDisplayedWhenStopped: value > 0?YES:NO];
+    [indicator setDisplayedWhenStopped: value];
 }
 
 
-void ProgressIndicator_SetHidden(void* ptr, int hidden) {
+void ProgressIndicator_SetHidden(void* ptr, bool hidden) {
     NSProgressIndicator* indicator = (NSProgressIndicator*)ptr;
-    indicator.hidden = hidden > 0?YES:NO;
+    indicator.hidden = hidden;
 }
 
 void ProgressIndicator_Remove(void* ptr) {

@@ -6,6 +6,7 @@ import (
 	"github.com/hsiafan/cocoa/appkit/color"
 	"github.com/hsiafan/cocoa/appkit/indicator"
 	"github.com/hsiafan/cocoa/appkit/textfield"
+	"github.com/hsiafan/cocoa/appkit/textview"
 	"github.com/hsiafan/cocoa/appkit/window"
 	"github.com/hsiafan/cocoa/core/dispatch"
 	"github.com/hsiafan/cocoa/foundation/geometry"
@@ -39,7 +40,7 @@ func main() {
 	})
 	w.AddView(quitBtn)
 
-	// text
+	// text field
 	tf := textfield.New()
 	tf.SetFrame(geometry.MkRect(10, 100, 150, 25))
 	w.AddView(tf)
@@ -82,6 +83,10 @@ func main() {
 			progressIndicator.StartAnimation()
 		})
 	}()
+
+	// text view
+	tv := textview.New(geometry.MkRect(10, 200, 200, 30))
+	w.AddView(tv)
 
 	w.MakeKeyAndOrderFront()
 	w.Center()

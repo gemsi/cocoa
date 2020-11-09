@@ -45,24 +45,24 @@ void* SecureTextField_New(long id) {
     return (void*)textField;
 }
 
-void TextField_SetBezeled(void* ptr, int bezeled) {
+void TextField_SetBezeled(void* ptr, bool bezeled) {
     NSTextField* textField = (NSTextField*)ptr;
-    [textField setBezeled:bezeled==0?NO:YES];
+    [textField setBezeled:bezeled];
 }
 
-void TextField_SetEditable(void* ptr, int editable) {
+void TextField_SetEditable(void* ptr, bool editable) {
     NSTextField* textField = (NSTextField*)ptr;
-    [textField setEditable:editable==0?NO:YES];
+    [textField setEditable:editable];
 }
 
-void TextField_SetSelectable(void* ptr, int selectable) {
+void TextField_SetSelectable(void* ptr, bool selectable) {
     NSTextField* textField = (NSTextField*)ptr;
-    [textField setSelectable:selectable==0?NO:YES];
+    [textField setSelectable:selectable];
 }
 
-void TextField_SetDrawsBackground(void* ptr, int draws) {
+void TextField_SetDrawsBackground(void* ptr, bool draws) {
     NSTextField* textField = (NSTextField*)ptr;
-    [textField setDrawsBackground:draws==0?NO:YES];
+    [textField setDrawsBackground:draws];
 }
 
 void* TextField_TextColor(void* ptr) {
