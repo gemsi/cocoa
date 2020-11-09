@@ -4,9 +4,11 @@ import (
 	"github.com/hsiafan/cocoa/appkit/application"
 	"github.com/hsiafan/cocoa/appkit/button"
 	"github.com/hsiafan/cocoa/appkit/color"
-	"github.com/hsiafan/cocoa/appkit/indicator"
+	"github.com/hsiafan/cocoa/appkit/progressindicator"
+	"github.com/hsiafan/cocoa/appkit/scrollview"
 	"github.com/hsiafan/cocoa/appkit/textfield"
 	"github.com/hsiafan/cocoa/appkit/textview"
+	"github.com/hsiafan/cocoa/appkit/view"
 	"github.com/hsiafan/cocoa/appkit/window"
 	"github.com/hsiafan/cocoa/core/dispatch"
 	"github.com/hsiafan/cocoa/foundation/geometry"
@@ -64,7 +66,7 @@ func main() {
 	w.AddView(stf)
 
 	// progress indicator
-	progressIndicator := indicator.New()
+	progressIndicator := progressindicator.New()
 	progressIndicator.SetFrame(geometry.MkRect(10, 70, 350, 25))
 	progressIndicator.SetLimits(0, 1)
 	progressIndicator.SetIndeterminate(false)
@@ -84,9 +86,16 @@ func main() {
 		})
 	}()
 
-	// text view
-	tv := textview.New(geometry.MkRect(10, 200, 200, 30))
-	w.AddView(tv)
+	// text view & scroll view
+	// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextUILayer/Tasks/TextInScrollView.html
+	tv := textview.New(geometry.MkRect(10, 200, 400, 400))
+	sv := scrollview.New(geometry.MkRect(10, 200, 200, 30))
+	sv.SetHasHorizontalScroller(false)
+	sv.SetHasVerticalScroller(true)
+	sv.SetBorderType(view.NoBorder)
+	sv.SetDocumentView(tv)
+	sv.SetAutoresizingMask(view.ViewWidthSizable | view.ViewHeightSizable)
+	w.AddView(sv)
 
 	w.MakeKeyAndOrderFront()
 	w.Center()

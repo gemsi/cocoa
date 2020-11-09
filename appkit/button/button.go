@@ -13,7 +13,7 @@ import (
 	"github.com/hsiafan/cocoa/appkit/control"
 )
 
-type BezelStyle uint32
+type BezelStyle uint64
 
 const (
 	BezelStyleRounded           BezelStyle = 1
@@ -50,7 +50,7 @@ type NSButton struct {
 }
 
 func (btn *NSButton) SetBezelStyle(style BezelStyle) {
-	C.Button_SetBezelStyle(btn.Ptr(), C.uint(style))
+	C.Button_SetBezelStyle(btn.Ptr(), C.ulong(style))
 }
 
 var resources = internal.NewResourceRegistry()

@@ -1,4 +1,4 @@
-package indicator
+package progressindicator
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
@@ -39,12 +39,12 @@ type ProgressIndicator interface {
 
 var _ ProgressIndicator = (*NSProgressIndicator)(nil)
 
-// ProgressIndicator represents a indicator control that can trigger actions.
+// NSProgressIndicator represents a indicator control that can trigger actions.
 type NSProgressIndicator struct {
 	view.NSView
 }
 
-// New constructs a new ProgressIndicator
+// New create a new progressindicator.ProgressIndicator
 func New() ProgressIndicator {
 	ptr := C.ProgressIndicator_New()
 	indicator := &NSProgressIndicator{

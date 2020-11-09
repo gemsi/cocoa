@@ -80,9 +80,20 @@ func (r *Rect) Height() float64 {
 	return float64(r.size.height)
 }
 
+// MkRect create a Rect struct
 func MkRect(x, y, width, height float64) Rect {
 	return Rect{
 		C.NSPoint(Point{C.double(x), C.double(y)}),
 		C.NSSize(Size{C.double(width), C.double(height)}),
 	}
+}
+
+// MkSize create a Size struct
+func MkSize(width, height float64) Size {
+	return Size{C.double(width), C.double(height)}
+}
+
+// MkPoint create a Point struct
+func MkPoint(x, y float64) Point {
+	return Point{C.double(x), C.double(y)}
 }

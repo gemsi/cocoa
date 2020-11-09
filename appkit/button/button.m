@@ -39,7 +39,7 @@ void Button_SizeToFit(void* ptr) {
     [button sizeToFit];
 }
 
-void Button_SetBezelStyle(void* ptr, unsigned int style) {
+void Button_SetBezelStyle(void* ptr, unsigned long style) {
     NSButton* button = (NSButton*)ptr;
     [button setBezelStyle:style];
 }

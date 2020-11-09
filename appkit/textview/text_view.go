@@ -7,7 +7,6 @@ import "C"
 import (
 	"github.com/hsiafan/cocoa/appkit/text"
 	"github.com/hsiafan/cocoa/foundation/geometry"
-	"github.com/hsiafan/cocoa/foundation/notification"
 	"github.com/hsiafan/cocoa/foundation/object"
 	"github.com/hsiafan/cocoa/internal"
 	"unsafe"
@@ -22,9 +21,6 @@ var _ TextView = (*NSTextView)(nil)
 
 type NSTextView struct {
 	text.NSText
-	textDidChange     func(notification.Notification)
-	textDidEndEditing func(notification.Notification)
-	onEnterKey        func(sender object.Object)
 }
 
 var resources = internal.NewResourceRegistry()
