@@ -5,33 +5,33 @@ package notification
 // #import "notification.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/foundation/object"
 	"unsafe"
 )
 
 // Notification wrap cocoa NSNotification
 type Notification interface {
-	foundation.Object
+	object.Object
 	// Name return the notification message name
 	Name() string
 	// Object return the sender of this notification
-	Object() foundation.Object
+	Object() object.Object
 }
 
 var _ Notification = (*NSNotification)(nil)
 
 // Make create new Notification, from native pointer of NSNotification, and the sender object
-func Make(ptr unsafe.Pointer, object foundation.Object) *NSNotification {
+func Make(ptr unsafe.Pointer, obj object.Object) *NSNotification {
 	return &NSNotification{
-		NSObject: *foundation.MakeObject(ptr),
-		object:   object,
+		NSObject: *object.Make(ptr),
+		object:   obj,
 	}
 }
 
 type NSNotification struct {
-	foundation.NSObject
+	object.NSObject
 	name   *string
-	object foundation.Object
+	object object.Object
 }
 
 func (n *NSNotification) Name() string {
@@ -43,6 +43,6 @@ func (n *NSNotification) Name() string {
 	return *n.name
 }
 
-func (n *NSNotification) Object() foundation.Object {
+func (n *NSNotification) Object() object.Object {
 	return n.object
 }

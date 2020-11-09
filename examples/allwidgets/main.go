@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/hsiafan/cocoa"
-	"github.com/hsiafan/cocoa/application"
-	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/appkit/application"
+	"github.com/hsiafan/cocoa/appkit/button"
+	"github.com/hsiafan/cocoa/appkit/color"
+	"github.com/hsiafan/cocoa/appkit/indicator"
+	"github.com/hsiafan/cocoa/appkit/textfield"
+	"github.com/hsiafan/cocoa/appkit/window"
+	"github.com/hsiafan/cocoa/core/dispatch"
 	"github.com/hsiafan/cocoa/foundation/geometry"
 	"github.com/hsiafan/cocoa/foundation/notification"
-	"github.com/hsiafan/cocoa/graphics/color"
-	"github.com/hsiafan/cocoa/widgets/button"
-	"github.com/hsiafan/cocoa/widgets/indicator"
-	"github.com/hsiafan/cocoa/widgets/textfield"
-	"github.com/hsiafan/cocoa/widgets/window"
+	"github.com/hsiafan/cocoa/foundation/object"
 	"runtime"
 	"time"
 )
@@ -34,7 +34,7 @@ func main() {
 	quitBtn := button.New()
 	quitBtn.SetFrame(geometry.MkRect(10, 130, 80, 25))
 	quitBtn.SetTitle("Quit")
-	quitBtn.SetAction(func(sender foundation.Object) {
+	quitBtn.SetAction(func(sender object.Object) {
 		application.Terminate()
 	})
 	w.AddView(quitBtn)
@@ -49,11 +49,11 @@ func main() {
 	label.SetFrame(geometry.MkRect(170, 100, 150, 25))
 	w.AddView(label)
 	tf.TextDidChange(func(notification.Notification) {
-		cocoa.RunOnUIThread(func() {
+		dispatch.MainQueueAsync(func() {
 			label.SetStringValue(tf.StringValue())
 		})
 	})
-	btn.SetAction(func(sender foundation.Object) {
+	btn.SetAction(func(sender object.Object) {
 		label.SetTextColor(color.RedColor())
 	})
 
@@ -69,16 +69,16 @@ func main() {
 	progressIndicator.SetIndeterminate(false)
 	w.AddView(progressIndicator)
 	go func() {
-		cocoa.RunOnUIThread(func() {
+		dispatch.MainQueueAsync(func() {
 			progressIndicator.StartAnimation()
 		})
 		for i := 0; i < 10; i++ {
 			time.Sleep(1 * time.Second)
-			cocoa.RunOnUIThread(func() {
+			dispatch.MainQueueAsync(func() {
 				progressIndicator.SetValue(0.1 * float64(i))
 			})
 		}
-		cocoa.RunOnUIThread(func() {
+		dispatch.MainQueueAsync(func() {
 			progressIndicator.StartAnimation()
 		})
 	}()

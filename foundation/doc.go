@@ -1,4 +1,4 @@
 /*
-base package contains basic object/definition in coco foundation lib
+Necessary go binding for Foundation framework.
 */
 package foundation
