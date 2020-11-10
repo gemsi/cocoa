@@ -49,7 +49,7 @@ func main() {
 		})
 	})
 	btn.SetAction(func(sender foundation.Object) {
-		label.SetTextColor(color.RedColor())
+		label.SetTextColor(color.Red)
 	})
 
 	// password

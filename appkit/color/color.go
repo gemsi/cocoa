@@ -33,292 +33,118 @@ func New(red, green, blue float64, alpha float64) Color {
 	return Make(ptr)
 }
 
-func BlackColor() Color {
-	ptr := C.Color_BlackColor()
-	return Make(ptr)
-}
+var Black = Make(C.Color_BlackColor())
 
-func DarkGrayColor() Color {
-	ptr := C.Color_DarkGrayColor()
-	return Make(ptr)
-}
+var DarkGray = Make(C.Color_DarkGrayColor())
 
-func LightGrayColor() Color {
-	ptr := C.Color_LightGrayColor()
-	return Make(ptr)
-}
+var LightGray = Make(C.Color_LightGrayColor())
 
-func WhiteColor() Color {
-	ptr := C.Color_WhiteColor()
-	return Make(ptr)
-}
+var White = Make(C.Color_WhiteColor())
 
-func GrayColor() Color {
-	ptr := C.Color_GrayColor()
-	return Make(ptr)
-}
+var Gray = Make(C.Color_GrayColor())
 
-func RedColor() Color {
-	ptr := C.Color_RedColor()
-	return Make(ptr)
-}
+var Red = Make(C.Color_RedColor())
 
-func GreenColor() Color {
-	ptr := C.Color_GreenColor()
-	return Make(ptr)
-}
+var Green = Make(C.Color_GreenColor())
 
-func BlueColor() Color {
-	ptr := C.Color_BlueColor()
-	return Make(ptr)
-}
+var Blue = Make(C.Color_BlueColor())
 
-func CyanColor() Color {
-	ptr := C.Color_CyanColor()
-	return Make(ptr)
-}
+var Cyan = Make(C.Color_CyanColor())
 
-func YellowColor() Color {
-	ptr := C.Color_YellowColor()
-	return Make(ptr)
-}
+var Yellow = Make(C.Color_YellowColor())
 
-func MagentaColor() Color {
-	ptr := C.Color_MagentaColor()
-	return Make(ptr)
-}
+var Magenta = Make(C.Color_MagentaColor())
 
-func OrangeColor() Color {
-	ptr := C.Color_OrangeColor()
-	return Make(ptr)
-}
+var Orange = Make(C.Color_OrangeColor())
 
-func PurpleColor() Color {
-	ptr := C.Color_PurpleColor()
-	return Make(ptr)
-}
+var Purple = Make(C.Color_PurpleColor())
 
-func BrownColor() Color {
-	ptr := C.Color_BrownColor()
-	return Make(ptr)
-}
+var Brown = Make(C.Color_BrownColor())
 
-func ClearColor() Color {
-	ptr := C.Color_ClearColor()
-	return Make(ptr)
-}
+var Clear = Make(C.Color_ClearColor())
 
-func LabelColor() Color {
-	ptr := C.Color_LabelColor()
-	return Make(ptr)
-}
+var Label = Make(C.Color_LabelColor())
 
-func SecondaryLabelColor() Color {
-	ptr := C.Color_SecondaryLabelColor()
-	return Make(ptr)
-}
+var SecondaryLabel = Make(C.Color_SecondaryLabelColor())
 
-func TertiaryLabelColor() Color {
-	ptr := C.Color_TertiaryLabelColor()
-	return Make(ptr)
-}
+var TertiaryLabel = Make(C.Color_TertiaryLabelColor())
 
-func QuaternaryLabelColor() Color {
-	ptr := C.Color_QuaternaryLabelColor()
-	return Make(ptr)
-}
+var QuaternaryLabel = Make(C.Color_QuaternaryLabelColor())
 
-func LinkColor() Color {
-	ptr := C.Color_LinkColor()
-	return Make(ptr)
-}
+var Link = Make(C.Color_LinkColor())
 
-func PlaceholderTextColor() Color {
-	ptr := C.Color_PlaceholderTextColor()
-	return Make(ptr)
-}
+var PlaceholderText = Make(C.Color_PlaceholderTextColor())
 
-func WindowFrameTextColor() Color {
-	ptr := C.Color_WindowFrameTextColor()
-	return Make(ptr)
-}
+var WindowFrameText = Make(C.Color_WindowFrameTextColor())
 
-func SelectedMenuItemTextColor() Color {
-	ptr := C.Color_SelectedMenuItemTextColor()
-	return Make(ptr)
-}
+var SelectedMenuItemText = Make(C.Color_SelectedMenuItemTextColor())
 
-func AlternateSelectedControlTextColor() Color {
-	ptr := C.Color_AlternateSelectedControlTextColor()
-	return Make(ptr)
-}
+var AlternateSelectedControlText = Make(C.Color_AlternateSelectedControlTextColor())
 
-func HeaderTextColor() Color {
-	ptr := C.Color_HeaderTextColor()
-	return Make(ptr)
-}
+var HeaderText = Make(C.Color_HeaderTextColor())
 
-func SeparatorColor() Color {
-	ptr := C.Color_SeparatorColor()
-	return Make(ptr)
-}
+var Separator = Make(C.Color_SeparatorColor())
 
-func GridColor() Color {
-	ptr := C.Color_GridColor()
-	return Make(ptr)
-}
+var Grid = Make(C.Color_GridColor())
 
-func WindowBackgroundColor() Color {
-	ptr := C.Color_WindowBackgroundColor()
-	return Make(ptr)
-}
+var WindowBackground = Make(C.Color_WindowBackgroundColor())
 
-func UnderPageBackgroundColor() Color {
-	ptr := C.Color_UnderPageBackgroundColor()
-	return Make(ptr)
-}
+var UnderPageBackground = Make(C.Color_UnderPageBackgroundColor())
 
-func ControlBackgroundColor() Color {
-	ptr := C.Color_ControlBackgroundColor()
-	return Make(ptr)
-}
+var ControlBackground = Make(C.Color_ControlBackgroundColor())
 
-func SelectedContentBackgroundColor() Color {
-	ptr := C.Color_SelectedContentBackgroundColor()
-	return Make(ptr)
-}
+var SelectedContentBackground = Make(C.Color_SelectedContentBackgroundColor())
 
-func UnemphasizedSelectedContentBackgroundColor() Color {
-	ptr := C.Color_UnemphasizedSelectedContentBackgroundColor()
-	return Make(ptr)
-}
+var UnemphasizedSelectedContentBackground = Make(C.Color_UnemphasizedSelectedContentBackgroundColor())
 
-func FindHighlightColor() Color {
-	ptr := C.Color_FindHighlightColor()
-	return Make(ptr)
-}
+var FindHighlight = Make(C.Color_FindHighlightColor())
 
-func TextColor() Color {
-	ptr := C.Color_TextColor()
-	return Make(ptr)
-}
+var Text = Make(C.Color_TextColor())
 
-func TextBackgroundColor() Color {
-	ptr := C.Color_TextBackgroundColor()
-	return Make(ptr)
-}
+var TextBackground = Make(C.Color_TextBackgroundColor())
 
-func SelectedTextColor() Color {
-	ptr := C.Color_SelectedTextColor()
-	return Make(ptr)
-}
+var SelectedText = Make(C.Color_SelectedTextColor())
 
-func SelectedTextBackgroundColor() Color {
-	ptr := C.Color_SelectedTextBackgroundColor()
-	return Make(ptr)
-}
+var SelectedTextBackground = Make(C.Color_SelectedTextBackgroundColor())
 
-func UnemphasizedSelectedTextBackgroundColor() Color {
-	ptr := C.Color_UnemphasizedSelectedTextBackgroundColor()
-	return Make(ptr)
-}
+var UnemphasizedSelectedTextBackground = Make(C.Color_UnemphasizedSelectedTextBackgroundColor())
 
-func UnemphasizedSelectedTextColor() Color {
-	ptr := C.Color_UnemphasizedSelectedTextColor()
-	return Make(ptr)
-}
+var UnemphasizedSelectedText = Make(C.Color_UnemphasizedSelectedTextColor())
 
-func ControlColor() Color {
-	ptr := C.Color_ControlColor()
-	return Make(ptr)
-}
+var Control = Make(C.Color_ControlColor())
 
-func ControlTextColor() Color {
-	ptr := C.Color_ControlTextColor()
-	return Make(ptr)
-}
+var ControlText = Make(C.Color_ControlTextColor())
 
-func SelectedControlColor() Color {
-	ptr := C.Color_SelectedControlColor()
-	return Make(ptr)
-}
+var SelectedControl = Make(C.Color_SelectedControlColor())
 
-func SelectedControlTextColor() Color {
-	ptr := C.Color_SelectedControlTextColor()
-	return Make(ptr)
-}
+var SelectedControlText = Make(C.Color_SelectedControlTextColor())
 
-func DisabledControlTextColor() Color {
-	ptr := C.Color_DisabledControlTextColor()
-	return Make(ptr)
-}
+var DisabledControlText = Make(C.Color_DisabledControlTextColor())
 
-func KeyboardFocusIndicatorColor() Color {
-	ptr := C.Color_KeyboardFocusIndicatorColor()
-	return Make(ptr)
-}
+var KeyboardFocusIndicator = Make(C.Color_KeyboardFocusIndicatorColor())
 
-func ScrubberTexturedBackgroundColor() Color {
-	ptr := C.Color_ScrubberTexturedBackgroundColor()
-	return Make(ptr)
-}
+var ScrubberTexturedBackground = Make(C.Color_ScrubberTexturedBackgroundColor())
 
-func SystemRedColor() Color {
-	ptr := C.Color_SystemRedColor()
-	return Make(ptr)
-}
+var SystemRed = Make(C.Color_SystemRedColor())
 
-func SystemGreenColor() Color {
-	ptr := C.Color_SystemGreenColor()
-	return Make(ptr)
-}
+var SystemGreen = Make(C.Color_SystemGreenColor())
 
-func SystemBlueColor() Color {
-	ptr := C.Color_SystemBlueColor()
-	return Make(ptr)
-}
+var SystemBlue = Make(C.Color_SystemBlueColor())
 
-func SystemOrangeColor() Color {
-	ptr := C.Color_SystemOrangeColor()
-	return Make(ptr)
-}
+var SystemOrange = Make(C.Color_SystemOrangeColor())
 
-func SystemYellowColor() Color {
-	ptr := C.Color_SystemYellowColor()
-	return Make(ptr)
-}
+var SystemYellow = Make(C.Color_SystemYellowColor())
 
-func SystemBrownColor() Color {
-	ptr := C.Color_SystemBrownColor()
-	return Make(ptr)
-}
+var SystemBrown = Make(C.Color_SystemBrownColor())
 
-func SystemPinkColor() Color {
-	ptr := C.Color_SystemPinkColor()
-	return Make(ptr)
-}
+var SystemPink = Make(C.Color_SystemPinkColor())
 
-func SystemPurpleColor() Color {
-	ptr := C.Color_SystemPurpleColor()
-	return Make(ptr)
-}
+var SystemPurple = Make(C.Color_SystemPurpleColor())
 
-func SystemGrayColor() Color {
-	ptr := C.Color_SystemGrayColor()
-	return Make(ptr)
-}
+var SystemGray = Make(C.Color_SystemGrayColor())
 
-func ControlAccentColor() Color {
-	ptr := C.Color_ControlAccentColor()
-	return Make(ptr)
-}
+var ControlAccent = Make(C.Color_ControlAccentColor())
 
-func HighlightColor() Color {
-	ptr := C.Color_HighlightColor()
-	return Make(ptr)
-}
+var Highlight = Make(C.Color_HighlightColor())
 
-func ShadowColor() Color {
-	ptr := C.Color_ShadowColor()
-	return Make(ptr)
-}
+var Shadow = Make(C.Color_ShadowColor())
