@@ -5,13 +5,13 @@ package color
 // #import "color.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/foundation/object"
+	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
 
 // Color is wrap for cocoa NSColor
 type Color interface {
-	object.Object
+	foundation.Object
 }
 
 var _ Color = (*NSColor)(nil)
@@ -19,12 +19,12 @@ var _ Color = (*NSColor)(nil)
 // Make create a Color from native pointer
 func Make(ptr unsafe.Pointer) *NSColor {
 	return &NSColor{
-		NSObject: *object.Make(ptr),
+		NSObject: *foundation.MakeObject(ptr),
 	}
 }
 
 type NSColor struct {
-	object.NSObject
+	foundation.NSObject
 }
 
 // New Creates a color using the given opacity value and RGB components

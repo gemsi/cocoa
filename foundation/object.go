@@ -1,4 +1,4 @@
-package object
+package foundation
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
@@ -30,6 +30,6 @@ func (o *NSObject) Ptr() unsafe.Pointer {
 	return o.ptr
 }
 
-func Make(ptr unsafe.Pointer) *NSObject {
+func MakeObject(ptr unsafe.Pointer) *NSObject {
 	return &NSObject{ptr}
 }

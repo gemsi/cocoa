@@ -1,15 +1,15 @@
-package event
+package widget
 
 import (
-	"github.com/hsiafan/cocoa/foundation/object"
+	"github.com/hsiafan/cocoa/foundation"
 )
 
 type Event interface {
-	object.Object
+	foundation.Object
 }
 
 var _ Event = (*NSEvent)(nil)
 
 type NSEvent struct {
-	object.NSObject
+	foundation.NSObject
 }

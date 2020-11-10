@@ -2,18 +2,10 @@ package main
 
 import (
 	"github.com/hsiafan/cocoa/appkit/application"
-	"github.com/hsiafan/cocoa/appkit/button"
 	"github.com/hsiafan/cocoa/appkit/color"
-	"github.com/hsiafan/cocoa/appkit/progressindicator"
-	"github.com/hsiafan/cocoa/appkit/scrollview"
-	"github.com/hsiafan/cocoa/appkit/textfield"
-	"github.com/hsiafan/cocoa/appkit/textview"
-	"github.com/hsiafan/cocoa/appkit/view"
-	"github.com/hsiafan/cocoa/appkit/window"
+	"github.com/hsiafan/cocoa/appkit/widget"
 	"github.com/hsiafan/cocoa/core/dispatch"
-	"github.com/hsiafan/cocoa/foundation/geometry"
-	"github.com/hsiafan/cocoa/foundation/notification"
-	"github.com/hsiafan/cocoa/foundation/object"
+	"github.com/hsiafan/cocoa/foundation"
 	"runtime"
 	"time"
 )
@@ -25,49 +17,49 @@ func init() {
 
 func main() {
 	application.Init()
-	w := window.New(geometry.MkRect(150, 150, 600, 400))
+	w := widget.NewWindow(foundation.MkRect(150, 150, 600, 400))
 	w.SetTitle("Test widgets")
 
 	// button
-	btn := button.New()
+	btn := widget.NewButton()
 	btn.SetTitle("click me")
-	btn.SetFrame(geometry.MkRect(10, 160, 80, 25))
+	btn.SetFrame(foundation.MkRect(10, 160, 80, 25))
 	w.AddView(btn)
 
-	quitBtn := button.New()
-	quitBtn.SetFrame(geometry.MkRect(10, 130, 80, 25))
+	quitBtn := widget.NewButton()
+	quitBtn.SetFrame(foundation.MkRect(10, 130, 80, 25))
 	quitBtn.SetTitle("Quit")
-	quitBtn.SetAction(func(sender object.Object) {
+	quitBtn.SetAction(func(sender foundation.Object) {
 		application.Terminate()
 	})
 	w.AddView(quitBtn)
 
 	// text field
-	tf := textfield.New()
-	tf.SetFrame(geometry.MkRect(10, 100, 150, 25))
+	tf := widget.NewTextField()
+	tf.SetFrame(foundation.MkRect(10, 100, 150, 25))
 	w.AddView(tf)
 
 	// label
-	label := textfield.NewLabel()
-	label.SetFrame(geometry.MkRect(170, 100, 150, 25))
+	label := widget.NewLabel()
+	label.SetFrame(foundation.MkRect(170, 100, 150, 25))
 	w.AddView(label)
-	tf.TextDidChange(func(notification.Notification) {
+	tf.TextDidChange(func(foundation.Notification) {
 		dispatch.MainQueueAsync(func() {
 			label.SetStringValue(tf.StringValue())
 		})
 	})
-	btn.SetAction(func(sender object.Object) {
+	btn.SetAction(func(sender foundation.Object) {
 		label.SetTextColor(color.RedColor())
 	})
 
 	// password
-	stf := textfield.NewSecure()
-	stf.SetFrame(geometry.MkRect(340, 100, 150, 25))
+	stf := widget.NewSecure()
+	stf.SetFrame(foundation.MkRect(340, 100, 150, 25))
 	w.AddView(stf)
 
 	// progress indicator
-	progressIndicator := progressindicator.New()
-	progressIndicator.SetFrame(geometry.MkRect(10, 70, 350, 25))
+	progressIndicator := widget.NewProgressIndicator()
+	progressIndicator.SetFrame(foundation.MkRect(10, 70, 350, 25))
 	progressIndicator.SetLimits(0, 1)
 	progressIndicator.SetIndeterminate(false)
 	w.AddView(progressIndicator)
@@ -88,13 +80,13 @@ func main() {
 
 	// text view & scroll view
 	// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextUILayer/Tasks/TextInScrollView.html
-	tv := textview.New(geometry.MkRect(10, 200, 400, 400))
-	sv := scrollview.New(geometry.MkRect(10, 200, 200, 30))
+	tv := widget.NewTextView(foundation.MkRect(10, 200, 400, 400))
+	sv := widget.NewScrollView(foundation.MkRect(10, 200, 200, 30))
 	sv.SetHasHorizontalScroller(false)
 	sv.SetHasVerticalScroller(true)
-	sv.SetBorderType(view.NoBorder)
+	sv.SetBorderType(widget.NoBorder)
 	sv.SetDocumentView(tv)
-	sv.SetAutoresizingMask(view.ViewWidthSizable | view.ViewHeightSizable)
+	sv.SetAutoresizingMask(widget.ViewWidthSizable | widget.ViewHeightSizable)
 	w.AddView(sv)
 
 	w.MakeKeyAndOrderFront()

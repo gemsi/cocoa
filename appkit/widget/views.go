@@ -1,4 +1,4 @@
-package view
+package widget
 
 // BorderType specify the type of a view’s border.
 type BorderType uint64

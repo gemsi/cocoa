@@ -1,4 +1,4 @@
-package textfield
+package widget
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
@@ -6,16 +6,13 @@ package textfield
 import "C"
 import (
 	c "github.com/hsiafan/cocoa/appkit/color"
-	"github.com/hsiafan/cocoa/appkit/control"
-	"github.com/hsiafan/cocoa/foundation/notification"
-	"github.com/hsiafan/cocoa/foundation/object"
-	"github.com/hsiafan/cocoa/internal"
+	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
 
 // TextField wrap cocoa NSTextField
 type TextField interface {
-	control.Control
+	Control
 	SetBezeled(bezeled bool)
 	SetDrawsBackground(draws bool)
 	// SetEditable set if this field can be edited
@@ -31,13 +28,13 @@ type TextField interface {
 	// SetBackgroundColor set background color
 	SetBackgroundColor(color c.Color)
 	// TextDidChange set handler for text change
-	TextDidChange(handler func(notification.Notification))
+	TextDidChange(handler func(foundation.Notification))
 	// TextDidEndEditing set handler for text edit finished
-	TextDidEndEditing(handler func(notification.Notification))
+	TextDidEndEditing(handler func(foundation.Notification))
 
-	getTextDidChange() func(notification.Notification)
-	getTextDidEndEditing() func(notification.Notification)
-	getOnEnterKey() func(sender object.Object)
+	getTextDidChange() func(foundation.Notification)
+	getTextDidEndEditing() func(foundation.Notification)
+	getOnEnterKey() func(sender foundation.Object)
 }
 
 // SecureTextField wrap for NSSecureTextField
@@ -48,30 +45,28 @@ type SecureTextField interface {
 var _ TextField = (*NSTextField)(nil)
 
 type NSTextField struct {
-	control.NSControl
-	textDidChange     func(notification.Notification)
-	textDidEndEditing func(notification.Notification)
-	onEnterKey        func(sender object.Object)
+	NSControl
+	textDidChange     func(foundation.Notification)
+	textDidEndEditing func(foundation.Notification)
+	onEnterKey        func(sender foundation.Object)
 }
 
 type NSSecureTextField struct {
 	NSTextField
 }
 
-var resources = internal.NewResourceRegistry()
-
-// New create new TextField
-func New() TextField {
+// NewTextField create new TextField
+func NewTextField() TextField {
 	id := resources.NextId()
 	ptr := C.TextField_New(C.long(id))
 
 	textField := &NSTextField{
-		NSControl: *control.Make(ptr),
+		NSControl: *MakeControl(ptr),
 	}
 
 	resources.Store(id, textField)
 
-	object.AddDeallocHook(textField, func() {
+	foundation.AddDeallocHook(textField, func() {
 		resources.Delete(id)
 	})
 
@@ -85,34 +80,34 @@ func NewSecure() SecureTextField {
 
 	textField := &NSSecureTextField{
 		NSTextField: NSTextField{
-			NSControl: *control.Make(ptr),
+			NSControl: *MakeControl(ptr),
 		},
 	}
 
 	resources.Store(id, textField)
 
-	object.AddDeallocHook(textField, func() {
+	foundation.AddDeallocHook(textField, func() {
 		resources.Delete(id)
 	})
 
 	return textField
 }
 
-func (f *NSTextField) getTextDidChange() func(notification.Notification) {
+func (f *NSTextField) getTextDidChange() func(foundation.Notification) {
 	return f.textDidChange
 }
 
-func (f *NSTextField) getTextDidEndEditing() func(notification.Notification) {
+func (f *NSTextField) getTextDidEndEditing() func(foundation.Notification) {
 	return f.textDidEndEditing
 }
 
-func (f *NSTextField) getOnEnterKey() func(sender object.Object) {
+func (f *NSTextField) getOnEnterKey() func(sender foundation.Object) {
 	return f.onEnterKey
 }
 
 // NewLabel create a text field, which looks like a Label
 func NewLabel() TextField {
-	tf := New()
+	tf := NewTextField()
 	tf.SetBezeled(false)
 	tf.SetDrawsBackground(false)
 	tf.SetEditable(false)
@@ -154,15 +149,15 @@ func (f *NSTextField) SetBackgroundColor(color c.Color) {
 	C.TextField_SetBackgroundColor(f.Ptr(), color.Ptr())
 }
 
-func (f *NSTextField) TextDidChange(handler func(notification.Notification)) {
+func (f *NSTextField) TextDidChange(handler func(foundation.Notification)) {
 	f.textDidChange = handler
 }
 
-func (f *NSTextField) TextDidEndEditing(handler func(notification.Notification)) {
+func (f *NSTextField) TextDidEndEditing(handler func(foundation.Notification)) {
 	f.textDidEndEditing = handler
 }
 
-func (f *NSTextField) OnEnterKey(handler func(sender object.Object)) {
+func (f *NSTextField) OnEnterKey(handler func(sender foundation.Object)) {
 	f.onEnterKey = handler
 }
 
@@ -170,7 +165,7 @@ func (f *NSTextField) OnEnterKey(handler func(sender object.Object)) {
 func onTextDidChange(id int64, notificationPtr unsafe.Pointer) {
 	f := resources.Get(id).(TextField)
 	if f.getTextDidChange() != nil {
-		f.getTextDidChange()(notification.Make(notificationPtr, f))
+		f.getTextDidChange()(foundation.MakeNotification(notificationPtr, f))
 	}
 }
 
@@ -178,7 +173,7 @@ func onTextDidChange(id int64, notificationPtr unsafe.Pointer) {
 func onTextDidEndEditing(id int64, notificationPtr unsafe.Pointer) {
 	f := resources.Get(id).(TextField)
 	if f.getTextDidEndEditing() != nil {
-		f.getTextDidEndEditing()(notification.Make(notificationPtr, f))
+		f.getTextDidEndEditing()(foundation.MakeNotification(notificationPtr, f))
 	}
 }
 
@@ -186,6 +181,6 @@ func onTextDidEndEditing(id int64, notificationPtr unsafe.Pointer) {
 func onEnterKey(id int64, sender unsafe.Pointer) {
 	f := resources.Get(id).(TextField)
 	if f.getOnEnterKey() != nil {
-		f.getOnEnterKey()(object.Make(sender))
+		f.getOnEnterKey()(foundation.MakeObject(sender))
 	}
 }

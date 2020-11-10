@@ -1,17 +1,16 @@
-package text
+package widget
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
 // #include "text.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/appkit/view"
 	"unsafe"
 )
 
 // Wrap NSText. The most general programmatic interface for objects that manage text.
 type Text interface {
-	view.View
+	View
 	// StringValue return the characters of the text.
 	StringValue() string
 	// Editable return  whether the receiver allows the user to edit its text.
@@ -28,13 +27,13 @@ var _ Text = (*NSText)(nil)
 
 // NSText
 type NSText struct {
-	view.NSView
+	NSView
 }
 
-// Make create a NSText from native pointer
-func Make(ptr unsafe.Pointer) *NSText {
+// MakeText create a NSText from native pointer
+func MakeText(ptr unsafe.Pointer) *NSText {
 	return &NSText{
-		NSView: *view.Make(ptr),
+		NSView: *MakeView(ptr),
 	}
 }
 

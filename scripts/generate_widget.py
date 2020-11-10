@@ -1,20 +1,9 @@
-#!env python3
-
 import sys
 import re
 import os
 from dataclasses import dataclass
 from typing import List, Optional
 import textwrap
-
-
-helper_methods_str = '''
-func toNSRect(rect geometry.Rect) C.NSRect {
-	return *(*C.NSRect)(unsafe.Pointer(&rect))
-}
-func toRect(nsRect C.NSRect) geometry.Rect {
-	return *(*geometry.Rect)(unsafe.Pointer(&nsRect))
-}'''
 
 
 cgo_type_dict = {
@@ -70,10 +59,8 @@ class Generator:
         super_type = self.super_type
         ns_name = 'NS' + name
         super_ns_name = 'NS' + super_type
-        package_name = name.lower()
-        super_package_name = super_type.lower()
         file_name = camel_to_underscore(name)
-        package_path = f'../appkit/{package_name}'
+        package_path = '../appkit/widget'
         try:
             os.makedirs(package_path)
         except FileExistsError:
@@ -89,46 +76,41 @@ class Generator:
         ''')
 
         self.imports = [
-            "github.com/hsiafan/cocoa/foundation/geometry",
-            "github.com/hsiafan/cocoa/foundation/object",
-            "github.com/hsiafan/cocoa/internal",
+            "github.com/hsiafan/cocoa/foundation",
             "unsafe",
         ]
-        self.imports.append(full_pacakge_path(super_package_name))
         
         interface_str = textwrap.dedent(f'''
         // {self.description}
         type {name} interface {{
-        \t{super_package_name}.{super_type}
+        \t{super_type}
         ''')
 
         struct_str = textwrap.dedent(f'''
         var _ {name} = (*{ns_name})(nil)
 
         type {ns_name} struct {{
-        \t{super_package_name}.{super_ns_name}
+        \t{super_ns_name}
         }}''')
 
         init_method_str = textwrap.dedent(f'''
-        var resources = internal.NewResourceRegistry()
-
         // Make create a View from native pointer
-        func Make(ptr unsafe.Pointer) *{ns_name} {{
-        \treturn &{ns_name}{{*{super_package_name}.Make(ptr)}}
+        func Make{name}(ptr unsafe.Pointer) *{ns_name} {{
+        \treturn &{ns_name}{{*Make{super_type}(ptr)}}
         }}
 
         // New create new {name}
-        func New(frame geometry.Rect) {name} {{
+        func New{name}(frame foundation.Rect) {name} {{
         \tid := resources.NextId()
         \tptr := C.{name}_New(C.long(id), toNSRect(frame))
 
         \tv := &{ns_name}{{
-        \t\t{super_ns_name}: *{super_package_name}.Make(ptr),
+        \t\t{super_ns_name}: *Make{super_type}(ptr),
         \t}}
 
         \tresources.Store(id, v)
 
-        \tobject.AddDeallocHook(v, func() {{
+        \tfoundation.AddDeallocHook(v, func() {{
         \t\tresources.Delete(id)
         \t}})
 
@@ -143,7 +125,7 @@ class Generator:
         
 
         with open(go_file_path, 'w+') as out:
-            print(f'package {package_name}', file=out)
+            print(f'package widget', file=out)
             print(cgo_imports_str, file=out)
             self.imports.sort()
             print('import (', file=out)
@@ -155,20 +137,20 @@ class Generator:
             for s in interface_methods:
                 print(s, file=out)
             print('}', file=out)
+
             print(struct_str, file=out)
+
+            print(init_method_str, file=out)
             for s in implimetion_methods:
                 print(s, file=out)
-            print(init_method_str, file=out)
-            print(helper_methods_str, file=out)
 
 
     def generate_objc_file(self):
         name = self.Type
         ns_name = 'NS' + name
-        package_name = name.lower()
         file_name = camel_to_underscore(name)
         var_name = file_name
-        package_path = f'../appkit/{package_name}'
+        package_path = f'../appkit/widget'
         try:
             os.makedirs(package_path)
         except FileExistsError:
@@ -222,11 +204,6 @@ class Generator:
         method_name = cap(property.name)
         if property.Type in cgo_type_dict:
             go_type = property.go_alias_type if property.go_alias_type else property.Type
-            idx = go_type.rfind('.')
-            if idx >0:
-                go_package = full_pacakge_path(go_type[:idx])
-                if go_package not in self.imports:
-                    self.imports.append(go_package)
             cgo_type = cgo_type_dict[property.Type]
             interface_methods.append((f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
 
@@ -243,8 +220,30 @@ class Generator:
                 func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
                 \tC.{name}_Set{method_name}({receiver_name}.Ptr(), C.{cgo_type}(value))
                 }}'''))
+        elif property.Type == 'string':
+            go_type = property.Type
+            interface_methods.append((f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
+
+            implimetion_methods.append(textwrap.dedent(f'''
+            func ({receiver_name} *NS{name}) {method_name}() {go_type} {{
+            \treturn C.GoString(C.{name}_{method_name}({receiver_name}.Ptr()))
+            }}'''))
+            
+            if not property.readonly:
+            
+                interface_methods.append(f'''\t// Set{method_name} set {property.description}\n\tSet{method_name}(value {go_type})''')
+            
+                implimetion_methods.append(textwrap.dedent(f'''
+                func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
+                \tcstr := C.CString(value)
+                \tdefer C.free(unsafe.Pointer(cstr))
+                \tC.{name}_Set{method_name}({receiver_name}.Ptr(), cstr)
+                }}'''))
         elif property.Type in ('Rect', 'Point', 'Size'):
-            go_type = f'geometry.{property.Type}'
+            go_type = f'foundation.{property.Type}'
+            full_package = f'github.com/hsiafan/cocoa/foundation'
+            if full_package not in self.imports:
+                self.imports.append(full_package)
             interface_methods.append((f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
 
             implimetion_methods.append(textwrap.dedent(f'''
@@ -261,12 +260,8 @@ class Generator:
                 \tC.{name}_Set{method_name}({receiver_name}.Ptr(), toNS{property.Type}(value))
                 }}'''))
         else:
-            package_name = property.Type.lower()
-            go_type = f'{package_name}.{property.Type}' if property.Type != self.Type else property.Type
-            make_method = f'{package_name}.Make' if property.Type != self.Type else 'Make'
-            go_package = full_pacakge_path(package_name)
-            if go_package not in self.imports and property.Type != self.Type:
-                self.imports.append(go_package)
+            go_type = f'{property.Type}'
+            make_method = f'Make{property.Type}'
             interface_methods.append((f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
 
             implimetion_methods.append(textwrap.dedent(f'''
@@ -316,7 +311,22 @@ class Generator:
                 m_funcs.append(textwrap.dedent(f'''
                 void {widget_type}_Set{pname}(void* ptr, {type_name} value) {{
                     NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                    return [{var_name} set{pname}:value];
+                    [{var_name} set{pname}:value];
+                }}'''))
+        elif property.Type == 'string':
+            type_name = 'const char*'
+            header_funcs.append(f'''\n{type_name} {widget_type}_{pname}(void* ptr); ''')
+            m_funcs.append(textwrap.dedent(f'''
+            {type_name} {widget_type}_{pname}(void* ptr) {{
+                NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
+                return [{var_name}.{property.name} UTF8String];
+            }}'''))
+            if not property.readonly:
+                header_funcs.append(f'''\nvoid {widget_type}_Set{pname}(void* ptr, {type_name} value); ''')
+                m_funcs.append(textwrap.dedent(f'''
+                void {widget_type}_Set{pname}(void* ptr, {type_name} value) {{
+                    NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
+                    [{var_name} set{pname}:[NSString stringWithUTF8String:value]];
                 }}'''))
         else:
             header_funcs.append(f'''\nvoid* {widget_type}_{pname}(void* ptr); ''')
@@ -331,7 +341,7 @@ class Generator:
                 void {widget_type}_Set{pname}(void* ptr, void* valuePtr) {{
                     NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
                     NS{property.Type}* value = (NS{property.Type}*)valuePtr;
-                    return [{var_name} set{pname}:value];
+                    [{var_name} set{pname}:value];
                 }}'''))
 
 def camel_to_underscore(s:str) -> str:
@@ -343,5 +353,3 @@ def cap(s:str) -> str:
 def to_receiver_name(s: str) -> str:
     return s[0].lower()
 
-def full_pacakge_path(package_name:str) -> str:
-    return f'github.com/hsiafan/cocoa/appkit/{package_name}'

@@ -1,4 +1,4 @@
-package object
+package foundation
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa

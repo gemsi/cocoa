@@ -1,23 +1,18 @@
-package window
+package widget
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
 // #include "window.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/foundation/geometry"
-	"github.com/hsiafan/cocoa/foundation/notification"
-	"github.com/hsiafan/cocoa/foundation/object"
+	"github.com/hsiafan/cocoa/foundation"
 	"github.com/hsiafan/cocoa/internal"
 	"unsafe"
-
-	"github.com/hsiafan/cocoa/appkit/responder"
-	"github.com/hsiafan/cocoa/appkit/view"
 )
 
 // Window is interface for NSWindow
 type Window interface {
-	responder.Responder
+	Responder
 	// MakeKeyAndOrderFront moves the window to the front of the screen list, shows the window.
 	MakeKeyAndOrderFront()
 	// SetTitle set title of window
@@ -25,53 +20,53 @@ type Window interface {
 	// Center adjust window to the center of screen
 	Center()
 	// AddView adds a view to the window.
-	AddView(view view.View)
+	AddView(view View)
 	// Update forces the whole window to repaint
 	Update()
-	DidResize(fn func(notification.Notification))
-	DidMiniaturize(fn func(notification.Notification))
-	DidDeminiaturize(fn func(notification.Notification))
-	DidMove(fn func(notification.Notification))
+	DidResize(fn func(foundation.Notification))
+	DidMiniaturize(fn func(foundation.Notification))
+	DidDeminiaturize(fn func(foundation.Notification))
+	DidMove(fn func(foundation.Notification))
 	// SetFrame set frame for this window
-	SetFrame(rect geometry.Rect, display bool)
+	SetFrame(rect foundation.Rect, display bool)
 	// Frame return the frame of this window
-	Frame() geometry.Rect
+	Frame() foundation.Rect
 }
 
 var _ Window = (*NSWindow)(nil)
 
 var resource = internal.NewResourceRegistry()
 
-// New constructs and returns a new window.
-func New(frame geometry.Rect) Window {
+// NewWindow constructs and returns a new window.
+func NewWindow(frame foundation.Rect) Window {
 	id := resource.NextId()
 
 	ptr := C.Window_New(C.long(id), toNSRect(frame))
 	window := &NSWindow{
-		NSResponder: *responder.Make(ptr),
+		NSResponder: *MakeResponder(ptr),
 	}
 
 	resource.Store(id, window)
 
-	object.AddDeallocHook(window, func() {
+	foundation.AddDeallocHook(window, func() {
 		resource.Delete(id)
 	})
 	return window
 }
 
 type NSWindow struct {
-	responder.NSResponder
-	didResize        func(notification.Notification)
-	didMiniaturize   func(notification.Notification)
-	didDeminiaturize func(notification.Notification)
-	didMove          func(notification.Notification)
+	NSResponder
+	didResize        func(foundation.Notification)
+	didMiniaturize   func(foundation.Notification)
+	didDeminiaturize func(foundation.Notification)
+	didMove          func(foundation.Notification)
 }
 
-func (w *NSWindow) SetFrame(rect geometry.Rect, display bool) {
+func (w *NSWindow) SetFrame(rect foundation.Rect, display bool) {
 	C.Window_SetFrame(w.Ptr(), toNSRect(rect), C.bool(display))
 }
 
-func (w *NSWindow) Frame() geometry.Rect {
+func (w *NSWindow) Frame() foundation.Rect {
 	nsRect := C.Window_Frame(w.Ptr())
 	return toRect(nsRect)
 }
@@ -90,7 +85,7 @@ func (w *NSWindow) MakeKeyAndOrderFront() {
 	C.Window_MakeKeyAndOrderFront(w.Ptr())
 }
 
-func (w *NSWindow) AddView(view view.View) {
+func (w *NSWindow) AddView(view View) {
 	C.Window_AddView(w.Ptr(), view.Ptr())
 }
 
@@ -98,19 +93,19 @@ func (w *NSWindow) Update() {
 	C.Window_Update(w.Ptr())
 }
 
-func (w *NSWindow) DidResize(handler func(notification.Notification)) {
+func (w *NSWindow) DidResize(handler func(foundation.Notification)) {
 	w.didResize = handler
 }
 
-func (w *NSWindow) DidMiniaturize(handler func(notification.Notification)) {
+func (w *NSWindow) DidMiniaturize(handler func(foundation.Notification)) {
 	w.didMiniaturize = handler
 }
 
-func (w *NSWindow) DidDeminiaturize(handler func(notification.Notification)) {
+func (w *NSWindow) DidDeminiaturize(handler func(foundation.Notification)) {
 	w.didDeminiaturize = handler
 }
 
-func (w *NSWindow) DidMove(handler func(notification.Notification)) {
+func (w *NSWindow) DidMove(handler func(foundation.Notification)) {
 	w.didMove = handler
 }
 
@@ -118,7 +113,7 @@ func (w *NSWindow) DidMove(handler func(notification.Notification)) {
 func onWindowDidResize(id C.int, notificationPtr unsafe.Pointer) {
 	window := resource.Get(int64(id)).(*NSWindow)
 	if window.didResize != nil {
-		window.didResize(notification.Make(notificationPtr, window))
+		window.didResize(foundation.MakeNotification(notificationPtr, window))
 	}
 }
 
@@ -126,7 +121,7 @@ func onWindowDidResize(id C.int, notificationPtr unsafe.Pointer) {
 func onWindowDidMiniaturize(id C.int, notificationPtr unsafe.Pointer) {
 	window := resource.Get(int64(id)).(*NSWindow)
 	if window.didMiniaturize != nil {
-		window.didMiniaturize(notification.Make(notificationPtr, window))
+		window.didMiniaturize(foundation.MakeNotification(notificationPtr, window))
 	}
 }
 
@@ -134,7 +129,7 @@ func onWindowDidMiniaturize(id C.int, notificationPtr unsafe.Pointer) {
 func onWindowDidDeminiaturize(id C.int, notificationPtr unsafe.Pointer) {
 	window := resource.Get(int64(id)).(*NSWindow)
 	if window.didDeminiaturize != nil {
-		window.didDeminiaturize(notification.Make(notificationPtr, window))
+		window.didDeminiaturize(foundation.MakeNotification(notificationPtr, window))
 	}
 }
 
@@ -142,13 +137,6 @@ func onWindowDidDeminiaturize(id C.int, notificationPtr unsafe.Pointer) {
 func onWindowDidMove(id C.int, notificationPtr unsafe.Pointer) {
 	window := resource.Get(int64(id)).(*NSWindow)
 	if window.didMove != nil {
-		window.didMove(notification.Make(notificationPtr, window))
+		window.didMove(foundation.MakeNotification(notificationPtr, window))
 	}
-}
-
-func toNSRect(rect geometry.Rect) C.NSRect {
-	return *(*C.NSRect)(unsafe.Pointer(&rect))
-}
-func toRect(nsRect C.NSRect) geometry.Rect {
-	return *(*geometry.Rect)(unsafe.Pointer(&nsRect))
 }

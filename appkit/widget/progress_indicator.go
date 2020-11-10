@@ -1,16 +1,13 @@
-package progressindicator
+package widget
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
 // #import "progress_indicator.h"
 import "C"
-import (
-	"github.com/hsiafan/cocoa/appkit/view"
-)
 
 // ProgressIndicator wrap cocoa NSProcessIndicator
 type ProgressIndicator interface {
-	view.View
+	View
 	// StartAnimation starts the animation of an indeterminate progress indicator.
 	StartAnimation()
 	// StopAnimation stops the animation of an indeterminate progress indicator.
@@ -41,14 +38,14 @@ var _ ProgressIndicator = (*NSProgressIndicator)(nil)
 
 // NSProgressIndicator represents a indicator control that can trigger actions.
 type NSProgressIndicator struct {
-	view.NSView
+	NSView
 }
 
-// New create a new progressindicator.ProgressIndicator
-func New() ProgressIndicator {
+// NewProgressIndicator create a new progressindicator.ProgressIndicator
+func NewProgressIndicator() ProgressIndicator {
 	ptr := C.ProgressIndicator_New()
 	indicator := &NSProgressIndicator{
-		NSView: *view.Make(ptr),
+		NSView: *MakeView(ptr),
 	}
 	return indicator
 }

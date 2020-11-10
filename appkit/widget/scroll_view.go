@@ -1,4 +1,4 @@
-package scrollview
+package widget
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
@@ -6,16 +6,13 @@ package scrollview
 import "C"
 
 import (
-	"github.com/hsiafan/cocoa/appkit/view"
-	"github.com/hsiafan/cocoa/foundation/geometry"
-	"github.com/hsiafan/cocoa/foundation/object"
-	"github.com/hsiafan/cocoa/internal"
+	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
 
 // A view that displays a portion of a document view and provides scroll bars that allow the user to move the document view within the scroll view.
 type ScrollView interface {
-	view.View
+	View
 
 	// HasVerticalScroller return whether the scroll view has a vertical scroller
 	HasVerticalScroller() bool
@@ -26,19 +23,42 @@ type ScrollView interface {
 	// SetHasHorizontalScroller set whether the scroll view has a horizontal scroller
 	SetHasHorizontalScroller(value bool)
 	// DocumentView return the view the scroll view scrolls within its content view
-	DocumentView() view.View
+	DocumentView() View
 	// SetDocumentView set the view the scroll view scrolls within its content view
-	SetDocumentView(value view.View)
+	SetDocumentView(value View)
 	// BorderType return the appearance of the scroll view’s border
-	BorderType() view.BorderType
+	BorderType() BorderType
 	// SetBorderType set the appearance of the scroll view’s border
-	SetBorderType(value view.BorderType)
+	SetBorderType(value BorderType)
 }
 
 var _ ScrollView = (*NSScrollView)(nil)
 
 type NSScrollView struct {
-	view.NSView
+	NSView
+}
+
+// Make create a View from native pointer
+func MakeScrollView(ptr unsafe.Pointer) *NSScrollView {
+	return &NSScrollView{*MakeView(ptr)}
+}
+
+// New create new ScrollView
+func NewScrollView(frame foundation.Rect) ScrollView {
+	id := resources.NextId()
+	ptr := C.ScrollView_New(C.long(id), toNSRect(frame))
+
+	v := &NSScrollView{
+		NSView: *MakeView(ptr),
+	}
+
+	resources.Store(id, v)
+
+	foundation.AddDeallocHook(v, func() {
+		resources.Delete(id)
+	})
+
+	return v
 }
 
 func (s *NSScrollView) HasVerticalScroller() bool {
@@ -57,45 +77,18 @@ func (s *NSScrollView) SetHasHorizontalScroller(value bool) {
 	C.ScrollView_SetHasHorizontalScroller(s.Ptr(), C.bool(value))
 }
 
-func (s *NSScrollView) DocumentView() view.View {
-	return view.Make(C.ScrollView_DocumentView(s.Ptr()))
+func (s *NSScrollView) DocumentView() View {
+	return MakeView(C.ScrollView_DocumentView(s.Ptr()))
 }
 
-func (s *NSScrollView) SetDocumentView(value view.View) {
+func (s *NSScrollView) SetDocumentView(value View) {
 	C.ScrollView_SetDocumentView(s.Ptr(), value.Ptr())
 }
 
-func (s *NSScrollView) BorderType() view.BorderType {
-	return view.BorderType(C.ScrollView_BorderType(s.Ptr()))
+func (s *NSScrollView) BorderType() BorderType {
+	return BorderType(C.ScrollView_BorderType(s.Ptr()))
 }
 
-func (s *NSScrollView) SetBorderType(value view.BorderType) {
+func (s *NSScrollView) SetBorderType(value BorderType) {
 	C.ScrollView_SetBorderType(s.Ptr(), C.ulong(value))
-}
-
-var resources = internal.NewResourceRegistry()
-
-// New create new ScrollView
-func New(frame geometry.Rect) ScrollView {
-	id := resources.NextId()
-	ptr := C.ScrollView_New(C.long(id), toNSRect(frame))
-
-	v := &NSScrollView{
-		NSView: *view.Make(ptr),
-	}
-
-	resources.Store(id, v)
-
-	object.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-
-	return v
-}
-
-func toNSRect(rect geometry.Rect) C.NSRect {
-	return *(*C.NSRect)(unsafe.Pointer(&rect))
-}
-func toRect(nsRect C.NSRect) geometry.Rect {
-	return *(*geometry.Rect)(unsafe.Pointer(&nsRect))
 }
