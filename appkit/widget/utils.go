@@ -18,3 +18,10 @@ func toNSRect(rect foundation.Rect) C.NSRect {
 func toRect(nsRect C.NSRect) foundation.Rect {
 	return *(*foundation.Rect)(unsafe.Pointer(&nsRect))
 }
+
+func toNSSize(size foundation.Size) C.NSSize {
+	return *(*C.NSSize)(unsafe.Pointer(&size))
+}
+func toSize(size C.NSSize) foundation.Size {
+	return *(*foundation.Size)(unsafe.Pointer(&size))
+}

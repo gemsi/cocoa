@@ -30,6 +30,8 @@ type ScrollView interface {
 	BorderType() BorderType
 	// SetBorderType set the appearance of the scroll view’s border
 	SetBorderType(value BorderType)
+	// ContentSize return the size of the scroll view’s content view
+	ContentSize() foundation.Size
 }
 
 var _ ScrollView = (*NSScrollView)(nil)
@@ -91,4 +93,8 @@ func (s *NSScrollView) BorderType() BorderType {
 
 func (s *NSScrollView) SetBorderType(value BorderType) {
 	C.ScrollView_SetBorderType(s.Ptr(), C.ulong(value))
+}
+
+func (s *NSScrollView) ContentSize() foundation.Size {
+	return toSize(C.ScrollView_ContentSize(s.Ptr()))
 }

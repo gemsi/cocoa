@@ -36,7 +36,7 @@ void* ScrollView_DocumentView(void* ptr) {
 void ScrollView_SetDocumentView(void* ptr, void* valuePtr) {
     NSScrollView* scroll_view = (NSScrollView*)ptr;
     NSView* value = (NSView*)valuePtr;
-    return [scroll_view setDocumentView:value];
+    [scroll_view setDocumentView:value];
 }
 
 unsigned long ScrollView_BorderType(void* ptr) {
@@ -47,4 +47,9 @@ unsigned long ScrollView_BorderType(void* ptr) {
 void ScrollView_SetBorderType(void* ptr, unsigned long value) {
     NSScrollView* scroll_view = (NSScrollView*)ptr;
     return [scroll_view setBorderType:value];
+}
+
+NSSize ScrollView_ContentSize(void* ptr) {
+    NSScrollView* scroll_view = (NSScrollView*)ptr;
+    return scroll_view.contentSize;
 }

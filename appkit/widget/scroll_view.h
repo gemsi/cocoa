@@ -18,3 +18,5 @@ void ScrollView_SetDocumentView(void* ptr, void* valuePtr);
 unsigned long ScrollView_BorderType(void* ptr); 
 
 void ScrollView_SetBorderType(void* ptr, unsigned long value); 
+
+NSSize ScrollView_ContentSize(void* ptr); 

@@ -4,13 +4,20 @@ package widget
 // #cgo LDFLAGS: -framework Cocoa
 // #include "text_view.h"
 import "C"
+
 import (
 	"github.com/hsiafan/cocoa/foundation"
+	"unsafe"
 )
 
-// TextView is a view that draws text and handles user interactions with that text.
+// A view that draws text and handles user interactions with that text.
 type TextView interface {
 	Text
+
+	// TextContainer return the receiver’s text container
+	TextContainer() TextContainer
+	// SetTextContainer set the receiver’s text container
+	SetTextContainer(value TextContainer)
 }
 
 var _ TextView = (*NSTextView)(nil)
@@ -19,7 +26,12 @@ type NSTextView struct {
 	NSText
 }
 
-// NewTextView create new TextView
+// Make create a View from native pointer
+func MakeTextView(ptr unsafe.Pointer) *NSTextView {
+	return &NSTextView{*MakeText(ptr)}
+}
+
+// New create new TextView
 func NewTextView(frame foundation.Rect) TextView {
 	id := resources.NextId()
 	ptr := C.TextView_New(C.long(id), toNSRect(frame))
@@ -35,4 +47,12 @@ func NewTextView(frame foundation.Rect) TextView {
 	})
 
 	return v
+}
+
+func (t *NSTextView) TextContainer() TextContainer {
+	return MakeTextContainer(C.TextView_TextContainer(t.Ptr()))
+}
+
+func (t *NSTextView) SetTextContainer(value TextContainer) {
+	C.TextView_SetTextContainer(t.Ptr(), value.Ptr())
 }
