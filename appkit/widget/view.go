@@ -17,11 +17,11 @@ type View interface {
 	// Frame return the view’s frame rectangle, which defines its position and size in its superview’s coordinate system
 	Frame() foundation.Rect
 	// SetFrame set the view’s frame rectangle, which defines its position and size in its superview’s coordinate system
-	SetFrame(value foundation.Rect)
+	SetFrame(frame foundation.Rect)
 	// AutoresizingMask return the view’s frame rectangle, which defines its position and size in its superview’s coordinate system
 	AutoresizingMask() AutoresizingMaskOptions
 	// SetAutoresizingMask set the view’s frame rectangle, which defines its position and size in its superview’s coordinate system
-	SetAutoresizingMask(value AutoresizingMaskOptions)
+	SetAutoresizingMask(autoresizingMask AutoresizingMaskOptions)
 }
 
 var _ View = (*NSView)(nil)
@@ -57,14 +57,14 @@ func (v *NSView) Frame() foundation.Rect {
 	return toRect(C.View_Frame(v.Ptr()))
 }
 
-func (v *NSView) SetFrame(value foundation.Rect) {
-	C.View_SetFrame(v.Ptr(), toNSRect(value))
+func (v *NSView) SetFrame(frame foundation.Rect) {
+	C.View_SetFrame(v.Ptr(), toNSRect(frame))
 }
 
 func (v *NSView) AutoresizingMask() AutoresizingMaskOptions {
 	return AutoresizingMaskOptions(C.View_AutoresizingMask(v.Ptr()))
 }
 
-func (v *NSView) SetAutoresizingMask(value AutoresizingMaskOptions) {
-	C.View_SetAutoresizingMask(v.Ptr(), C.ulong(value))
+func (v *NSView) SetAutoresizingMask(autoresizingMask AutoresizingMaskOptions) {
+	C.View_SetAutoresizingMask(v.Ptr(), C.ulong(autoresizingMask))
 }

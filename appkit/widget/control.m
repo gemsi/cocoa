@@ -7,63 +7,51 @@ void* Control_New(long id, NSRect frame) {
     NSControl* control = [[[NSControl alloc] initWithFrame:frame] autorelease];
     return (void*)control;
 }
-
-bool Control_Enabled(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return control.enabled;
+bool Control_IsEnabled(void* ptr) {
+	NSControl* control = (NSControl*)ptr;
+	return [control isEnabled];
 }
-
-void Control_SetEnabled(void* ptr, bool value) {
-    NSControl* control = (NSControl*)ptr;
-    return [control setEnabled:value];
+void Control_SetEnabled(void* ptr, bool enabled) {
+	NSControl* control = (NSControl*)ptr;
+	[control setEnabled:enabled];
 }
-
 double Control_DoubleValue(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return control.doubleValue;
+	NSControl* control = (NSControl*)ptr;
+	return [control doubleValue];
 }
-
-void Control_SetDoubleValue(void* ptr, double value) {
-    NSControl* control = (NSControl*)ptr;
-    return [control setDoubleValue:value];
+void Control_SetDoubleValue(void* ptr, double doubleValue) {
+	NSControl* control = (NSControl*)ptr;
+	[control setDoubleValue:doubleValue];
 }
-
 float Control_FloatValue(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return control.floatValue;
+	NSControl* control = (NSControl*)ptr;
+	return [control floatValue];
 }
-
-void Control_SetFloatValue(void* ptr, float value) {
-    NSControl* control = (NSControl*)ptr;
-    return [control setFloatValue:value];
+void Control_SetFloatValue(void* ptr, float floatValue) {
+	NSControl* control = (NSControl*)ptr;
+	[control setFloatValue:floatValue];
 }
-
 int Control_IntValue(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return control.intValue;
+	NSControl* control = (NSControl*)ptr;
+	return [control intValue];
 }
-
-void Control_SetIntValue(void* ptr, int value) {
-    NSControl* control = (NSControl*)ptr;
-    return [control setIntValue:value];
+void Control_SetIntValue(void* ptr, int intValue) {
+	NSControl* control = (NSControl*)ptr;
+	[control setIntValue:intValue];
 }
-
 long Control_IntegerValue(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return control.integerValue;
+	NSControl* control = (NSControl*)ptr;
+	return [control integerValue];
 }
-
-void Control_SetIntegerValue(void* ptr, long value) {
-    NSControl* control = (NSControl*)ptr;
-    return [control setIntegerValue:value];
+void Control_SetIntegerValue(void* ptr, long integerValue) {
+	NSControl* control = (NSControl*)ptr;
+	[control setIntegerValue:integerValue];
 }
-
 const char* Control_StringValue(void* ptr) {
-    NSControl* control = (NSControl*)ptr;
-    return [control.stringValue UTF8String];
+	NSControl* control = (NSControl*)ptr;
+	return [[control stringValue] UTF8String];
 }
-
-void Control_SetStringValue(void* ptr, const char* value) {
-    NSControl* control = (NSControl*)ptr;
-    [control setStringValue:[NSString stringWithUTF8String:value]];
+void Control_SetStringValue(void* ptr, const char* stringValue) {
+	NSControl* control = (NSControl*)ptr;
+	[control setStringValue:[NSString stringWithUTF8String:stringValue]];
 }

@@ -2,7 +2,7 @@ import sys
 import re
 import os
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import textwrap
 
 
@@ -38,6 +38,185 @@ c_type_dict = {
     'float64': 'double',
 }
 
+struct_types = {'foundation.Rect', 'foundation.Point', 'foundation.Size'}
+
+
+def type_part(Type: str) -> str:
+    idx = Type.find('.')
+    if idx >= 0:
+        return Type[idx+1:]
+    return Type
+
+
+def package_part(Type: str) -> str:
+    idx = Type.find('.')
+    if idx >= 0:
+        return Type[:idx]
+    return ''
+
+
+def objc_type(Type: str) -> str:
+    if Type == '':
+        return 'void'
+    elif Type in c_type_dict:
+        return c_type_dict[Type]
+    elif Type in struct_types:
+        return 'NS' + type_part(Type)
+    elif Type == 'string':
+        return 'const char*'
+    else:
+        # return 'NS' + type_part(Type)
+        return 'void*'
+
+
+@dataclass
+class Param:
+    name: str
+    Type: str
+    go_alias: str = ''  # go alias type, enum, etc.
+    objc_param_name: str = ''  # objc param def name
+
+    def go_def_code(self) -> str:
+        if self.go_alias:
+            return self.name + ' ' + self.go_alias
+        return self.name + ' ' + self.Type
+
+    def objc_def_code(self) -> str:
+        return objc_type(self.Type) + ' ' + self.name
+
+    def go_convert_code(self) -> str:
+        # TODO: cgo convert code
+        if self.Type in cgo_type_dict:
+            return f'C.{cgo_type_dict[self.Type]}({self.name})'
+        elif self.Type == 'string':
+            return f'C.CString({self.name})'
+        elif self.Type in struct_types:
+            return f'toNS{type_part(self.Type)}({self.name})'
+        else:
+            return f'{self.name}.Ptr()'
+
+    def objc_convert_code(self) -> str:
+        if self.Type == 'string':
+            return f'[NSString stringWithUTF8String:{self.name}]'
+        else:
+            return self.name
+
+
+@dataclass
+class ReturnValue:
+    Type: str
+    go_alias: str = ''  # go alias type, enum, etc.
+
+    def go_def_code(self) -> str:
+        if self.go_alias:
+            return self.go_alias
+        return self.Type
+
+    def objc_def_code(self) -> str:
+        return objc_type(self.Type)
+
+    def go_convert_code(self, return_str: str) -> str:
+        if self.Type == '':
+            return return_str
+        elif self.Type in cgo_type_dict:
+            if self.go_alias:
+                return f'{self.go_alias}({return_str})'
+            return f'{self.Type}({return_str})'
+        elif self.Type == 'string':
+            return f'C.GoString({return_str})'
+        elif self.Type in struct_types:
+            t = type_part(self.Type)
+            return f'to{t}({return_str})'
+        else:
+            t = type_part(self.Type)
+            p = package_part(self.Type)
+            if p:
+                p += '.'
+            return f'{p}Make{t}({return_str})'
+
+    def objc_convert_code(self, return_str: str) -> str:
+        if self.Type == 'string':
+            return f'[{return_str} UTF8String]'
+        return return_str
+
+
+@dataclass
+class Method:
+    name: str
+    params: List[Param]
+    return_value: ReturnValue
+    description: str
+
+    def go_interface_code(self) -> List[str]:
+        name = cap(self.name)
+        params_str = ' '.join([p.go_def_code() for p in self.params])
+        go_def_return = self.return_value.go_def_code()
+        if go_def_return:
+            go_def_return = ' ' + go_def_return
+        return [
+            f'// {name} {self.description}',
+            name + '(' + params_str + ')' + go_def_return,
+        ]
+
+    def go_impl_code(self, receiver_type: str) -> List[str]:
+        receiver = receiver_type[0].lower()
+        name = cap(self.name)
+        params_str = ' '.join([p.go_def_code() for p in self.params])
+        receiver_str = receiver + ' *NS' + receiver_type
+        go_def_return = self.return_value.go_def_code()
+        if go_def_return:
+            go_def_return = ' ' + go_def_return
+        codes = ['func (' + receiver_str + ') ' + name + '(' + params_str + ')' + go_def_return + ' {', ]
+        args = [f'{receiver}.Ptr()']
+        for param in self.params:
+            convert_code = param.go_convert_code()
+            if param.Type == 'string':
+                cstr_name = 'c_' + param.name
+                codes.append(f'\t{cstr_name} := {convert_code}')
+                codes.append(f'\tdefer C.free(unsafe.Pointer({cstr_name}))')
+                args.append(cstr_name)
+            else:
+                args.append(convert_code)
+        c_args_str = ', '.join(args)
+        return_str = self.return_value.go_convert_code(f'C.{receiver_type}_{name}({c_args_str})')
+        if self.return_value.Type != '':
+            return_str = 'return ' + return_str
+        codes.append('\t' + return_str)
+        codes.append('}')
+        return codes
+
+    def objc_h_code(self, receiver_type: str) -> List[str]:
+        c_params_str = ' '.join([p.objc_def_code() for p in self.params])
+        if c_params_str:
+            c_params_str = f'void* ptr, {c_params_str}'
+        else:
+            c_params_str = f'void* ptr'
+        return [f'{self.return_value.objc_def_code()} {receiver_type}_{cap(self.name)}({c_params_str});']
+
+    def objc_m_code(self, receiver_type: str) -> List[str]:
+        c_params_str = ' '.join([p.objc_def_code() for p in self.params])
+        if c_params_str:
+            c_params_str = f'void* ptr, {c_params_str}'
+        else:
+            c_params_str = f'void* ptr'
+        ns_var_name = de_cap(receiver_type)
+        codes = [
+            f'{self.return_value.objc_def_code()} {receiver_type}_{cap(self.name)}({c_params_str}) {{',
+            f'\tNS{receiver_type}* {ns_var_name} = (NS{receiver_type}*)ptr;',
+        ]
+        call_code = '[' + ns_var_name + ' ' + de_cap(self.name)
+        if len(self.params) > 0:
+            call_code += ':' + self.params[0].objc_convert_code()
+            for param in self.params[1:]:
+                call_code += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + param.name
+        call_code += ']'
+        call_code = self.return_value.objc_convert_code(call_code)
+        if self.return_value.Type != '':
+            call_code = 'return ' + call_code
+        codes.append('\t' + call_code + ';')
+        codes.append('}')
+        return codes
+
 
 @dataclass
 class InitMethod:
@@ -51,7 +230,26 @@ class Property:
     Type: str  # the property type
     description: str
     readonly: bool = False
-    go_alias_type: Optional[str] = None  # the go alias type, for enum etc..
+    go_alias_type: str = ''  # the go alias type, for enum etc..
+    prefixIs: bool = True
+
+    def getter(self) -> Method:
+        return Method(
+            name='is' + cap(self.name) if self.Type == 'bool' and self.prefixIs else self.name,
+            params=[],
+            return_value=ReturnValue(Type=self.Type, go_alias=self.go_alias_type),
+            description='return ' + self.description,
+        )
+
+    def setter(self) -> Optional[Method]:
+        if self.readonly:
+            return None
+        return Method(
+            name='set' + cap(self.name),
+            params=[Param(name=self.name, Type=self.Type, go_alias=self.go_alias_type)],
+            return_value=ReturnValue(Type=''),
+            description='set ' + self.description,
+        )
 
 
 @dataclass
@@ -116,14 +314,14 @@ class Generator:
         func Make{name}(ptr unsafe.Pointer) *{ns_name} {{
         \treturn &{ns_name}{{*{super_make_name}(ptr)}}
         }}''')
-        
+
         init_param_name = self.init_method.param_name
         init_param_type = self.init_method.param_type
         init_method_str = textwrap.dedent(f'''
         // New create new {name}
-        func New{name}({init_param_name} foundation.{init_param_type}) {name} {{
+        func New{name}({init_param_name} {init_param_type}) {name} {{
         \tid := resources.NextId()
-        \tptr := C.{name}_New(C.long(id), toNS{init_param_type}({init_param_name}))
+        \tptr := C.{name}_New(C.long(id), toNS{type_part(init_param_type)}({init_param_name}))
 
         \tv := &{ns_name}{{
         \t\t{super_field_name}: *{super_make_name}(ptr),
@@ -138,13 +336,6 @@ class Generator:
         \treturn v
         }}''')
 
-        interface_methods: List[str] = []
-        implimetion_methods: List[str] = []
-
-        for property in self.properties:
-            self.generate_property_go(
-                property, interface_methods, implimetion_methods)
-
         with open(go_file_path, 'w+') as out:
             print(f'package widget', file=out)
             print(cgo_imports_str, file=out)
@@ -154,17 +345,34 @@ class Generator:
                 print(f'\t"{s}"', file=out)
             print(')', file=out)
 
+            # interface
             print(interface_str, file=out)
-            for s in interface_methods:
-                print(s, file=out)
+            # interface properties
+            for property in self.properties:
+                getter = property.getter()
+                for line in getter.go_interface_code():
+                    print('\t' + line, file=out)
+                setter = property.setter()
+                if setter is not None:
+                    for line in setter.go_interface_code():
+                        print('\t' + line, file=out)
             print('}', file=out)
 
+            # struct impl
             print(struct_str, file=out)
-
             print(make_method_str, file=out)
             print(init_method_str, file=out)
-            for s in implimetion_methods:
-                print(s, file=out)
+            # properties impl
+            for property in self.properties:
+                getter = property.getter()
+                print(file=out)
+                for line in getter.go_impl_code(self.Type):
+                    print(line, file=out)
+                setter = property.setter()
+                if setter is not None:
+                    print(file=out)
+                    for line in setter.go_impl_code(self.Type):
+                        print(line, file=out)
 
     def generate_objc_file(self):
         name = self.Type
@@ -181,9 +389,9 @@ class Generator:
             'stdlib.h',
             'Foundation/NSGeometry.h',
         ]
-        
+
         init_param_name = self.init_method.param_name
-        init_param_type = 'NS' + self.init_method.param_type
+        init_param_type = 'NS' + type_part(self.init_method.param_type)
         init_param_mname = 'initWith' + cap(self.init_method.param_name)
         new_method_str = f'\nvoid* {name}_New(long id, {init_param_type} {init_param_name});'
         new_method_impl = textwrap.dedent(f'''
@@ -196,191 +404,40 @@ class Generator:
         #include "_cgo_export.h"
         ''')
 
-        header_funcs: List[str] = []
-        m_funcs: List[str] = []
-        for property in self.properties:
-            self.generate_property_objc(property, header_funcs, m_funcs)
-
+        # header files
         header_file_path = f'{package_path}/{file_name}.h'
         with open(header_file_path, 'w+') as out:
             for s in imports:
                 print(f'#import <{s}>', file=out)
             print(new_method_str, file=out)
-            for s in header_funcs:
-                print(s, file=out)
+            # properties header defination
+            for property in self.properties:
+                getter = property.getter()
+                for line in getter.objc_h_code(self.Type):
+                    print(line, file=out)
+                setter = property.setter()
+                if setter is not None:
+                    for line in setter.objc_h_code(self.Type):
+                        print(line, file=out)
 
+        # m files
         m_file_path = f'{package_path}/{file_name}.m'
         with open(m_file_path, 'w+') as out:
             print(m_import_str, file=out)
             print(new_method_impl, file=out)
-            for s in m_funcs:
-                print(s, file=out)
+            # properties header defination
+            for property in self.properties:
+                getter = property.getter()
+                for line in getter.objc_m_code(self.Type):
+                    print(line, file=out)
+                setter = property.setter()
+                if setter is not None:
+                    for line in setter.objc_m_code(self.Type):
+                        print(line, file=out)
 
     def generate_widgets(self):
         self.generate_go_file()
         self.generate_objc_file()
-
-    def generate_property_go(self, property: Property, interface_methods: List[str], implimetion_methods: List[str]):
-        name = self.Type
-        receiver_name = to_receiver_name(self.Type)
-        method_name = cap(property.name)
-        if property.Type in cgo_type_dict:
-            go_type = property.go_alias_type if property.go_alias_type else property.Type
-            cgo_type = cgo_type_dict[property.Type]
-            interface_methods.append(
-                (f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
-
-            implimetion_methods.append(textwrap.dedent(f'''
-            func ({receiver_name} *NS{name}) {method_name}() {go_type} {{
-            \treturn {go_type}(C.{name}_{method_name}({receiver_name}.Ptr()))
-            }}'''))
-
-            if not property.readonly:
-
-                interface_methods.append(
-                    f'''\t// Set{method_name} set {property.description}\n\tSet{method_name}(value {go_type})''')
-
-                implimetion_methods.append(textwrap.dedent(f'''
-                func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
-                \tC.{name}_Set{method_name}({receiver_name}.Ptr(), C.{cgo_type}(value))
-                }}'''))
-        elif property.Type == 'string':
-            go_type = property.Type
-            interface_methods.append(
-                (f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
-
-            implimetion_methods.append(textwrap.dedent(f'''
-            func ({receiver_name} *NS{name}) {method_name}() {go_type} {{
-            \treturn C.GoString(C.{name}_{method_name}({receiver_name}.Ptr()))
-            }}'''))
-
-            if not property.readonly:
-
-                interface_methods.append(
-                    f'''\t// Set{method_name} set {property.description}\n\tSet{method_name}(value {go_type})''')
-
-                implimetion_methods.append(textwrap.dedent(f'''
-                func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
-                \tcstr := C.CString(value)
-                \tdefer C.free(unsafe.Pointer(cstr))
-                \tC.{name}_Set{method_name}({receiver_name}.Ptr(), cstr)
-                }}'''))
-        elif property.Type in ('Rect', 'Point', 'Size'):
-            go_type = f'foundation.{property.Type}'
-            full_package = f'github.com/hsiafan/cocoa/foundation'
-            if full_package not in self.imports:
-                self.imports.append(full_package)
-            interface_methods.append(
-                (f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
-
-            implimetion_methods.append(textwrap.dedent(f'''
-            func ({receiver_name} *NS{name}) {method_name}() {go_type} {{
-            \treturn to{property.Type}(C.{name}_{method_name}({receiver_name}.Ptr()))
-            }}'''))
-
-            if not property.readonly:
-
-                interface_methods.append(
-                    f'''\t// Set{method_name} set {property.description}\n\tSet{method_name}(value {go_type})''')
-
-                implimetion_methods.append(textwrap.dedent(f'''
-                func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
-                \tC.{name}_Set{method_name}({receiver_name}.Ptr(), toNS{property.Type}(value))
-                }}'''))
-        else:
-            go_type = f'{property.Type}'
-            make_method = f'Make{property.Type}'
-            interface_methods.append(
-                (f'\t// {method_name} return {property.description}\n\t{method_name}() {go_type}'))
-
-            implimetion_methods.append(textwrap.dedent(f'''
-            func ({receiver_name} *NS{name}) {method_name}() {go_type} {{
-            \treturn {make_method}(C.{name}_{method_name}({receiver_name}.Ptr()))
-            }}'''))
-
-            if not property.readonly:
-
-                interface_methods.append(
-                    f'''\t// Set{method_name} set {property.description}\n\tSet{method_name}(value {go_type})''')
-
-                implimetion_methods.append(textwrap.dedent(f'''
-                func ({receiver_name} *NS{name}) Set{method_name}(value {go_type}) {{
-                \tC.{name}_Set{method_name}({receiver_name}.Ptr(), value.Ptr())
-                }}'''))
-
-    def generate_property_objc(self, property: Property, header_funcs: List[str], m_funcs: List[str]):
-        pname = cap(property.name)
-        var_name = camel_to_underscore(self.Type)
-        type_name = property.Type
-        widget_type = self.Type
-        if property.Type in c_type_dict:
-            type_name = c_type_dict[property.Type]
-            header_funcs.append(
-                f'''\n{type_name} {widget_type}_{pname}(void* ptr); ''')
-            m_funcs.append(textwrap.dedent(f'''
-            {type_name} {widget_type}_{pname}(void* ptr) {{
-                NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                return {var_name}.{property.name};
-            }}'''))
-            if not property.readonly:
-                header_funcs.append(
-                    f'''\nvoid {widget_type}_Set{pname}(void* ptr, {type_name} value); ''')
-                m_funcs.append(textwrap.dedent(f'''
-                void {widget_type}_Set{pname}(void* ptr, {type_name} value) {{
-                    NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                    return [{var_name} set{pname}:value];
-                }}'''))
-        elif property.Type in ('Rect', 'Point', 'Size'):
-            type_name = f'NS{type_name}'
-            header_funcs.append(
-                f'''\n{type_name} {widget_type}_{pname}(void* ptr); ''')
-            m_funcs.append(textwrap.dedent(f'''
-            {type_name} {widget_type}_{pname}(void* ptr) {{
-                NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                return {var_name}.{property.name};
-            }}'''))
-            if not property.readonly:
-                header_funcs.append(
-                    f'''\nvoid {widget_type}_Set{pname}(void* ptr, {type_name} value); ''')
-                m_funcs.append(textwrap.dedent(f'''
-                void {widget_type}_Set{pname}(void* ptr, {type_name} value) {{
-                    NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                    [{var_name} set{pname}:value];
-                }}'''))
-        elif property.Type == 'string':
-            type_name = 'const char*'
-            header_funcs.append(
-                f'''\n{type_name} {widget_type}_{pname}(void* ptr); ''')
-            m_funcs.append(textwrap.dedent(f'''
-            {type_name} {widget_type}_{pname}(void* ptr) {{
-                NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                return [{var_name}.{property.name} UTF8String];
-            }}'''))
-            if not property.readonly:
-                header_funcs.append(
-                    f'''\nvoid {widget_type}_Set{pname}(void* ptr, {type_name} value); ''')
-                m_funcs.append(textwrap.dedent(f'''
-                void {widget_type}_Set{pname}(void* ptr, {type_name} value) {{
-                    NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                    [{var_name} set{pname}:[NSString stringWithUTF8String:value]];
-                }}'''))
-        else:
-            header_funcs.append(
-                f'''\nvoid* {widget_type}_{pname}(void* ptr); ''')
-            m_funcs.append(textwrap.dedent(f'''
-            void* {widget_type}_{pname}(void* ptr) {{
-                NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                return {var_name}.{property.name};
-            }}'''))
-            if not property.readonly:
-                header_funcs.append(
-                    f'''\nvoid {widget_type}_Set{pname}(void* ptr, void* valuePtr); ''')
-                m_funcs.append(textwrap.dedent(f'''
-                void {widget_type}_Set{pname}(void* ptr, void* valuePtr) {{
-                    NS{widget_type}* {var_name} = (NS{widget_type}*)ptr;
-                    NS{property.Type}* value = (NS{property.Type}*)valuePtr;
-                    [{var_name} set{pname}:value];
-                }}'''))
 
 
 def camel_to_underscore(s: str) -> str:
@@ -389,6 +446,10 @@ def camel_to_underscore(s: str) -> str:
 
 def cap(s: str) -> str:
     return s[:1].upper() + s[1:]
+
+
+def de_cap(s: str) -> str:
+    return s[:1].lower() + s[1:]
 
 
 def to_receiver_name(s: str) -> str:

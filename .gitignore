@@ -2,3 +2,4 @@
 **/.DS_Store
 examples/helloworld/helloworld
 __pycache__/
+.vscode/

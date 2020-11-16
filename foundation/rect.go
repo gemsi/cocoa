@@ -6,6 +6,9 @@ import "C"
 // #cgo LDFLAGS: -framework Cocoa
 // #include "rect.h"
 import "C"
+import "math"
+
+const SIZE_MAX = math.MaxFloat64
 
 // Point
 type Point C.NSPoint

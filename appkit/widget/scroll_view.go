@@ -17,19 +17,19 @@ type ScrollView interface {
 	// HasVerticalScroller return whether the scroll view has a vertical scroller
 	HasVerticalScroller() bool
 	// SetHasVerticalScroller set whether the scroll view has a vertical scroller
-	SetHasVerticalScroller(value bool)
+	SetHasVerticalScroller(hasVerticalScroller bool)
 	// HasHorizontalScroller return whether the scroll view has a horizontal scroller
 	HasHorizontalScroller() bool
 	// SetHasHorizontalScroller set whether the scroll view has a horizontal scroller
-	SetHasHorizontalScroller(value bool)
+	SetHasHorizontalScroller(hasHorizontalScroller bool)
 	// DocumentView return the view the scroll view scrolls within its content view
 	DocumentView() View
 	// SetDocumentView set the view the scroll view scrolls within its content view
-	SetDocumentView(value View)
+	SetDocumentView(documentView View)
 	// BorderType return the appearance of the scroll view’s border
 	BorderType() BorderType
 	// SetBorderType set the appearance of the scroll view’s border
-	SetBorderType(value BorderType)
+	SetBorderType(borderType BorderType)
 	// ContentSize return the size of the scroll view’s content view
 	ContentSize() foundation.Size
 }
@@ -40,7 +40,7 @@ type NSScrollView struct {
 	NSView
 }
 
-// Make create a View from native pointer
+// Make create a ScrollView from native pointer
 func MakeScrollView(ptr unsafe.Pointer) *NSScrollView {
 	return &NSScrollView{*MakeView(ptr)}
 }
@@ -67,32 +67,32 @@ func (s *NSScrollView) HasVerticalScroller() bool {
 	return bool(C.ScrollView_HasVerticalScroller(s.Ptr()))
 }
 
-func (s *NSScrollView) SetHasVerticalScroller(value bool) {
-	C.ScrollView_SetHasVerticalScroller(s.Ptr(), C.bool(value))
+func (s *NSScrollView) SetHasVerticalScroller(hasVerticalScroller bool) {
+	C.ScrollView_SetHasVerticalScroller(s.Ptr(), C.bool(hasVerticalScroller))
 }
 
 func (s *NSScrollView) HasHorizontalScroller() bool {
 	return bool(C.ScrollView_HasHorizontalScroller(s.Ptr()))
 }
 
-func (s *NSScrollView) SetHasHorizontalScroller(value bool) {
-	C.ScrollView_SetHasHorizontalScroller(s.Ptr(), C.bool(value))
+func (s *NSScrollView) SetHasHorizontalScroller(hasHorizontalScroller bool) {
+	C.ScrollView_SetHasHorizontalScroller(s.Ptr(), C.bool(hasHorizontalScroller))
 }
 
 func (s *NSScrollView) DocumentView() View {
 	return MakeView(C.ScrollView_DocumentView(s.Ptr()))
 }
 
-func (s *NSScrollView) SetDocumentView(value View) {
-	C.ScrollView_SetDocumentView(s.Ptr(), value.Ptr())
+func (s *NSScrollView) SetDocumentView(documentView View) {
+	C.ScrollView_SetDocumentView(s.Ptr(), documentView.Ptr())
 }
 
 func (s *NSScrollView) BorderType() BorderType {
 	return BorderType(C.ScrollView_BorderType(s.Ptr()))
 }
 
-func (s *NSScrollView) SetBorderType(value BorderType) {
-	C.ScrollView_SetBorderType(s.Ptr(), C.ulong(value))
+func (s *NSScrollView) SetBorderType(borderType BorderType) {
+	C.ScrollView_SetBorderType(s.Ptr(), C.ulong(borderType))
 }
 
 func (s *NSScrollView) ContentSize() foundation.Size {

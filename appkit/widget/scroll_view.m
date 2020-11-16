@@ -7,49 +7,39 @@ void* ScrollView_New(long id, NSRect frame) {
     NSScrollView* scroll_view = [[[NSScrollView alloc] initWithFrame:frame] autorelease];
     return (void*)scroll_view;
 }
-
 bool ScrollView_HasVerticalScroller(void* ptr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return scroll_view.hasVerticalScroller;
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	return [scrollView hasVerticalScroller];
 }
-
-void ScrollView_SetHasVerticalScroller(void* ptr, bool value) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return [scroll_view setHasVerticalScroller:value];
+void ScrollView_SetHasVerticalScroller(void* ptr, bool hasVerticalScroller) {
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	[scrollView setHasVerticalScroller:hasVerticalScroller];
 }
-
 bool ScrollView_HasHorizontalScroller(void* ptr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return scroll_view.hasHorizontalScroller;
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	return [scrollView hasHorizontalScroller];
 }
-
-void ScrollView_SetHasHorizontalScroller(void* ptr, bool value) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return [scroll_view setHasHorizontalScroller:value];
+void ScrollView_SetHasHorizontalScroller(void* ptr, bool hasHorizontalScroller) {
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	[scrollView setHasHorizontalScroller:hasHorizontalScroller];
 }
-
 void* ScrollView_DocumentView(void* ptr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return scroll_view.documentView;
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	return [scrollView documentView];
 }
-
-void ScrollView_SetDocumentView(void* ptr, void* valuePtr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    NSView* value = (NSView*)valuePtr;
-    [scroll_view setDocumentView:value];
+void ScrollView_SetDocumentView(void* ptr, void* documentView) {
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	[scrollView setDocumentView:documentView];
 }
-
 unsigned long ScrollView_BorderType(void* ptr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return scroll_view.borderType;
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	return [scrollView borderType];
 }
-
-void ScrollView_SetBorderType(void* ptr, unsigned long value) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return [scroll_view setBorderType:value];
+void ScrollView_SetBorderType(void* ptr, unsigned long borderType) {
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	[scrollView setBorderType:borderType];
 }
-
 NSSize ScrollView_ContentSize(void* ptr) {
-    NSScrollView* scroll_view = (NSScrollView*)ptr;
-    return scroll_view.contentSize;
+	NSScrollView* scrollView = (NSScrollView*)ptr;
+	return [scrollView contentSize];
 }

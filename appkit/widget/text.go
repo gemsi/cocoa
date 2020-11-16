@@ -17,39 +17,39 @@ type Text interface {
 	// String return the characters of the receiver’s text
 	String() string
 	// SetString set the characters of the receiver’s text
-	SetString(value string)
-	// Editable return whether the receiver allows the user to edit its text
-	Editable() bool
+	SetString(string string)
+	// IsEditable return whether the receiver allows the user to edit its text
+	IsEditable() bool
 	// SetEditable set whether the receiver allows the user to edit its text
-	SetEditable(value bool)
-	// Selectable return whether the receiver allows the user to select its text
-	Selectable() bool
+	SetEditable(editable bool)
+	// IsSelectable return whether the receiver allows the user to select its text
+	IsSelectable() bool
 	// SetSelectable set whether the receiver allows the user to select its text
-	SetSelectable(value bool)
-	// FieldEditor return whether the receiver interprets Tab, Shift-Tab, and Return (Enter) as cues to end editing and possibly to change the first responder
-	FieldEditor() bool
+	SetSelectable(selectable bool)
+	// IsFieldEditor return whether the receiver interprets Tab, Shift-Tab, and Return (Enter) as cues to end editing and possibly to change the first responder
+	IsFieldEditor() bool
 	// SetFieldEditor set whether the receiver interprets Tab, Shift-Tab, and Return (Enter) as cues to end editing and possibly to change the first responder
-	SetFieldEditor(value bool)
-	// RichText return whether the receiver allows the user to apply attributes to specific ranges of the text
-	RichText() bool
+	SetFieldEditor(fieldEditor bool)
+	// IsRichText return whether the receiver allows the user to apply attributes to specific ranges of the text
+	IsRichText() bool
 	// SetRichText set whether the receiver allows the user to apply attributes to specific ranges of the text
-	SetRichText(value bool)
+	SetRichText(richText bool)
 	// MinSize return the receiver’s minimum size
 	MinSize() foundation.Size
 	// SetMinSize set the receiver’s minimum size
-	SetMinSize(value foundation.Size)
+	SetMinSize(minSize foundation.Size)
 	// MaxSize return the receiver’s maximum size
 	MaxSize() foundation.Size
 	// SetMaxSize set the receiver’s maximum size
-	SetMaxSize(value foundation.Size)
-	// VerticallyResizable return whether the receiver changes its height to fit the height of its text.
-	VerticallyResizable() bool
+	SetMaxSize(maxSize foundation.Size)
+	// IsVerticallyResizable return whether the receiver changes its height to fit the height of its text.
+	IsVerticallyResizable() bool
 	// SetVerticallyResizable set whether the receiver changes its height to fit the height of its text.
-	SetVerticallyResizable(value bool)
-	// HorizontallyResizable return whether the receiver changes its width to fit the width of its text
-	HorizontallyResizable() bool
+	SetVerticallyResizable(verticallyResizable bool)
+	// IsHorizontallyResizable return whether the receiver changes its width to fit the width of its text
+	IsHorizontallyResizable() bool
 	// SetHorizontallyResizable set whether the receiver changes its width to fit the width of its text
-	SetHorizontallyResizable(value bool)
+	SetHorizontallyResizable(horizontallyResizable bool)
 }
 
 var _ Text = (*NSText)(nil)
@@ -58,7 +58,7 @@ type NSText struct {
 	NSView
 }
 
-// Make create a View from native pointer
+// Make create a Text from native pointer
 func MakeText(ptr unsafe.Pointer) *NSText {
 	return &NSText{*MakeView(ptr)}
 }
@@ -85,72 +85,72 @@ func (t *NSText) String() string {
 	return C.GoString(C.Text_String(t.Ptr()))
 }
 
-func (t *NSText) SetString(value string) {
-	cstr := C.CString(value)
-	defer C.free(unsafe.Pointer(cstr))
-	C.Text_SetString(t.Ptr(), cstr)
+func (t *NSText) SetString(string string) {
+	c_string := C.CString(string)
+	defer C.free(unsafe.Pointer(c_string))
+	C.Text_SetString(t.Ptr(), c_string)
 }
 
-func (t *NSText) Editable() bool {
-	return bool(C.Text_Editable(t.Ptr()))
+func (t *NSText) IsEditable() bool {
+	return bool(C.Text_IsEditable(t.Ptr()))
 }
 
-func (t *NSText) SetEditable(value bool) {
-	C.Text_SetEditable(t.Ptr(), C.bool(value))
+func (t *NSText) SetEditable(editable bool) {
+	C.Text_SetEditable(t.Ptr(), C.bool(editable))
 }
 
-func (t *NSText) Selectable() bool {
-	return bool(C.Text_Selectable(t.Ptr()))
+func (t *NSText) IsSelectable() bool {
+	return bool(C.Text_IsSelectable(t.Ptr()))
 }
 
-func (t *NSText) SetSelectable(value bool) {
-	C.Text_SetSelectable(t.Ptr(), C.bool(value))
+func (t *NSText) SetSelectable(selectable bool) {
+	C.Text_SetSelectable(t.Ptr(), C.bool(selectable))
 }
 
-func (t *NSText) FieldEditor() bool {
-	return bool(C.Text_FieldEditor(t.Ptr()))
+func (t *NSText) IsFieldEditor() bool {
+	return bool(C.Text_IsFieldEditor(t.Ptr()))
 }
 
-func (t *NSText) SetFieldEditor(value bool) {
-	C.Text_SetFieldEditor(t.Ptr(), C.bool(value))
+func (t *NSText) SetFieldEditor(fieldEditor bool) {
+	C.Text_SetFieldEditor(t.Ptr(), C.bool(fieldEditor))
 }
 
-func (t *NSText) RichText() bool {
-	return bool(C.Text_RichText(t.Ptr()))
+func (t *NSText) IsRichText() bool {
+	return bool(C.Text_IsRichText(t.Ptr()))
 }
 
-func (t *NSText) SetRichText(value bool) {
-	C.Text_SetRichText(t.Ptr(), C.bool(value))
+func (t *NSText) SetRichText(richText bool) {
+	C.Text_SetRichText(t.Ptr(), C.bool(richText))
 }
 
 func (t *NSText) MinSize() foundation.Size {
 	return toSize(C.Text_MinSize(t.Ptr()))
 }
 
-func (t *NSText) SetMinSize(value foundation.Size) {
-	C.Text_SetMinSize(t.Ptr(), toNSSize(value))
+func (t *NSText) SetMinSize(minSize foundation.Size) {
+	C.Text_SetMinSize(t.Ptr(), toNSSize(minSize))
 }
 
 func (t *NSText) MaxSize() foundation.Size {
 	return toSize(C.Text_MaxSize(t.Ptr()))
 }
 
-func (t *NSText) SetMaxSize(value foundation.Size) {
-	C.Text_SetMaxSize(t.Ptr(), toNSSize(value))
+func (t *NSText) SetMaxSize(maxSize foundation.Size) {
+	C.Text_SetMaxSize(t.Ptr(), toNSSize(maxSize))
 }
 
-func (t *NSText) VerticallyResizable() bool {
-	return bool(C.Text_VerticallyResizable(t.Ptr()))
+func (t *NSText) IsVerticallyResizable() bool {
+	return bool(C.Text_IsVerticallyResizable(t.Ptr()))
 }
 
-func (t *NSText) SetVerticallyResizable(value bool) {
-	C.Text_SetVerticallyResizable(t.Ptr(), C.bool(value))
+func (t *NSText) SetVerticallyResizable(verticallyResizable bool) {
+	C.Text_SetVerticallyResizable(t.Ptr(), C.bool(verticallyResizable))
 }
 
-func (t *NSText) HorizontallyResizable() bool {
-	return bool(C.Text_HorizontallyResizable(t.Ptr()))
+func (t *NSText) IsHorizontallyResizable() bool {
+	return bool(C.Text_IsHorizontallyResizable(t.Ptr()))
 }
 
-func (t *NSText) SetHorizontallyResizable(value bool) {
-	C.Text_SetHorizontallyResizable(t.Ptr(), C.bool(value))
+func (t *NSText) SetHorizontallyResizable(horizontallyResizable bool) {
+	C.Text_SetHorizontallyResizable(t.Ptr(), C.bool(horizontallyResizable))
 }

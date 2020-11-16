@@ -7,33 +7,27 @@ void* TextContainer_New(long id, NSSize size) {
     NSTextContainer* text_container = [[[NSTextContainer alloc] initWithSize:size] autorelease];
     return (void*)text_container;
 }
-
 NSSize TextContainer_Size(void* ptr) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    return text_container.size;
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	return [textContainer size];
 }
-
-void TextContainer_SetSize(void* ptr, NSSize value) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    [text_container setSize:value];
+void TextContainer_SetSize(void* ptr, NSSize size) {
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	[textContainer setSize:size];
 }
-
 bool TextContainer_WidthTracksTextView(void* ptr) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    return text_container.widthTracksTextView;
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	return [textContainer widthTracksTextView];
 }
-
-void TextContainer_SetWidthTracksTextView(void* ptr, bool value) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    return [text_container setWidthTracksTextView:value];
+void TextContainer_SetWidthTracksTextView(void* ptr, bool widthTracksTextView) {
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	[textContainer setWidthTracksTextView:widthTracksTextView];
 }
-
 bool TextContainer_HeightTracksTextView(void* ptr) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    return text_container.heightTracksTextView;
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	return [textContainer heightTracksTextView];
 }
-
-void TextContainer_SetHeightTracksTextView(void* ptr, bool value) {
-    NSTextContainer* text_container = (NSTextContainer*)ptr;
-    return [text_container setHeightTracksTextView:value];
+void TextContainer_SetHeightTracksTextView(void* ptr, bool heightTracksTextView) {
+	NSTextContainer* textContainer = (NSTextContainer*)ptr;
+	[textContainer setHeightTracksTextView:heightTracksTextView];
 }

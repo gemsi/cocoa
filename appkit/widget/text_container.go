@@ -17,15 +17,15 @@ type TextContainer interface {
 	// Size return the size of the text container’s bounding rectangle
 	Size() foundation.Size
 	// SetSize set the size of the text container’s bounding rectangle
-	SetSize(value foundation.Size)
+	SetSize(size foundation.Size)
 	// WidthTracksTextView return whether the text container adjusts the width of its bounding rectangle when its text view resizes
 	WidthTracksTextView() bool
 	// SetWidthTracksTextView set whether the text container adjusts the width of its bounding rectangle when its text view resizes
-	SetWidthTracksTextView(value bool)
+	SetWidthTracksTextView(widthTracksTextView bool)
 	// HeightTracksTextView return whether the text container adjusts the height of its bounding rectangle when its text view resizes
 	HeightTracksTextView() bool
 	// SetHeightTracksTextView set whether the text container adjusts the height of its bounding rectangle when its text view resizes
-	SetHeightTracksTextView(value bool)
+	SetHeightTracksTextView(heightTracksTextView bool)
 }
 
 var _ TextContainer = (*NSTextContainer)(nil)
@@ -61,22 +61,22 @@ func (t *NSTextContainer) Size() foundation.Size {
 	return toSize(C.TextContainer_Size(t.Ptr()))
 }
 
-func (t *NSTextContainer) SetSize(value foundation.Size) {
-	C.TextContainer_SetSize(t.Ptr(), toNSSize(value))
+func (t *NSTextContainer) SetSize(size foundation.Size) {
+	C.TextContainer_SetSize(t.Ptr(), toNSSize(size))
 }
 
 func (t *NSTextContainer) WidthTracksTextView() bool {
 	return bool(C.TextContainer_WidthTracksTextView(t.Ptr()))
 }
 
-func (t *NSTextContainer) SetWidthTracksTextView(value bool) {
-	C.TextContainer_SetWidthTracksTextView(t.Ptr(), C.bool(value))
+func (t *NSTextContainer) SetWidthTracksTextView(widthTracksTextView bool) {
+	C.TextContainer_SetWidthTracksTextView(t.Ptr(), C.bool(widthTracksTextView))
 }
 
 func (t *NSTextContainer) HeightTracksTextView() bool {
 	return bool(C.TextContainer_HeightTracksTextView(t.Ptr()))
 }
 
-func (t *NSTextContainer) SetHeightTracksTextView(value bool) {
-	C.TextContainer_SetHeightTracksTextView(t.Ptr(), C.bool(value))
+func (t *NSTextContainer) SetHeightTracksTextView(heightTracksTextView bool) {
+	C.TextContainer_SetHeightTracksTextView(t.Ptr(), C.bool(heightTracksTextView))
 }

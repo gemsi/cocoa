@@ -8,12 +8,12 @@ if __name__ == "__main__":
         Type="TextContainer",
         super_type='foundation.Object',
         description="a region where text layout occurs.",
-        init_method=InitMethod(param_name='size', param_type='Size'),
+        init_method=InitMethod(param_name='size', param_type='foundation.Size'),
         properties=[
-            Property(name="size", Type='Size', description='the size of the text container’s bounding rectangle'),
-            Property(name="widthTracksTextView", Type='bool',
+            Property(name="size", Type='foundation.Size', description='the size of the text container’s bounding rectangle'),
+            Property(name="widthTracksTextView", Type='bool', prefixIs=False,
                      description='whether the text container adjusts the width of its bounding rectangle when its text view resizes'),
-            Property(name="heightTracksTextView", Type='bool',
+            Property(name="heightTracksTextView", Type='bool', prefixIs=False,
                      description='whether the text container adjusts the height of its bounding rectangle when its text view resizes'),
         ],
     )

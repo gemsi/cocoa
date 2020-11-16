@@ -6,7 +6,6 @@ import (
 	"github.com/hsiafan/cocoa/appkit/widget"
 	"github.com/hsiafan/cocoa/core/dispatch"
 	"github.com/hsiafan/cocoa/foundation"
-	"math"
 	"runtime"
 	"time"
 )
@@ -80,21 +79,7 @@ func main() {
 	}()
 
 	// text view & scroll view
-	tv := widget.NewTextView(foundation.MkRect(10, 200, 400, 400))
-	sv := widget.NewScrollView(foundation.MkRect(10, 200, 200, 30))
-	svSize := sv.ContentSize()
-	tv.SetMinSize(foundation.MkSize(0.0, svSize.Height()))
-	tv.SetMaxSize(foundation.MkSize(math.MaxFloat32, math.MaxFloat32))
-	tv.SetVerticallyResizable(true)
-	tv.SetHorizontallyResizable(false)
-	tv.SetAutoresizingMask(widget.ViewWidthSizable)
-	tv.TextContainer().SetSize(foundation.MkSize(svSize.Width(), math.MaxFloat32))
-	tv.TextContainer().SetWidthTracksTextView(true)
-	sv.SetHasHorizontalScroller(false)
-	sv.SetHasVerticalScroller(true)
-	//sv.SetBorderType(widget.NoBorder)
-	sv.SetDocumentView(tv)
-	sv.SetAutoresizingMask(widget.ViewWidthSizable | widget.ViewHeightSizable)
+	sv := widget.NewVerticallyScrollableTextView(foundation.MkRect(10, 200, 200, 30))
 	w.AddView(sv)
 	/*
 		Listing 4  Setting up a horizontal scroll bar

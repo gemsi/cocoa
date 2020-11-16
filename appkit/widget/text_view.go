@@ -17,7 +17,7 @@ type TextView interface {
 	// TextContainer return the receiver’s text container
 	TextContainer() TextContainer
 	// SetTextContainer set the receiver’s text container
-	SetTextContainer(value TextContainer)
+	SetTextContainer(textContainer TextContainer)
 }
 
 var _ TextView = (*NSTextView)(nil)
@@ -26,7 +26,7 @@ type NSTextView struct {
 	NSText
 }
 
-// Make create a View from native pointer
+// Make create a TextView from native pointer
 func MakeTextView(ptr unsafe.Pointer) *NSTextView {
 	return &NSTextView{*MakeText(ptr)}
 }
@@ -53,6 +53,6 @@ func (t *NSTextView) TextContainer() TextContainer {
 	return MakeTextContainer(C.TextView_TextContainer(t.Ptr()))
 }
 
-func (t *NSTextView) SetTextContainer(value TextContainer) {
-	C.TextView_SetTextContainer(t.Ptr(), value.Ptr())
+func (t *NSTextView) SetTextContainer(textContainer TextContainer) {
+	C.TextView_SetTextContainer(t.Ptr(), textContainer.Ptr())
 }
