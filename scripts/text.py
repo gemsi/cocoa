@@ -1,14 +1,13 @@
 #!env python3
 
-from generate_widget import Generator, Property, InitMethod
+from .generate import Component, Property, InitMethod
 
 
 if __name__ == "__main__":
-    generator = Generator(
-        Type = "Text", 
-        super_type = 'View',
+    w = Component(
+        Type = "appkit.Text", 
+        super_type = 'appkit.View',
         description = "The most general programmatic interface for objects that manage text.",
-        init_method=InitMethod(param_name='frame', param_type='foundation.Rect'),
         properties = [
             Property(name="string", Type='string', description='the characters of the receiver’s text'),
             Property(name="editable", Type='bool', description='whether the receiver allows the user to edit its text'),
@@ -21,4 +20,4 @@ if __name__ == "__main__":
             Property(name="horizontallyResizable", Type='bool', description='whether the receiver changes its width to fit the width of its text'),
         ],
     )
-    generator.generate_widgets()
+    w.generate_code()

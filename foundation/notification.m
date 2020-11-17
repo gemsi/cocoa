@@ -9,3 +9,8 @@ const char* Notification_Name(void* ptr) {
     NSNotification* notification = (NSNotification*)ptr;
     return [[notification name] UTF8String];
 }
+
+void* Notification_Object(void* ptr) {
+    NSNotification* notification = (NSNotification*)ptr;
+    return [notification object];
+}

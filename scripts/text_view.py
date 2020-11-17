@@ -1,16 +1,16 @@
 #!env python3
 
-from generate_widget import Generator, Property, InitMethod
+from .generate import Component, Property, InitMethod, Param
 
 
 if __name__ == "__main__":
-    generator = Generator(
-        Type="TextView",
-        super_type='Text',
+    w = Component(
+        Type="appkit.TextView",
+        super_type='appkit.Text',
         description="A view that draws text and handles user interactions with that text.",
-        init_method=InitMethod(param_name='frame', param_type='foundation.Rect'),
+        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
         properties=[
-            Property(name="textContainer", Type='TextContainer', description='the receiver’s text container'),
+            Property(name="textContainer", Type='appkit.TextContainer', description='the receiver’s text container'),
         ],
     )
-    generator.generate_widgets()
+    w.generate_code()

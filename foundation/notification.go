@@ -20,28 +20,21 @@ type Notification interface {
 var _ Notification = (*NSNotification)(nil)
 
 // MakeObject create new Notification, from native pointer of NSNotification, and the sender object
-func MakeNotification(ptr unsafe.Pointer, obj Object) *NSNotification {
+func MakeNotification(ptr unsafe.Pointer) *NSNotification {
 	return &NSNotification{
 		NSObject: *MakeObject(ptr),
-		object:   obj,
 	}
 }
 
 type NSNotification struct {
 	NSObject
-	name   *string
-	object Object
 }
 
 func (n *NSNotification) Name() string {
-	if n.name == nil {
-		cstr := C.Notification_Name(n.Ptr())
-		name := C.GoString(cstr)
-		n.name = &name
-	}
-	return *n.name
+	cstr := C.Notification_Name(n.Ptr())
+	return C.GoString(cstr)
 }
 
 func (n *NSNotification) Object() Object {
-	return n.object
+	return MakeObject(unsafe.Pointer(C.Notification_Object(n.ptr)))
 }
