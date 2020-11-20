@@ -46,6 +46,9 @@ type NSSplitView struct {
 
 // MakeSplitView create a SplitView from native pointer
 func MakeSplitView(ptr unsafe.Pointer) *NSSplitView {
+	if ptr == nil {
+		return nil
+	}
 	return &NSSplitView{
 		NSView: *MakeView(ptr),
 	}

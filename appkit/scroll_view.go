@@ -42,6 +42,9 @@ type NSScrollView struct {
 
 // MakeScrollView create a ScrollView from native pointer
 func MakeScrollView(ptr unsafe.Pointer) *NSScrollView {
+	if ptr == nil {
+		return nil
+	}
 	return &NSScrollView{
 		NSView: *MakeView(ptr),
 	}
@@ -82,7 +85,7 @@ func (s *NSScrollView) DocumentView() View {
 }
 
 func (s *NSScrollView) SetDocumentView(documentView View) {
-	C.ScrollView_SetDocumentView(s.Ptr(), documentView.Ptr())
+	C.ScrollView_SetDocumentView(s.Ptr(), toPointer(documentView))
 }
 
 func (s *NSScrollView) BorderType() BorderType {

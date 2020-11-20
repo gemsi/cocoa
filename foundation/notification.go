@@ -21,6 +21,9 @@ var _ Notification = (*NSNotification)(nil)
 
 // MakeObject create new Notification, from native pointer of NSNotification, and the sender object
 func MakeNotification(ptr unsafe.Pointer) *NSNotification {
+	if ptr == nil {
+		return nil
+	}
 	return &NSNotification{
 		NSObject: *MakeObject(ptr),
 	}

@@ -52,6 +52,9 @@ type NSTabViewItem struct {
 
 // MakeTabViewItem create a TabViewItem from native pointer
 func MakeTabViewItem(ptr unsafe.Pointer) *NSTabViewItem {
+	if ptr == nil {
+		return nil
+	}
 	return &NSTabViewItem{
 		NSObject: *foundation.MakeObject(ptr),
 	}
@@ -60,7 +63,7 @@ func MakeTabViewItem(ptr unsafe.Pointer) *NSTabViewItem {
 // NewTabViewItem create new TabViewItem
 func NewTabViewItem(identifier foundation.Object) TabViewItem {
 	id := resources.NextId()
-	ptr := C.TabViewItem_initWithIdentifier(C.long(id), identifier.Ptr())
+	ptr := C.TabViewItem_initWithIdentifier(C.long(id), toPointer(identifier))
 	v := &NSTabViewItem{
 		NSObject: *foundation.MakeObject(ptr),
 	}
@@ -100,7 +103,7 @@ func (t *NSTabViewItem) Identifier() foundation.Object {
 }
 
 func (t *NSTabViewItem) SetIdentifier(identifier foundation.Object) {
-	C.TabViewItem_SetIdentifier(t.Ptr(), identifier.Ptr())
+	C.TabViewItem_SetIdentifier(t.Ptr(), toPointer(identifier))
 }
 
 func (t *NSTabViewItem) Color() Color {
@@ -108,7 +111,7 @@ func (t *NSTabViewItem) Color() Color {
 }
 
 func (t *NSTabViewItem) SetColor(color Color) {
-	C.TabViewItem_SetColor(t.Ptr(), color.Ptr())
+	C.TabViewItem_SetColor(t.Ptr(), toPointer(color))
 }
 
 func (t *NSTabViewItem) View() View {
@@ -116,7 +119,7 @@ func (t *NSTabViewItem) View() View {
 }
 
 func (t *NSTabViewItem) SetView(view View) {
-	C.TabViewItem_SetView(t.Ptr(), view.Ptr())
+	C.TabViewItem_SetView(t.Ptr(), toPointer(view))
 }
 
 func (t *NSTabViewItem) InitialFirstResponder() View {
@@ -124,7 +127,7 @@ func (t *NSTabViewItem) InitialFirstResponder() View {
 }
 
 func (t *NSTabViewItem) SetInitialFirstResponder(initialFirstResponder View) {
-	C.TabViewItem_SetInitialFirstResponder(t.Ptr(), initialFirstResponder.Ptr())
+	C.TabViewItem_SetInitialFirstResponder(t.Ptr(), toPointer(initialFirstResponder))
 }
 
 func (t *NSTabViewItem) TabView() TabView {

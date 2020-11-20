@@ -1,8 +1,12 @@
 #import <Appkit/NSTabView.h>
 #import "tab_view.h"
+#import "tab_view_delegate.h"
 
 void* TabView_initWithFrame(long goID, NSRect frame) {
 	NSTabView* tab_view = [[[NSTabView alloc] initWithFrame:frame] autorelease];
+	GoNSTabViewDelegate* delegate = [[GoNSTabViewDelegate alloc] init];
+	[delegate setGoID:goID];
+	[tab_view setDelegate:delegate];
 	return (void*)tab_view;
 }
 

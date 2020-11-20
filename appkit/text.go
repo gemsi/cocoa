@@ -60,6 +60,9 @@ type NSText struct {
 
 // MakeText create a Text from native pointer
 func MakeText(ptr unsafe.Pointer) *NSText {
+	if ptr == nil {
+		return nil
+	}
 	return &NSText{
 		NSView: *MakeView(ptr),
 	}

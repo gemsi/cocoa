@@ -36,6 +36,9 @@ type NSTextContainer struct {
 
 // MakeTextContainer create a TextContainer from native pointer
 func MakeTextContainer(ptr unsafe.Pointer) *NSTextContainer {
+	if ptr == nil {
+		return nil
+	}
 	return &NSTextContainer{
 		NSObject: *foundation.MakeObject(ptr),
 	}

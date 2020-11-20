@@ -80,6 +80,8 @@ def objc_type(Type: str) -> str:
     if Type == '':
         return 'void'
     elif Type in c_type_dict:
+        if Type == 'bool':
+            return 'BOOL'
         return c_type_dict[Type]
     elif Type in geo_struct_types:
         return 'NS' + type_part(Type)
@@ -122,7 +124,10 @@ class Param:
         return c_type(self.Type) + ' ' + self.name
 
     def objc_def_code(self) -> str:
-        return f'({objc_type(self.Type)}){self.name}'
+        code = f'({objc_type(self.Type)}){self.name}'
+        if self.objc_param_name:
+            code = self.objc_param_name + ':' + code
+        return code
 
     def cgo_export_def_code(self) -> str:
         return f'{self.name} {cgo_export_type(self.Type)}'
@@ -136,7 +141,7 @@ class Param:
         elif self.Type in geo_struct_types:
             return f'toNS{type_part(self.Type)}({self.name})'
         else:
-            return f'{self.name}.Ptr()'
+            return f'toPointer({self.name})'
 
     def c_to_objc_code(self) -> str:
         """convert c types to objc types"""
@@ -298,6 +303,8 @@ class DelegateMethod:
     params: List[Param]
     description: str
     return_value: ReturnValue = ReturnValue('')
+    go_func_name: str = ''
+    default_return_value: str = ''
 
     def __post_init__(self):
         pass
@@ -306,14 +313,15 @@ class DelegateMethod:
         self.current_pkg = current_pkg
         self.receiver_type = receiver_type
         self.receiver_name = receiver_type[0].lower()
-        self.go_func_name = cap(self.name)
-        self.go_params_str = ' '.join([p.go_def_code(current_pkg) for p in self.params])
-        self.cgo_export_func_name = f'{self.receiver_type}_Delegate_{cap(self.name)}'
+        self.go_params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         self.objc_func_name = de_cap(self.name)
-        self.callback_field_name = de_cap(self.name)
         self.go_def_return = self.return_value.go_def_code(current_pkg)
         if self.go_def_return:
             self.go_def_return = ' ' + self.go_def_return
+        if not self.go_func_name:
+            self.go_func_name = cap(self.name)
+        self.cgo_export_func_name = f'{self.receiver_type}_Delegate_{self.go_func_name}'
+        self.callback_field_name = de_cap(self.go_func_name)
 
     def go_interface_code(self) -> List[str]:
         return [
@@ -332,25 +340,34 @@ class DelegateMethod:
         return codes
 
     def go_callback_field_code(self) -> List[str]:
-        return [f'{self.callback_field_name} func({self.go_params_str})']
+        return [f'{self.callback_field_name} func({self.go_params_str}){self.go_def_return}']
 
     def cgo_export_code(self) -> List[str]:
         param_name = de_cap(self.receiver_type)
-        params_def_str = ' '.join([param.cgo_export_def_code() for param in self.params])
-        args_str = ' '.join([param.cgo_export_to_go_code(self.current_pkg) for param in self.params])
-        return [
+        params_def_str = ', '.join([param.cgo_export_def_code() for param in self.params])
+        args_str = ', '.join([param.cgo_export_to_go_code(self.current_pkg) for param in self.params])
+        return_str = self.return_value.go_def_code(self.current_pkg)
+        if return_str:
+            return_str = ' ' + return_str
+        codes = [
             f'//export {self.cgo_export_func_name}',
-            f'func {self.cgo_export_func_name}(id int64, {params_def_str}) {{',
+            f'func {self.cgo_export_func_name}(id int64, {params_def_str}){return_str} {{',
             f'\t{param_name} := resources.Get(id).(*NS{self.receiver_type})',
             f'\tif {param_name}.{self.callback_field_name} != nil {{',
-            f'\t\t{param_name}.{self.callback_field_name}({args_str})',
-            '\t}',
-            '}'
         ]
+        return_state = f'\t\t{param_name}.{self.callback_field_name}({args_str})'
+        if return_str:
+            return_state = 'return ' + return_state
+        codes.append(return_state)
+        codes.append('\t}')
+        if return_str:
+            codes.append(f'\treturn {self.default_return_value}')
+        codes.append('}')
+        return codes
 
     def objc_m_code(self) -> List[str]:
         params_def_str = ' '.join([param.objc_def_code() for param in self.params])
-        args_str = ' '.join([param.objc_to_c_code() for param in self.params])
+        args_str = ', '.join([param.objc_to_c_code() for param in self.params])
         # TODO: convert ns types to c types?
         return [
             f'- ({self.return_value.objc_def_code()}){self.objc_func_name}:{params_def_str} {{',
@@ -377,7 +394,7 @@ class ActionMethod:
         self.receiver_type = receiver_type
         self.receiver_name = receiver_type[0].lower()
         self.go_func_name = 'Set' + cap(self.name)
-        self.go_params_str = ' '.join([p.go_def_code(current_pkg) for p in self.params])
+        self.go_params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         self.cgo_export_func_name = f'{self.receiver_type}_Target_{cap(self.name)}'
         self.objc_func_name = 'on' + cap(self.name)
         self.callback_field_name = de_cap(self.name)
@@ -597,6 +614,9 @@ class Component:
         make_method_str = textwrap.dedent(f'''
         // Make{type_name} create a {type_name} from native pointer
         func Make{type_name}(ptr unsafe.Pointer) *{ns_name} {{
+        \tif ptr == nil {{
+        \t\treturn nil
+        \t}}
         \treturn &{ns_name}{{
         \t\tNS{super_type_name}: *{super_make_name}(ptr),
         \t}}

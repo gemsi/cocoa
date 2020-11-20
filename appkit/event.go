@@ -32,6 +32,9 @@ type NSEvent struct {
 
 // MakeEvent create a Event from native pointer
 func MakeEvent(ptr unsafe.Pointer) *NSEvent {
+	if ptr == nil {
+		return nil
+	}
 	return &NSEvent{
 		NSObject: *foundation.MakeObject(ptr),
 	}

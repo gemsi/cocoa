@@ -96,7 +96,7 @@ func main() {
 	w.WindowDidMove(func(notification foundation.Notification) {
 		label.SetStringValue("moved!")
 	})
-	w.MakeKeyAndOrderFront(w)
+	w.MakeKeyAndOrderFront(nil)
 	w.Center()
 
 	appkit.Run()

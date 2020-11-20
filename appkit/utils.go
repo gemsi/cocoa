@@ -32,3 +32,10 @@ func toNSPoint(pointer foundation.Point) C.NSPoint {
 func toPoint(pointer C.NSPoint) foundation.Point {
 	return *(*foundation.Point)(unsafe.Pointer(&pointer))
 }
+
+func toPointer(o foundation.Object) unsafe.Pointer {
+	if o == nil {
+		return nil
+	}
+	return o.Ptr()
+}

@@ -66,16 +66,31 @@ type TabView interface {
 	SelectTabViewItem(tabViewItem TabViewItem)
 	// SelectTabViewItemAtIndex selects the tab view item specified by index
 	SelectTabViewItemAtIndex(index int)
+	// TabViewDidChangeNumberOfTabViewItems informs the delegate that the number of tab view items in tabView has changed
+	TabViewDidChangeNumberOfTabViewItems(callback func(view TabView))
+	// ShouldSelectTabViewItem invoked just before tabViewItem in tabView is selected. Return true if the tab view item should be selected, otherwise no.
+	ShouldSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem) bool)
+	// WillSelectTabViewItem informs the delegate that tabView is about to select tabViewItem
+	WillSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem))
+	// DidSelectTabViewItem informs the delegate that tabView has selected tabViewItem
+	DidSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem))
 }
 
 var _ TabView = (*NSTabView)(nil)
 
 type NSTabView struct {
 	NSView
+	tabViewDidChangeNumberOfTabViewItems func(view TabView)
+	shouldSelectTabViewItem              func(view TabView, tabViewItem TabViewItem) bool
+	willSelectTabViewItem                func(view TabView, tabViewItem TabViewItem)
+	didSelectTabViewItem                 func(view TabView, tabViewItem TabViewItem)
 }
 
 // MakeTabView create a TabView from native pointer
 func MakeTabView(ptr unsafe.Pointer) *NSTabView {
+	if ptr == nil {
+		return nil
+	}
 	return &NSTabView{
 		NSView: *MakeView(ptr),
 	}
@@ -140,7 +155,7 @@ func (t *NSTabView) Font() Font {
 }
 
 func (t *NSTabView) SetFont(font Font) {
-	C.TabView_SetFont(t.Ptr(), font.Ptr())
+	C.TabView_SetFont(t.Ptr(), toPointer(font))
 }
 
 func (t *NSTabView) MinimumSize() foundation.Size {
@@ -156,19 +171,19 @@ func (t *NSTabView) SetControlSize(controlSize ControlSize) {
 }
 
 func (t *NSTabView) AddTabViewItem(tabViewItem TabViewItem) {
-	C.TabView_AddTabViewItem(t.Ptr(), tabViewItem.Ptr())
+	C.TabView_AddTabViewItem(t.Ptr(), toPointer(tabViewItem))
 }
 
 func (t *NSTabView) InsertTabViewItem(tabViewItem TabViewItem, index int) {
-	C.TabView_InsertTabViewItem(t.Ptr(), tabViewItem.Ptr(), C.long(index))
+	C.TabView_InsertTabViewItem(t.Ptr(), toPointer(tabViewItem), C.long(index))
 }
 
 func (t *NSTabView) RemoveTabViewItem(tabViewItem TabViewItem) {
-	C.TabView_RemoveTabViewItem(t.Ptr(), tabViewItem.Ptr())
+	C.TabView_RemoveTabViewItem(t.Ptr(), toPointer(tabViewItem))
 }
 
 func (t *NSTabView) IndexOfTabViewItem(tabViewItem TabViewItem) int {
-	return int(C.TabView_IndexOfTabViewItem(t.Ptr(), tabViewItem.Ptr()))
+	return int(C.TabView_IndexOfTabViewItem(t.Ptr(), toPointer(tabViewItem)))
 }
 
 func (t *NSTabView) TabViewItemAtIndex(index int) TabViewItem {
@@ -176,25 +191,74 @@ func (t *NSTabView) TabViewItemAtIndex(index int) TabViewItem {
 }
 
 func (t *NSTabView) SelectFirstTabViewItem(sender foundation.Object) {
-	C.TabView_SelectFirstTabViewItem(t.Ptr(), sender.Ptr())
+	C.TabView_SelectFirstTabViewItem(t.Ptr(), toPointer(sender))
 }
 
 func (t *NSTabView) SelectLastTabViewItem(sender foundation.Object) {
-	C.TabView_SelectLastTabViewItem(t.Ptr(), sender.Ptr())
+	C.TabView_SelectLastTabViewItem(t.Ptr(), toPointer(sender))
 }
 
 func (t *NSTabView) SelectNextTabViewItem(sender foundation.Object) {
-	C.TabView_SelectNextTabViewItem(t.Ptr(), sender.Ptr())
+	C.TabView_SelectNextTabViewItem(t.Ptr(), toPointer(sender))
 }
 
 func (t *NSTabView) SelectPreviousTabViewItem(sender foundation.Object) {
-	C.TabView_SelectPreviousTabViewItem(t.Ptr(), sender.Ptr())
+	C.TabView_SelectPreviousTabViewItem(t.Ptr(), toPointer(sender))
 }
 
 func (t *NSTabView) SelectTabViewItem(tabViewItem TabViewItem) {
-	C.TabView_SelectTabViewItem(t.Ptr(), tabViewItem.Ptr())
+	C.TabView_SelectTabViewItem(t.Ptr(), toPointer(tabViewItem))
 }
 
 func (t *NSTabView) SelectTabViewItemAtIndex(index int) {
 	C.TabView_SelectTabViewItemAtIndex(t.Ptr(), C.long(index))
+}
+
+func (t *NSTabView) TabViewDidChangeNumberOfTabViewItems(callback func(view TabView)) {
+	t.tabViewDidChangeNumberOfTabViewItems = callback
+}
+
+func (t *NSTabView) ShouldSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem) bool) {
+	t.shouldSelectTabViewItem = callback
+}
+
+func (t *NSTabView) WillSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem)) {
+	t.willSelectTabViewItem = callback
+}
+
+func (t *NSTabView) DidSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem)) {
+	t.didSelectTabViewItem = callback
+}
+
+//export TabView_Delegate_TabViewDidChangeNumberOfTabViewItems
+func TabView_Delegate_TabViewDidChangeNumberOfTabViewItems(id int64, view unsafe.Pointer) {
+	tabView := resources.Get(id).(*NSTabView)
+	if tabView.tabViewDidChangeNumberOfTabViewItems != nil {
+		tabView.tabViewDidChangeNumberOfTabViewItems(MakeTabView(view))
+	}
+}
+
+//export TabView_Delegate_ShouldSelectTabViewItem
+func TabView_Delegate_ShouldSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) bool {
+	tabView := resources.Get(id).(*NSTabView)
+	if tabView.shouldSelectTabViewItem != nil {
+		return tabView.shouldSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	}
+	return true
+}
+
+//export TabView_Delegate_WillSelectTabViewItem
+func TabView_Delegate_WillSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) {
+	tabView := resources.Get(id).(*NSTabView)
+	if tabView.willSelectTabViewItem != nil {
+		tabView.willSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	}
+}
+
+//export TabView_Delegate_DidSelectTabViewItem
+func TabView_Delegate_DidSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) {
+	tabView := resources.Get(id).(*NSTabView)
+	if tabView.didSelectTabViewItem != nil {
+		tabView.didSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	}
 }

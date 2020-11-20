@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import Component, Property, InitMethod, Param, Method, ReturnValue
+from .generate import Component, Property, InitMethod, Param, Method, ReturnValue, DelegateMethod
 
 if __name__ == "__main__":
     w = Component(
@@ -22,7 +22,7 @@ if __name__ == "__main__":
                      description='the font used for the tab view’s label text'),
             Property(name='minimumSize', Type='foundation.Size', readonly=True,
                      description='the minimum size necessary for the tab view to display tabs in a useful way'),
-            Property(name='controlSize', Type='uint',go_alias_type='ControlSize',
+            Property(name='controlSize', Type='uint', go_alias_type='ControlSize',
                      description='the size of the tab view'),
         ],
         methods=[
@@ -86,7 +86,42 @@ if __name__ == "__main__":
                 params=[Param(name='index', Type='int')],
                 description='selects the tab view item specified by index',
             ),
-
-        ]
+        ],
+        delegate_methods=[
+            DelegateMethod(
+                name='tabViewDidChangeNumberOfTabViewItems',
+                params=[Param(name='view', Type='appkit.TabView')],
+                description='informs the delegate that the number of tab view items in tabView has changed',
+            ),
+            DelegateMethod(
+                name='tabView',
+                go_func_name='ShouldSelectTabViewItem',
+                params=[
+                    Param(name='view', Type='appkit.TabView'),
+                    Param(name='tabViewItem', Type='appkit.TabViewItem', objc_param_name='shouldSelectTabViewItem'),
+                ],
+                return_value=ReturnValue(Type='bool'),
+                default_return_value='true',
+                description='invoked just before tabViewItem in tabView is selected. Return true if the tab view item should be selected, otherwise no.',
+            ),
+            DelegateMethod(
+                name='tabView',
+                go_func_name='WillSelectTabViewItem',
+                params=[
+                    Param(name='view', Type='appkit.TabView'),
+                    Param(name='tabViewItem', Type='appkit.TabViewItem', objc_param_name='willSelectTabViewItem'),
+                ],
+                description='informs the delegate that tabView is about to select tabViewItem',
+            ),
+            DelegateMethod(
+                name='tabView',
+                go_func_name='DidSelectTabViewItem',
+                params=[
+                    Param(name='view', Type='appkit.TabView'),
+                    Param(name='tabViewItem', Type='appkit.TabViewItem', objc_param_name='didSelectTabViewItem'),
+                ],
+                description='informs the delegate that tabView has selected tabViewItem',
+            ),
+        ],
     )
     w.generate_code()

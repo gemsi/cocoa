@@ -53,6 +53,9 @@ type NSControl struct {
 
 // MakeControl create a Control from native pointer
 func MakeControl(ptr unsafe.Pointer) *NSControl {
+	if ptr == nil {
+		return nil
+	}
 	return &NSControl{
 		NSView: *MakeView(ptr),
 	}
@@ -113,7 +116,7 @@ func (c *NSControl) Cell() Cell {
 }
 
 func (c *NSControl) SetCell(cell Cell) {
-	C.Control_SetCell(c.Ptr(), cell.Ptr())
+	C.Control_SetCell(c.Ptr(), toPointer(cell))
 }
 
 func (c *NSControl) SizeToFit() {

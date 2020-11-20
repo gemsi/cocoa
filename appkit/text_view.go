@@ -28,6 +28,9 @@ type NSTextView struct {
 
 // MakeTextView create a TextView from native pointer
 func MakeTextView(ptr unsafe.Pointer) *NSTextView {
+	if ptr == nil {
+		return nil
+	}
 	return &NSTextView{
 		NSText: *MakeText(ptr),
 	}
@@ -52,5 +55,5 @@ func (t *NSTextView) TextContainer() TextContainer {
 }
 
 func (t *NSTextView) SetTextContainer(textContainer TextContainer) {
-	C.TextView_SetTextContainer(t.Ptr(), textContainer.Ptr())
+	C.TextView_SetTextContainer(t.Ptr(), toPointer(textContainer))
 }

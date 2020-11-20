@@ -41,6 +41,9 @@ type NSButton struct {
 
 // MakeButton create a Button from native pointer
 func MakeButton(ptr unsafe.Pointer) *NSButton {
+	if ptr == nil {
+		return nil
+	}
 	return &NSButton{
 		NSControl: *MakeControl(ptr),
 	}

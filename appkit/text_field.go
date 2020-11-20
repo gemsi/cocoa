@@ -57,6 +57,9 @@ type NSTextField struct {
 
 // MakeTextField create a TextField from native pointer
 func MakeTextField(ptr unsafe.Pointer) *NSTextField {
+	if ptr == nil {
+		return nil
+	}
 	return &NSTextField{
 		NSControl: *MakeControl(ptr),
 	}
@@ -113,7 +116,7 @@ func (t *NSTextField) TextColor() Color {
 }
 
 func (t *NSTextField) SetTextColor(textColor Color) {
-	C.TextField_SetTextColor(t.Ptr(), textColor.Ptr())
+	C.TextField_SetTextColor(t.Ptr(), toPointer(textColor))
 }
 
 func (t *NSTextField) BackgroundColor() Color {
@@ -121,7 +124,7 @@ func (t *NSTextField) BackgroundColor() Color {
 }
 
 func (t *NSTextField) SetBackgroundColor(backgroundColor Color) {
-	C.TextField_SetBackgroundColor(t.Ptr(), backgroundColor.Ptr())
+	C.TextField_SetBackgroundColor(t.Ptr(), toPointer(backgroundColor))
 }
 
 func (t *NSTextField) ControlTextDidChange(callback func(notification foundation.Notification)) {

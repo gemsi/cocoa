@@ -58,6 +58,9 @@ type NSProgressIndicator struct {
 
 // MakeProgressIndicator create a ProgressIndicator from native pointer
 func MakeProgressIndicator(ptr unsafe.Pointer) *NSProgressIndicator {
+	if ptr == nil {
+		return nil
+	}
 	return &NSProgressIndicator{
 		NSView: *MakeView(ptr),
 	}
@@ -134,11 +137,11 @@ func (p *NSProgressIndicator) SetDisplayedWhenStopped(displayedWhenStopped bool)
 }
 
 func (p *NSProgressIndicator) StartAnimation(sender foundation.Object) {
-	C.ProgressIndicator_StartAnimation(p.Ptr(), sender.Ptr())
+	C.ProgressIndicator_StartAnimation(p.Ptr(), toPointer(sender))
 }
 
 func (p *NSProgressIndicator) StopAnimation(sender foundation.Object) {
-	C.ProgressIndicator_StopAnimation(p.Ptr(), sender.Ptr())
+	C.ProgressIndicator_StopAnimation(p.Ptr(), toPointer(sender))
 }
 
 func (p *NSProgressIndicator) IncrementBy(delta float64) {

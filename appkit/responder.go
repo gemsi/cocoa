@@ -30,6 +30,9 @@ type NSResponder struct {
 
 // MakeResponder create a Responder from native pointer
 func MakeResponder(ptr unsafe.Pointer) *NSResponder {
+	if ptr == nil {
+		return nil
+	}
 	return &NSResponder{
 		NSObject: *foundation.MakeObject(ptr),
 	}
@@ -44,5 +47,5 @@ func (r *NSResponder) NextResponder() Responder {
 }
 
 func (r *NSResponder) SetNextResponder(nextResponder Responder) {
-	C.Responder_SetNextResponder(r.Ptr(), nextResponder.Ptr())
+	C.Responder_SetNextResponder(r.Ptr(), toPointer(nextResponder))
 }

@@ -31,5 +31,8 @@ func (o *NSObject) Ptr() unsafe.Pointer {
 }
 
 func MakeObject(ptr unsafe.Pointer) *NSObject {
+	if ptr == nil {
+		return nil
+	}
 	return &NSObject{ptr}
 }

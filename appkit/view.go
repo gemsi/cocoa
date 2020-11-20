@@ -38,6 +38,9 @@ type NSView struct {
 
 // MakeView create a View from native pointer
 func MakeView(ptr unsafe.Pointer) *NSView {
+	if ptr == nil {
+		return nil
+	}
 	return &NSView{
 		NSResponder: *MakeResponder(ptr),
 	}
@@ -68,5 +71,5 @@ func (v *NSView) SetNeedsDisplay(needsDisplay bool) {
 }
 
 func (v *NSView) AddSubview(subView View) {
-	C.View_AddSubview(v.Ptr(), subView.Ptr())
+	C.View_AddSubview(v.Ptr(), toPointer(subView))
 }

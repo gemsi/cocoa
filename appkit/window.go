@@ -52,6 +52,9 @@ type NSWindow struct {
 
 // MakeWindow create a Window from native pointer
 func MakeWindow(ptr unsafe.Pointer) *NSWindow {
+	if ptr == nil {
+		return nil
+	}
 	return &NSWindow{
 		NSResponder: *MakeResponder(ptr),
 	}
@@ -86,7 +89,7 @@ func (w *NSWindow) ContentView() View {
 }
 
 func (w *NSWindow) SetContentView(contentView View) {
-	C.Window_SetContentView(w.Ptr(), contentView.Ptr())
+	C.Window_SetContentView(w.Ptr(), toPointer(contentView))
 }
 
 func (w *NSWindow) StyleMask() WindowStyleMask {
@@ -102,7 +105,7 @@ func (w *NSWindow) Center() {
 }
 
 func (w *NSWindow) MakeKeyAndOrderFront(sender foundation.Object) {
-	C.Window_MakeKeyAndOrderFront(w.Ptr(), sender.Ptr())
+	C.Window_MakeKeyAndOrderFront(w.Ptr(), toPointer(sender))
 }
 
 func (w *NSWindow) WindowDidResize(callback func(notification foundation.Notification)) {
