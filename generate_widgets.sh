@@ -16,6 +16,9 @@ python3 -m scripts.responder
 python3 -m scripts.window
 python3 -m scripts.text_field
 python3 -m scripts.button
+python3 -m scripts.split_view
+python3 -m scripts.tab_view_item
+python3 -m scripts.tab_view
 
 echo 'format go code...'
 go fmt ./appkit
