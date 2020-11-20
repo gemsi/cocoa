@@ -27,6 +27,20 @@ if __name__ == "__main__":
                 return_value=ReturnValue('float64'),
                 description='returns the minimum possible position of the divider at the specified index'
             ),
+            Method(
+                name='maxPossiblePositionOfDividerAtIndex',
+                params=[Param(name='dividerIndex', Type='int')],
+                return_value=ReturnValue('float64'),
+                description='returns the maximum possible position of the divider at the specified index'
+            ),
+            Method(
+                name='setPosition',
+                params=[
+                    Param(name='position', Type='float64'),
+                    Param(name='dividerIndex', Type='int', objc_param_name='ofDividerAtIndex'),
+                ],
+                description='sets the position of the divider at the specified index'
+            ),
         ]
     )
     w.generate_code()

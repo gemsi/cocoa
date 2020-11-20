@@ -46,7 +46,17 @@ void SplitView_SetDividerStyle(void* ptr, long dividerStyle) {
 	[splitView setDividerStyle:dividerStyle];
 }
 
-double SplitView_MinPossiblePositionOfDividerAtIndex(void* ptr, int dividerIndex) {
+double SplitView_MinPossiblePositionOfDividerAtIndex(void* ptr, long dividerIndex) {
 	NSSplitView* splitView = (NSSplitView*)ptr;
 	return [splitView minPossiblePositionOfDividerAtIndex:dividerIndex];
+}
+
+double SplitView_MaxPossiblePositionOfDividerAtIndex(void* ptr, long dividerIndex) {
+	NSSplitView* splitView = (NSSplitView*)ptr;
+	return [splitView maxPossiblePositionOfDividerAtIndex:dividerIndex];
+}
+
+void SplitView_SetPosition(void* ptr, double position, long dividerIndex) {
+	NSSplitView* splitView = (NSSplitView*)ptr;
+	[splitView setPosition:position ofDividerAtIndex:dividerIndex];
 }

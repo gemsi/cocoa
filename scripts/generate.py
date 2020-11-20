@@ -223,7 +223,7 @@ class Method:
 
     def go_interface_code(self, current_pkg: str) -> List[str]:
         name = cap(self.name)
-        params_str = ' '.join([p.go_def_code(current_pkg) for p in self.params])
+        params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
             go_def_return = ' ' + go_def_return
@@ -235,7 +235,7 @@ class Method:
     def go_impl_code(self, current_pkg: str, receiver_type: str) -> List[str]:
         receiver = receiver_type[0].lower()
         name = cap(self.name)
-        params_str = ' '.join([p.go_def_code(current_pkg) for p in self.params])
+        params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         receiver_str = receiver + ' *NS' + receiver_type
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
@@ -260,7 +260,7 @@ class Method:
         return codes
 
     def c_h_code(self, receiver_type: str) -> List[str]:
-        c_params_str = ' '.join([p.c_def_code() for p in self.params])
+        c_params_str = ', '.join([p.c_def_code() for p in self.params])
         if c_params_str:
             c_params_str = f'void* ptr, {c_params_str}'
         else:
@@ -268,7 +268,7 @@ class Method:
         return [f'{self.return_value.c_def_code()} {receiver_type}_{cap(self.name)}({c_params_str});']
 
     def objc_m_code(self, receiver_type: str) -> List[str]:
-        c_params_str = ' '.join([p.c_def_code() for p in self.params])
+        c_params_str = ', '.join([p.c_def_code() for p in self.params])
         if c_params_str:
             c_params_str = f'void* ptr, {c_params_str}'
         else:

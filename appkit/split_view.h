@@ -13,4 +13,6 @@ double SplitView_DividerThickness(void* ptr);
 long SplitView_DividerStyle(void* ptr);
 void SplitView_SetDividerStyle(void* ptr, long dividerStyle);
 
-double SplitView_MinPossiblePositionOfDividerAtIndex(void* ptr, int dividerIndex);
+double SplitView_MinPossiblePositionOfDividerAtIndex(void* ptr, long dividerIndex);
+double SplitView_MaxPossiblePositionOfDividerAtIndex(void* ptr, long dividerIndex);
+void SplitView_SetPosition(void* ptr, double position, long dividerIndex);

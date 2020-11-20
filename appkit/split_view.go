@@ -32,6 +32,10 @@ type SplitView interface {
 	SetDividerStyle(dividerStyle SplitViewDividerStyle)
 	// MinPossiblePositionOfDividerAtIndex returns the minimum possible position of the divider at the specified index
 	MinPossiblePositionOfDividerAtIndex(dividerIndex int) float64
+	// MaxPossiblePositionOfDividerAtIndex returns the maximum possible position of the divider at the specified index
+	MaxPossiblePositionOfDividerAtIndex(dividerIndex int) float64
+	// SetPosition sets the position of the divider at the specified index
+	SetPosition(position float64, dividerIndex int)
 }
 
 var _ SplitView = (*NSSplitView)(nil)
@@ -94,5 +98,13 @@ func (s *NSSplitView) SetDividerStyle(dividerStyle SplitViewDividerStyle) {
 }
 
 func (s *NSSplitView) MinPossiblePositionOfDividerAtIndex(dividerIndex int) float64 {
-	return float64(C.SplitView_MinPossiblePositionOfDividerAtIndex(s.Ptr(), C.int(dividerIndex)))
+	return float64(C.SplitView_MinPossiblePositionOfDividerAtIndex(s.Ptr(), C.long(dividerIndex)))
+}
+
+func (s *NSSplitView) MaxPossiblePositionOfDividerAtIndex(dividerIndex int) float64 {
+	return float64(C.SplitView_MaxPossiblePositionOfDividerAtIndex(s.Ptr(), C.long(dividerIndex)))
+}
+
+func (s *NSSplitView) SetPosition(position float64, dividerIndex int) {
+	C.SplitView_SetPosition(s.Ptr(), C.double(position), C.long(dividerIndex))
 }
