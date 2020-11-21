@@ -40,10 +40,13 @@ type TextField interface {
 	SetBackgroundColor(backgroundColor Color)
 	// ControlTextDidChange
 	ControlTextDidChange(callback func(notification foundation.Notification))
+	_controlTextDidChange() func(notification foundation.Notification)
 	// ControlTextDidEndEditing
 	ControlTextDidEndEditing(callback func(notification foundation.Notification))
+	_controlTextDidEndEditing() func(notification foundation.Notification)
 	// ControlTextDidBeginEditing
 	ControlTextDidBeginEditing(callback func(notification foundation.Notification))
+	_controlTextDidBeginEditing() func(notification foundation.Notification)
 }
 
 var _ TextField = (*NSTextField)(nil)
@@ -131,34 +134,49 @@ func (t *NSTextField) ControlTextDidChange(callback func(notification foundation
 	t.controlTextDidChange = callback
 }
 
+func (t *NSTextField) _controlTextDidChange() func(notification foundation.Notification) {
+	return t.controlTextDidChange
+}
+
 func (t *NSTextField) ControlTextDidEndEditing(callback func(notification foundation.Notification)) {
 	t.controlTextDidEndEditing = callback
+}
+
+func (t *NSTextField) _controlTextDidEndEditing() func(notification foundation.Notification) {
+	return t.controlTextDidEndEditing
 }
 
 func (t *NSTextField) ControlTextDidBeginEditing(callback func(notification foundation.Notification)) {
 	t.controlTextDidBeginEditing = callback
 }
 
+func (t *NSTextField) _controlTextDidBeginEditing() func(notification foundation.Notification) {
+	return t.controlTextDidBeginEditing
+}
+
 //export TextField_Delegate_ControlTextDidChange
 func TextField_Delegate_ControlTextDidChange(id int64, notification unsafe.Pointer) {
-	textField := resources.Get(id).(*NSTextField)
-	if textField.controlTextDidChange != nil {
-		textField.controlTextDidChange(foundation.MakeNotification(notification))
+	textField := resources.Get(id).(TextField)
+	callback := textField._controlTextDidChange()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }
 
 //export TextField_Delegate_ControlTextDidEndEditing
 func TextField_Delegate_ControlTextDidEndEditing(id int64, notification unsafe.Pointer) {
-	textField := resources.Get(id).(*NSTextField)
-	if textField.controlTextDidEndEditing != nil {
-		textField.controlTextDidEndEditing(foundation.MakeNotification(notification))
+	textField := resources.Get(id).(TextField)
+	callback := textField._controlTextDidEndEditing()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }
 
 //export TextField_Delegate_ControlTextDidBeginEditing
 func TextField_Delegate_ControlTextDidBeginEditing(id int64, notification unsafe.Pointer) {
-	textField := resources.Get(id).(*NSTextField)
-	if textField.controlTextDidBeginEditing != nil {
-		textField.controlTextDidBeginEditing(foundation.MakeNotification(notification))
+	textField := resources.Get(id).(TextField)
+	callback := textField._controlTextDidBeginEditing()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }

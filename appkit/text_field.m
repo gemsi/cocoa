@@ -2,6 +2,22 @@
 #import "text_field.h"
 #import "text_field_delegate.h"
 
+@implementation GoNSTextFieldDelegate
+
+- (void)controlTextDidChange:(NSNotification*)notification {
+	return TextField_Delegate_ControlTextDidChange([self goID], notification);
+}
+
+- (void)controlTextDidEndEditing:(NSNotification*)notification {
+	return TextField_Delegate_ControlTextDidEndEditing([self goID], notification);
+}
+
+- (void)controlTextDidBeginEditing:(NSNotification*)notification {
+	return TextField_Delegate_ControlTextDidBeginEditing([self goID], notification);
+}
+
+@end
+
 void* TextField_initWithFrame(long goID, NSRect frame) {
 	NSTextField* text_field = [[[NSTextField alloc] initWithFrame:frame] autorelease];
 	GoNSTextFieldDelegate* delegate = [[GoNSTextFieldDelegate alloc] init];

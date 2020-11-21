@@ -2,6 +2,26 @@
 #import "tab_view.h"
 #import "tab_view_delegate.h"
 
+@implementation GoNSTabViewDelegate
+
+- (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView*)view {
+	return TabView_Delegate_TabViewDidChangeNumberOfTabViewItems([self goID], view);
+}
+
+- (BOOL)tabView:(NSTabView*)view shouldSelectTabViewItem:(NSTabViewItem*)tabViewItem {
+	return TabView_Delegate_ShouldSelectTabViewItem([self goID], view, tabViewItem);
+}
+
+- (void)tabView:(NSTabView*)view willSelectTabViewItem:(NSTabViewItem*)tabViewItem {
+	return TabView_Delegate_WillSelectTabViewItem([self goID], view, tabViewItem);
+}
+
+- (void)tabView:(NSTabView*)view didSelectTabViewItem:(NSTabViewItem*)tabViewItem {
+	return TabView_Delegate_DidSelectTabViewItem([self goID], view, tabViewItem);
+}
+
+@end
+
 void* TabView_initWithFrame(long goID, NSRect frame) {
 	NSTabView* tab_view = [[[NSTabView alloc] initWithFrame:frame] autorelease];
 	GoNSTabViewDelegate* delegate = [[GoNSTabViewDelegate alloc] init];

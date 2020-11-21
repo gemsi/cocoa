@@ -15,6 +15,7 @@ python3 -m scripts.event
 python3 -m scripts.responder
 python3 -m scripts.window
 python3 -m scripts.text_field
+python3 -m scripts.secure_text_field
 python3 -m scripts.button
 python3 -m scripts.split_view
 python3 -m scripts.tab_view_item

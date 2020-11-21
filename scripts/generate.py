@@ -322,20 +322,26 @@ class DelegateMethod:
             self.go_func_name = cap(self.name)
         self.cgo_export_func_name = f'{self.receiver_type}_Delegate_{self.go_func_name}'
         self.callback_field_name = de_cap(self.go_func_name)
+        self.callback_get_func = '_' + self.callback_field_name
+        self.callback_type = 'func(' + self.go_params_str + ')' + self.go_def_return
 
     def go_interface_code(self) -> List[str]:
         return [
             f'// {self.go_func_name} {self.description}',
-            self.go_func_name + '(callback func(' + self.go_params_str + ')' + self.go_def_return + ')',
+            f'{self.go_func_name}(callback {self.callback_type})',
+            f'{self.callback_get_func}() {self.callback_type}',
         ]
 
     def go_impl_code(self) -> List[str]:
         receiver_str = self.receiver_name + ' *NS' + self.receiver_type
         codes = [
-            'func (' + receiver_str + ') ' + self.go_func_name +
-            '(callback func(' + self.go_params_str + ')' + self.go_def_return + ')' + ' {',
+            f'func ({receiver_str}) {self.go_func_name}(callback {self.callback_type}) {{',
             f'\t{self.receiver_name}.{self.callback_field_name} = callback',
-            '}'
+            '}',
+            '',
+            f'func ({receiver_str}) {self.callback_get_func}() {self.callback_type} {{',
+            f'\treturn {self.receiver_name}.{self.callback_field_name}',
+            '}',
         ]
         return codes
 
@@ -352,10 +358,11 @@ class DelegateMethod:
         codes = [
             f'//export {self.cgo_export_func_name}',
             f'func {self.cgo_export_func_name}(id int64, {params_def_str}){return_str} {{',
-            f'\t{param_name} := resources.Get(id).(*NS{self.receiver_type})',
-            f'\tif {param_name}.{self.callback_field_name} != nil {{',
+            f'\t{param_name} := resources.Get(id).({self.receiver_type})',
+            f'\tcallback := {param_name}.{self.callback_get_func}()',
+            f'\tif callback != nil {{',
         ]
-        return_state = f'\t\t{param_name}.{self.callback_field_name}({args_str})'
+        return_state = f'\t\tcallback({args_str})'
         if return_str:
             return_state = 'return ' + return_state
         codes.append(return_state)
@@ -575,7 +582,7 @@ class Component:
         if self.delegate_type == '':
             self.delegate_type = type_part(self.Type) + 'Delegate'
         if self.init_method is not None:
-            self.init_method.init_env(len(self.delegate_methods) > 0, self.action_methods)
+            self.init_method.init_env(self.delegate_methods or self.extend_delegate, self.action_methods)
         for method in self.delegate_methods:
             pkg, type_name = split_type(self.Type)
             method.init_env(pkg, type_name)
@@ -699,6 +706,7 @@ class Component:
                 for line in method.go_impl_code():
                     print(line, file=out)
 
+            # delegate/action cgo exports funcs
             for method in self.delegate_methods:
                 print(file=out)
                 for line in method.cgo_export_code():
@@ -781,8 +789,25 @@ class Component:
             print(file=out)
             if self.delegate_methods or self.extend_delegate:
                 print(f'@interface Go{self.ns_type}Delegate : {base_delegate_class} <NS{self.delegate_type}>', file=out)
+                if not self.extend_delegate:
+                    print('@property (assign) long goID;', file=out)
+                print(f'@end', file=out)
+            # action target
+            if self.action_methods:
+                print(f'@interface {self.ns_type}Handler : NSObject', file=out)
                 print('@property (assign) long goID;', file=out)
                 print(f'@end', file=out)
+
+    def generate_objc_m_file(self):
+        m_file_path = f'./{self.pkg}/{self.file_name}.m'
+        with open(m_file_path, 'w+') as out:
+            print(f'#import <Appkit/{self.ns_type}.h>', file=out)
+            print(f'#import "{self.file_name}.h"', file=out)
+            if self.delegate_methods or self.extend_delegate or self.action_methods:
+                print(f'#import "{self.file_name}_delegate.h"', file=out)
+
+            # delegate and target impl
+            if self.delegate_methods or self.extend_delegate:
                 print(file=out)
                 print(f'@implementation Go{self.ns_type}Delegate', file=out)
                 for method in self.delegate_methods:
@@ -793,9 +818,6 @@ class Component:
                 print(f'@end', file=out)
             # action target
             if self.action_methods:
-                print(f'@interface {self.ns_type}Handler : NSObject', file=out)
-                print('@property (assign) long goID;', file=out)
-                print(f'@end', file=out)
                 print(file=out)
                 print(f'@implementation {self.ns_type}Handler', file=out)
                 for method in self.action_methods:
@@ -805,13 +827,6 @@ class Component:
                 print(file=out)
                 print(f'@end', file=out)
 
-    def generate_objc_m_file(self):
-        m_file_path = f'./{self.pkg}/{self.file_name}.m'
-        with open(m_file_path, 'w+') as out:
-            print(f'#import <Appkit/{self.ns_type}.h>', file=out)
-            print(f'#import "{self.file_name}.h"', file=out)
-            if self.delegate_methods or self.action_methods:
-                print(f'#import "{self.file_name}_delegate.h"', file=out)
             # init method
             if self.init_method is not None:
                 print(file=out)

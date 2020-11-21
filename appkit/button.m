@@ -2,6 +2,14 @@
 #import "button.h"
 #import "button_delegate.h"
 
+@implementation NSButtonHandler
+
+- (void)onAction:(NSObject*)sender {
+	return Button_Target_Action([self goID], sender);
+}
+
+@end
+
 void* Button_initWithFrame(long goID, NSRect frame) {
 	NSButton* button = [[[NSButton alloc] initWithFrame:frame] autorelease];
 	NSButtonHandler* handler = [[[NSButtonHandler alloc] init] autorelease];

@@ -2,6 +2,26 @@
 #import "window.h"
 #import "window_delegate.h"
 
+@implementation GoNSWindowDelegate
+
+- (void)windowDidResize:(NSNotification*)notification {
+	return Window_Delegate_WindowDidResize([self goID], notification);
+}
+
+- (void)windowDidMove:(NSNotification*)notification {
+	return Window_Delegate_WindowDidMove([self goID], notification);
+}
+
+- (void)windowDidMiniaturize:(NSNotification*)notification {
+	return Window_Delegate_WindowDidMiniaturize([self goID], notification);
+}
+
+- (void)windowDidDeminiaturize:(NSNotification*)notification {
+	return Window_Delegate_WindowDidDeminiaturize([self goID], notification);
+}
+
+@end
+
 void* Window_initWithContentRect(long goID, NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer) {
 	NSWindow* window = [[[NSWindow alloc] initWithContentRect:rect styleMask:styleMask backing:backing defer:Defer] autorelease];
 	GoNSWindowDelegate* delegate = [[GoNSWindowDelegate alloc] init];

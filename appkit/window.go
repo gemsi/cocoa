@@ -32,12 +32,16 @@ type Window interface {
 	MakeKeyAndOrderFront(sender foundation.Object)
 	// WindowDidResize the window has been resized
 	WindowDidResize(callback func(notification foundation.Notification))
+	_windowDidResize() func(notification foundation.Notification)
 	// WindowDidMove the window has moved
 	WindowDidMove(callback func(notification foundation.Notification))
+	_windowDidMove() func(notification foundation.Notification)
 	// WindowDidMiniaturize the window has been minimized
 	WindowDidMiniaturize(callback func(notification foundation.Notification))
+	_windowDidMiniaturize() func(notification foundation.Notification)
 	// WindowDidDeminiaturize the window has been deminimized
 	WindowDidDeminiaturize(callback func(notification foundation.Notification))
+	_windowDidDeminiaturize() func(notification foundation.Notification)
 }
 
 var _ Window = (*NSWindow)(nil)
@@ -112,46 +116,66 @@ func (w *NSWindow) WindowDidResize(callback func(notification foundation.Notific
 	w.windowDidResize = callback
 }
 
+func (w *NSWindow) _windowDidResize() func(notification foundation.Notification) {
+	return w.windowDidResize
+}
+
 func (w *NSWindow) WindowDidMove(callback func(notification foundation.Notification)) {
 	w.windowDidMove = callback
+}
+
+func (w *NSWindow) _windowDidMove() func(notification foundation.Notification) {
+	return w.windowDidMove
 }
 
 func (w *NSWindow) WindowDidMiniaturize(callback func(notification foundation.Notification)) {
 	w.windowDidMiniaturize = callback
 }
 
+func (w *NSWindow) _windowDidMiniaturize() func(notification foundation.Notification) {
+	return w.windowDidMiniaturize
+}
+
 func (w *NSWindow) WindowDidDeminiaturize(callback func(notification foundation.Notification)) {
 	w.windowDidDeminiaturize = callback
 }
 
+func (w *NSWindow) _windowDidDeminiaturize() func(notification foundation.Notification) {
+	return w.windowDidDeminiaturize
+}
+
 //export Window_Delegate_WindowDidResize
 func Window_Delegate_WindowDidResize(id int64, notification unsafe.Pointer) {
-	window := resources.Get(id).(*NSWindow)
-	if window.windowDidResize != nil {
-		window.windowDidResize(foundation.MakeNotification(notification))
+	window := resources.Get(id).(Window)
+	callback := window._windowDidResize()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }
 
 //export Window_Delegate_WindowDidMove
 func Window_Delegate_WindowDidMove(id int64, notification unsafe.Pointer) {
-	window := resources.Get(id).(*NSWindow)
-	if window.windowDidMove != nil {
-		window.windowDidMove(foundation.MakeNotification(notification))
+	window := resources.Get(id).(Window)
+	callback := window._windowDidMove()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }
 
 //export Window_Delegate_WindowDidMiniaturize
 func Window_Delegate_WindowDidMiniaturize(id int64, notification unsafe.Pointer) {
-	window := resources.Get(id).(*NSWindow)
-	if window.windowDidMiniaturize != nil {
-		window.windowDidMiniaturize(foundation.MakeNotification(notification))
+	window := resources.Get(id).(Window)
+	callback := window._windowDidMiniaturize()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }
 
 //export Window_Delegate_WindowDidDeminiaturize
 func Window_Delegate_WindowDidDeminiaturize(id int64, notification unsafe.Pointer) {
-	window := resources.Get(id).(*NSWindow)
-	if window.windowDidDeminiaturize != nil {
-		window.windowDidDeminiaturize(foundation.MakeNotification(notification))
+	window := resources.Get(id).(Window)
+	callback := window._windowDidDeminiaturize()
+	if callback != nil {
+		callback(foundation.MakeNotification(notification))
 	}
 }

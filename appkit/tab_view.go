@@ -68,12 +68,16 @@ type TabView interface {
 	SelectTabViewItemAtIndex(index int)
 	// TabViewDidChangeNumberOfTabViewItems informs the delegate that the number of tab view items in tabView has changed
 	TabViewDidChangeNumberOfTabViewItems(callback func(view TabView))
+	_tabViewDidChangeNumberOfTabViewItems() func(view TabView)
 	// ShouldSelectTabViewItem invoked just before tabViewItem in tabView is selected. Return true if the tab view item should be selected, otherwise no.
 	ShouldSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem) bool)
+	_shouldSelectTabViewItem() func(view TabView, tabViewItem TabViewItem) bool
 	// WillSelectTabViewItem informs the delegate that tabView is about to select tabViewItem
 	WillSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem))
+	_willSelectTabViewItem() func(view TabView, tabViewItem TabViewItem)
 	// DidSelectTabViewItem informs the delegate that tabView has selected tabViewItem
 	DidSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem))
+	_didSelectTabViewItem() func(view TabView, tabViewItem TabViewItem)
 }
 
 var _ TabView = (*NSTabView)(nil)
@@ -218,47 +222,67 @@ func (t *NSTabView) TabViewDidChangeNumberOfTabViewItems(callback func(view TabV
 	t.tabViewDidChangeNumberOfTabViewItems = callback
 }
 
+func (t *NSTabView) _tabViewDidChangeNumberOfTabViewItems() func(view TabView) {
+	return t.tabViewDidChangeNumberOfTabViewItems
+}
+
 func (t *NSTabView) ShouldSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem) bool) {
 	t.shouldSelectTabViewItem = callback
+}
+
+func (t *NSTabView) _shouldSelectTabViewItem() func(view TabView, tabViewItem TabViewItem) bool {
+	return t.shouldSelectTabViewItem
 }
 
 func (t *NSTabView) WillSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem)) {
 	t.willSelectTabViewItem = callback
 }
 
+func (t *NSTabView) _willSelectTabViewItem() func(view TabView, tabViewItem TabViewItem) {
+	return t.willSelectTabViewItem
+}
+
 func (t *NSTabView) DidSelectTabViewItem(callback func(view TabView, tabViewItem TabViewItem)) {
 	t.didSelectTabViewItem = callback
 }
 
+func (t *NSTabView) _didSelectTabViewItem() func(view TabView, tabViewItem TabViewItem) {
+	return t.didSelectTabViewItem
+}
+
 //export TabView_Delegate_TabViewDidChangeNumberOfTabViewItems
 func TabView_Delegate_TabViewDidChangeNumberOfTabViewItems(id int64, view unsafe.Pointer) {
-	tabView := resources.Get(id).(*NSTabView)
-	if tabView.tabViewDidChangeNumberOfTabViewItems != nil {
-		tabView.tabViewDidChangeNumberOfTabViewItems(MakeTabView(view))
+	tabView := resources.Get(id).(TabView)
+	callback := tabView._tabViewDidChangeNumberOfTabViewItems()
+	if callback != nil {
+		callback(MakeTabView(view))
 	}
 }
 
 //export TabView_Delegate_ShouldSelectTabViewItem
 func TabView_Delegate_ShouldSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) bool {
-	tabView := resources.Get(id).(*NSTabView)
-	if tabView.shouldSelectTabViewItem != nil {
-		return tabView.shouldSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	tabView := resources.Get(id).(TabView)
+	callback := tabView._shouldSelectTabViewItem()
+	if callback != nil {
+		return callback(MakeTabView(view), MakeTabViewItem(tabViewItem))
 	}
 	return true
 }
 
 //export TabView_Delegate_WillSelectTabViewItem
 func TabView_Delegate_WillSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) {
-	tabView := resources.Get(id).(*NSTabView)
-	if tabView.willSelectTabViewItem != nil {
-		tabView.willSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	tabView := resources.Get(id).(TabView)
+	callback := tabView._willSelectTabViewItem()
+	if callback != nil {
+		callback(MakeTabView(view), MakeTabViewItem(tabViewItem))
 	}
 }
 
 //export TabView_Delegate_DidSelectTabViewItem
 func TabView_Delegate_DidSelectTabViewItem(id int64, view unsafe.Pointer, tabViewItem unsafe.Pointer) {
-	tabView := resources.Get(id).(*NSTabView)
-	if tabView.didSelectTabViewItem != nil {
-		tabView.didSelectTabViewItem(MakeTabView(view), MakeTabViewItem(tabViewItem))
+	tabView := resources.Get(id).(TabView)
+	callback := tabView._didSelectTabViewItem()
+	if callback != nil {
+		callback(MakeTabView(view), MakeTabViewItem(tabViewItem))
 	}
 }

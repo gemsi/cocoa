@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/hsiafan/cocoa/appkit"
 	"github.com/hsiafan/cocoa/dispatch"
 	"github.com/hsiafan/cocoa/foundation"
@@ -56,6 +57,9 @@ func main() {
 
 	// password
 	stf := appkit.NewPlainSecureTextField(foundation.MakeRect(340, 100, 150, 25))
+	stf.ControlTextDidChange(func(notification foundation.Notification) {
+		fmt.Println(stf.StringValue())
+	})
 	w.ContentView().AddSubview(stf)
 
 	// progress indicator
@@ -83,15 +87,6 @@ func main() {
 	// text view & scroll view
 	sv := appkit.NewVerticallyScrollableTextView(foundation.MakeRect(10, 200, 200, 30))
 	w.ContentView().AddSubview(sv)
-	/*
-		Listing 4  Setting up a horizontal scroll bar
-
-		[[theTextView enclosingScrollView] setHasHorizontalScroller:YES];
-		[theTextView setHorizontallyResizable:YES];
-		[theTextView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-		[[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-		[[theTextView textContainer] setWidthTracksTextView:NO];
-	*/
 
 	w.WindowDidMove(func(notification foundation.Notification) {
 		label.SetStringValue("moved!")

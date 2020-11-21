@@ -10,7 +10,7 @@ import (
 	"unsafe"
 )
 
-// a text field that hides the typed text
+// SecureTextField is a text field that hides the typed text
 type SecureTextField interface {
 	TextField
 }
@@ -21,8 +21,11 @@ type NSSecureTextField struct {
 	NSTextField
 }
 
-// Make create a SecureTextField from native pointer
+// MakeSecureTextField create a SecureTextField from native pointer
 func MakeSecureTextField(ptr unsafe.Pointer) *NSSecureTextField {
+	if ptr == nil {
+		return nil
+	}
 	return &NSSecureTextField{
 		NSTextField: *MakeTextField(ptr),
 	}
