@@ -20,6 +20,8 @@ type Responder interface {
 	NextResponder() Responder
 	// SetNextResponder set the next responder after this one, or nil if it has none
 	SetNextResponder(nextResponder Responder)
+	// BecomeFirstResponder notifies the receiver that it’s about to become first responder in its NSWindow
+	BecomeFirstResponder() bool
 }
 
 var _ Responder = (*NSResponder)(nil)
@@ -48,4 +50,8 @@ func (r *NSResponder) NextResponder() Responder {
 
 func (r *NSResponder) SetNextResponder(nextResponder Responder) {
 	C.Responder_SetNextResponder(r.Ptr(), toPointer(nextResponder))
+}
+
+func (r *NSResponder) BecomeFirstResponder() bool {
+	return bool(C.Responder_BecomeFirstResponder(r.Ptr()))
 }

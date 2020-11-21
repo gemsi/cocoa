@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import Component, Property, InitMethod, Param, Method, ReturnValue
+from .generate import Component, Property, InitMethod, Param, Method, Return
 
 if __name__ == "__main__":
     w = Component(
@@ -24,13 +24,13 @@ if __name__ == "__main__":
             Method(
                 name='minPossiblePositionOfDividerAtIndex',
                 params=[Param(name='dividerIndex', Type='int')],
-                return_value=ReturnValue('float64'),
+                return_value=Return('float64'),
                 description='returns the minimum possible position of the divider at the specified index'
             ),
             Method(
                 name='maxPossiblePositionOfDividerAtIndex',
                 params=[Param(name='dividerIndex', Type='int')],
-                return_value=ReturnValue('float64'),
+                return_value=Return('float64'),
                 description='returns the maximum possible position of the divider at the specified index'
             ),
             Method(

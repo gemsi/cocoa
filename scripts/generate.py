@@ -110,17 +110,18 @@ class Param:
     Type: str
     go_alias: str = ''  # go alias type, enum, etc.
     objc_param_name: str = ''  # objc param def name
+    array: bool = False
 
     def go_def_code(self, current_pkg: str) -> str:
-        if self.go_alias:
-            return self.name + ' ' + self.go_alias
-        pkg, type_name = split_type(self.Type)
-        if current_pkg == pkg:
-            return self.name + ' ' + type_name
-        else:
-            return self.name + ' ' + self.Type
+        pkg, type_name = split_type(self.go_alias if self.go_alias else self.Type)
+        def_type = type_name if pkg == '' or current_pkg == pkg else pkg + '.' + type_name
+        if self.array:
+            def_type = '[]' + def_type
+        return self.name + ' ' + def_type
 
     def c_def_code(self) -> str:
+        if self.array:
+            return f'{c_type(self.Type)}* {self.name}, size_t {self.name}_len'
         return c_type(self.Type) + ' ' + self.name
 
     def objc_def_code(self) -> str:
@@ -132,23 +133,48 @@ class Param:
     def cgo_export_def_code(self) -> str:
         return f'{self.name} {cgo_export_type(self.Type)}'
 
-    def go_to_c_code(self) -> str:
+    def go_to_c_code(self) -> Tuple[List[str], str]:
         """convert go to c types in go code"""
-        if self.Type in cgo_type_dict:
-            return f'C.{cgo_type_dict[self.Type]}({self.name})'
+        if self.array:
+            # Note: only support NSObject array
+            c_name = 'c' + cap(self.name)
+            codes = [
+                f'{c_name} := make([]unsafe.Pointer, len({self.name}))',
+                f'for idx, v := range {self.name} {{',
+                f'\t{c_name}[idx] = unsafe.Pointer(v.Ptr())',
+                '}',
+            ]
+            return codes, f'&{c_name}[0], C.size_t(len({self.name}))'
+        elif self.Type in cgo_type_dict:
+            return [], f'C.{cgo_type_dict[self.Type]}({self.name})'
         elif self.Type == 'string':
-            return f'C.CString({self.name})'
+            cstr_name = 'c' + cap(self.name)
+            codes = [
+                f'{cstr_name} := C.CString({self.name})',
+                f'defer C.free(unsafe.Pointer({cstr_name}))',
+            ]
+            return codes, cstr_name
         elif self.Type in geo_struct_types:
-            return f'toNS{type_part(self.Type)}({self.name})'
+            return [], f'toNS{type_part(self.Type)}({self.name})'
         else:
-            return f'toPointer({self.name})'
+            return [], f'toPointer({self.name})'
 
-    def c_to_objc_code(self) -> str:
+    def c_to_objc_code(self) -> Tuple[List[str], str]:
         """convert c types to objc types"""
-        if self.Type == 'string':
-            return f'[NSString stringWithUTF8String:{self.name}]'
+        pkg, type_name = split_type(self.go_alias if self.go_alias else self.Type)
+        if self.array:
+            objc_name = f'objc{cap(self.name)}'
+            codes = [
+                f'NSMutableArray* {objc_name} = [[NSMutableArray alloc] init];;',
+                f'for (int i = 0; i < {self.name}_len; i++) {{',
+                f'\t[{objc_name} addObject:(NS{type_name}*){self.name}[i]];',
+                '}',
+            ]
+            return codes, objc_name
+        elif self.Type == 'string':
+            return [], f'[NSString stringWithUTF8String:{self.name}]'
         else:
-            return self.name
+            return [], self.name
 
     def objc_to_c_code(self) -> str:
         """convert objc type to c type"""
@@ -173,50 +199,83 @@ class Param:
 
 
 @dataclass
-class ReturnValue:
+class Return:
     Type: str
     go_alias: str = ''  # go alias type, enum, etc.
+    array: bool = False
 
     def go_def_code(self, current_pkg: str) -> str:
-        if self.go_alias:
-            return self.go_alias
-        pkg, type_name = split_type(self.Type)
-        if current_pkg == pkg:
-            return type_name
-        else:
-            return self.Type
+        pkg, type_name = split_type(self.go_alias if self.go_alias else self.Type)
+        def_type = type_name if pkg == '' or current_pkg == pkg else pkg + '.' + type_name
+        if self.array:
+            def_type = '[]' + def_type
+        return def_type
 
     def c_def_code(self) -> str:
-        return c_type(self.Type)
+        t = c_type(self.Type)
+        if self.array:
+            t = 'Array'
+        return t
 
     def objc_def_code(self) -> str:
         return objc_type(self.Type)
 
-    def c_to_go_code(self, return_str: str, current_pkg: str) -> str:
+    def c_to_go_code(self, return_str: str, current_pkg: str) -> Tuple[List[str], str]:
         """convert c types to go types, in go code"""
         if self.Type == '':
-            return return_str
+            return [], return_str
+        elif self.array:
+            p, t = split_type(self.Type)
+            if p and p != current_pkg:
+                make_func = f'{p}.Make{t}'
+            else:
+                make_func = f'Make{t}'
+            pkg, type_name = split_type(self.go_alias if self.go_alias else self.Type)
+            def_type = type_name if pkg == '' or current_pkg == pkg else pkg + '.' + type_name
+            codes = [
+                f'var cArray C.Array =  {return_str}',
+                f'defer C.free(cArray.data)',
+                f'result := (*[1 << 28]unsafe.Pointer)(unsafe.Pointer(cArray.data))[:cArray.len:cArray.len]',
+                f'var goResult = make([]{def_type}, len(result))',
+                f'for idx, r := range result {{',
+                f'\tgoResult[idx] = {make_func}(r)',
+                '}',
+            ]
+            return codes, 'goResult'
         elif self.Type in cgo_type_dict:
             if self.go_alias:
-                return f'{self.go_alias}({return_str})'
-            return f'{self.Type}({return_str})'
+                return [], f'{self.go_alias}({return_str})'
+            return [], f'{self.Type}({return_str})'
         elif self.Type == 'string':
-            return f'C.GoString({return_str})'
+            return [], f'C.GoString({return_str})'
         elif self.Type in geo_struct_types:
             t = type_part(self.Type)
-            return f'to{t}({return_str})'
+            return [], f'to{t}({return_str})'
         else:
             p, t = split_type(self.Type)
             if p and p != current_pkg:
-                return f'{p}.Make{t}({return_str})'
+                return [], f'{p}.Make{t}({return_str})'
             else:
-                return f'Make{t}({return_str})'
+                return [], f'Make{t}({return_str})'
 
-    def objc_to_c_code(self, return_str: str) -> str:
+    def objc_to_c_code(self, return_str: str) -> Tuple[List[str], str]:
         """convert objc type to c type"""
-        if self.Type == 'string':
-            return f'[{return_str} UTF8String]'
-        return return_str
+        if self.array:
+            codes = [
+                f'NSArray* array = {return_str};',
+                'int count = [array count];',
+                'void** data = malloc(count * sizeof(void*));',
+                'for (int i = 0; i < count; i++) {',
+                '\t data[i] = [array objectAtIndex:i];',
+                '}',
+                'Array result;',
+                'result.data = data;',
+                'result.len = count;',
+            ]
+            return codes, 'result'
+        elif self.Type == 'string':
+            return [], f'[{return_str} UTF8String]'
+        return [], return_str
 
 
 @dataclass
@@ -224,7 +283,7 @@ class Method:
     name: str
     description: str
     params: List[Param] = field(default_factory=list)
-    return_value: ReturnValue = ReturnValue('')
+    return_value: Return = Return('')
 
     def go_interface_code(self, current_pkg: str) -> List[str]:
         name = cap(self.name)
@@ -248,16 +307,14 @@ class Method:
         codes = ['func (' + receiver_str + ') ' + name + '(' + params_str + ')' + go_def_return + ' {', ]
         args = [f'{receiver}.Ptr()']
         for param in self.params:
-            convert_code = param.go_to_c_code()
-            if param.Type == 'string':
-                cstr_name = 'c_' + param.name
-                codes.append(f'\t{cstr_name} := {convert_code}')
-                codes.append(f'\tdefer C.free(unsafe.Pointer({cstr_name}))')
-                args.append(cstr_name)
-            else:
-                args.append(convert_code)
+            convert_codes, arg = param.go_to_c_code()
+            for convert_code in convert_codes:
+                codes.append('\t' + convert_code)
+            args.append(arg)
         c_args_str = ', '.join(args)
-        return_str = self.return_value.c_to_go_code(f'C.{receiver_type}_{name}({c_args_str})', current_pkg)
+        convert_codes, return_str = self.return_value.c_to_go_code(f'C.{receiver_type}_{name}({c_args_str})', current_pkg)
+        for convert_code in convert_codes:
+            codes.append('\t' + convert_code)
         if self.return_value.Type != '':
             return_str = 'return ' + return_str
         codes.append('\t' + return_str)
@@ -285,11 +342,13 @@ class Method:
         ]
         call_code = '[' + ns_var_name + ' ' + de_cap(self.name)
         if len(self.params) > 0:
-            call_code += ':' + self.params[0].c_to_objc_code()
+            call_code += ':' + self.params[0].c_to_objc_code()[1]
             for param in self.params[1:]:
                 call_code += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + param.name
         call_code += ']'
-        call_code = self.return_value.objc_to_c_code(call_code)
+        convert_codes, call_code = self.return_value.objc_to_c_code(call_code)
+        for c in convert_codes:
+            codes.append('\t' + c)
         if self.return_value.Type != '':
             call_code = 'return ' + call_code
         codes.append('\t' + call_code + ';')
@@ -302,7 +361,7 @@ class DelegateMethod:
     name: str
     params: List[Param]
     description: str
-    return_value: ReturnValue = ReturnValue('')
+    return_value: Return = Return('')
     go_func_name: str = ''
     default_return_value: str = ''
 
@@ -388,7 +447,7 @@ class ActionMethod:
     name: str
     params: List[Param] = field(default_factory=list)
     description: str = ''
-    return_value: ReturnValue = ReturnValue('')
+    return_value: Return = Return('')
 
     def __post_init__(self):
         pass
@@ -457,6 +516,7 @@ class ActionMethod:
 class InitMethod:
     name: str
     params: List[Param] = field(default_factory=list)
+    is_factory: bool = False  # TODO: how do handle factory method
 
     def init_env(self, has_delegate: bool, action_methods: List[ActionMethod]):
         self.has_delegate = has_delegate
@@ -465,16 +525,26 @@ class InitMethod:
     def go_code(self, Type: str, super_type: str) -> List[str]:
         current_pkg, type_name = split_type(Type)
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
-        c_args_str = ', '.join([param.go_to_c_code() for param in self.params])
+        func_name = f'New{type_name}' if not self.is_factory else f'New{cap((self.name))}'
+        codes = [
+            f"// {func_name} create new {type_name}",
+            f'func {func_name}({params_str}) {type_name} {{',
+        ]
+        args = []
+        for param in self.params:
+            convert_codes, arg = param.go_to_c_code()
+            for convert_code in convert_codes:
+                codes.append('\t' + convert_code)
+            else:
+                args.append(arg)
+        c_args_str = ', '.join(args)
         pkg, type_name = split_type(Type)
         super_package, super_type_name = split_type(super_type)
         if super_package == pkg:
             super_make_name = 'Make' + super_type_name
         else:
             super_make_name = super_package + '.Make' + super_type_name
-        return [
-            f"// New{type_name} create new {type_name}",
-            f'func New{type_name}({params_str}) {type_name} {{',
+        codes.extend([
             '\tid := resources.NextId()',
             f'\tptr := C.{type_name}_{self.name}(C.long(id), {c_args_str})',
             f'\tv := &NS{type_name}{{',
@@ -486,7 +556,8 @@ class InitMethod:
             '\t})',
             '\treturn v',
             '}',
-        ]
+        ])
+        return codes
 
     def c_h_code(self, Type: str) -> List[str]:
         c_params_str = ', '.join([p.c_def_code() for p in self.params])
@@ -503,14 +574,23 @@ class InitMethod:
         else:
             c_params_str = f'long goID'
         var_name = camel_to_underscore(Type)
-        params_str = self.params[0].c_to_objc_code()
-        for param in self.params[1:]:
-            params_str += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + param.name
-
         codes = [
             f'void* {Type}_{self.name}({c_params_str}) {{',
-            f'\tNS{Type}* {var_name} = [[[NS{Type} alloc] {self.name}:{params_str}] autorelease];',
         ]
+        convert_codes, arg = self.params[0].c_to_objc_code()
+        for l in convert_codes:
+            codes.append('\t' + l)
+        args_str = arg
+        for param in self.params[1:]:
+            convert_codes, arg = param.c_to_objc_code()
+            for l in convert_codes:
+                codes.append('\t' + l)
+            args_str += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + arg
+
+        if self.is_factory:
+            codes.append(f'\tNS{Type}* {var_name} = [[NS{Type} {self.name}:{args_str}] autorelease];', )
+        else:
+            codes.append(f'\tNS{Type}* {var_name} = [[[NS{Type} alloc] {self.name}:{args_str}] autorelease];', )
 
         if self.has_delegate:
             codes.extend([
@@ -541,12 +621,13 @@ class Property:
     readonly: bool = False
     go_alias_type: str = ''  # the go alias type, for enum etc..
     getter_prefix_is: bool = True
+    array: bool = False
 
     def getter(self) -> Method:
         return Method(
             name='is' + cap(self.name) if self.Type == 'bool' and self.getter_prefix_is else self.name,
             params=[],
-            return_value=ReturnValue(Type=self.Type, go_alias=self.go_alias_type),
+            return_value=Return(Type=self.Type, go_alias=self.go_alias_type, array=self.array),
             description='return ' + self.description,
         )
 
@@ -555,8 +636,8 @@ class Property:
             return None
         return Method(
             name='set' + cap(self.name),
-            params=[Param(name=self.name, Type=self.Type, go_alias=self.go_alias_type)],
-            return_value=ReturnValue(Type=''),
+            params=[Param(name=self.name, Type=self.Type, go_alias=self.go_alias_type, array=self.array)],
+            return_value=Return(Type=''),
             description='set ' + self.description,
         )
 
@@ -724,6 +805,7 @@ class Component:
         types: List[str] = [self.super_type]
         if self.init_method is not None:
             types.extend([param.Type for param in self.init_method.params])
+            imports.add('github.com/hsiafan/cocoa/foundation')
         types.extend([p.Type for p in self.properties])
         for method in self.methods:
             types.extend([param.Type for param in method.params])
@@ -852,6 +934,7 @@ class Component:
     def get_c_imports(self) -> List[str]:
         imports: Set[str] = {
             'stdlib.h',
+            'utils.h'
         }
         types: List[str] = []
         if self.init_method is not None:

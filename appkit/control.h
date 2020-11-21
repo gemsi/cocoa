@@ -1,5 +1,6 @@
 #import <stdbool.h>
 #import <stdlib.h>
+#import <utils.h>
 
 bool Control_IsEnabled(void* ptr);
 void Control_SetEnabled(void* ptr, bool enabled);

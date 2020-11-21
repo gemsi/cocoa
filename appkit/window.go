@@ -30,6 +30,8 @@ type Window interface {
 	Center()
 	// MakeKeyAndOrderFront moves the window to the front of the screen list, within its level, and makes it the key window; that is, it shows the window.
 	MakeKeyAndOrderFront(sender foundation.Object)
+	// MakeFirstResponder attempts to make a given responder the first responder for the window.nil makes the window its first responder.
+	MakeFirstResponder(responder Responder) bool
 	// WindowDidResize the window has been resized
 	WindowDidResize(callback func(notification foundation.Notification))
 	_windowDidResize() func(notification foundation.Notification)
@@ -83,9 +85,9 @@ func (w *NSWindow) Title() string {
 }
 
 func (w *NSWindow) SetTitle(title string) {
-	c_title := C.CString(title)
-	defer C.free(unsafe.Pointer(c_title))
-	C.Window_SetTitle(w.Ptr(), c_title)
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	C.Window_SetTitle(w.Ptr(), cTitle)
 }
 
 func (w *NSWindow) ContentView() View {
@@ -110,6 +112,10 @@ func (w *NSWindow) Center() {
 
 func (w *NSWindow) MakeKeyAndOrderFront(sender foundation.Object) {
 	C.Window_MakeKeyAndOrderFront(w.Ptr(), toPointer(sender))
+}
+
+func (w *NSWindow) MakeFirstResponder(responder Responder) bool {
+	return bool(C.Window_MakeFirstResponder(w.Ptr(), toPointer(responder)))
 }
 
 func (w *NSWindow) WindowDidResize(callback func(notification foundation.Notification)) {

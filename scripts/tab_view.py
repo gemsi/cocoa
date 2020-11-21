@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import Component, Property, InitMethod, Param, Method, ReturnValue, DelegateMethod
+from .generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
 
 if __name__ == "__main__":
     w = Component(
@@ -47,13 +47,13 @@ if __name__ == "__main__":
             Method(
                 name='indexOfTabViewItem',
                 params=[Param(name='tabViewItem', Type='appkit.TabViewItem')],
-                return_value=ReturnValue(Type='int'),
+                return_value=Return(Type='int'),
                 description='returns the index of the specified item in the tab view',
             ),
             Method(
                 name='tabViewItemAtIndex',
                 params=[Param(name='index', Type='int')],
-                return_value=ReturnValue(Type='appkit.TabViewItem'),
+                return_value=Return(Type='appkit.TabViewItem'),
                 description='returns the tab view item at index in the tab view’s array of items',
             ),
             Method(
@@ -100,7 +100,7 @@ if __name__ == "__main__":
                     Param(name='view', Type='appkit.TabView'),
                     Param(name='tabViewItem', Type='appkit.TabViewItem', objc_param_name='shouldSelectTabViewItem'),
                 ],
-                return_value=ReturnValue(Type='bool'),
+                return_value=Return(Type='bool'),
                 default_return_value='true',
                 description='invoked just before tabViewItem in tabView is selected. Return true if the tab view item should be selected, otherwise no.',
             ),

@@ -1,6 +1,7 @@
 #import <Foundation/NSGeometry.h>
 #import <stdbool.h>
 #import <stdlib.h>
+#import <utils.h>
 
 NSRect View_Frame(void* ptr);
 void View_SetFrame(void* ptr, NSRect frame);

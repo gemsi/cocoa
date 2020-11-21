@@ -1,6 +1,7 @@
 #import <Foundation/NSGeometry.h>
 #import <stdbool.h>
 #import <stdlib.h>
+#import <utils.h>
 
 void* Window_initWithContentRect(long goID, NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer);
 
@@ -13,3 +14,4 @@ void Window_SetStyleMask(void* ptr, unsigned long styleMask);
 
 void Window_Center(void* ptr);
 void Window_MakeKeyAndOrderFront(void* ptr, void* sender);
+bool Window_MakeFirstResponder(void* ptr, void* responder);

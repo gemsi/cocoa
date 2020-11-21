@@ -1,6 +1,6 @@
 #!env python3
 
-from scripts.generate import Component, Property, InitMethod, Param, Method, ReturnValue, DelegateMethod
+from scripts.generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
 
 
 if __name__ == "__main__":
@@ -25,34 +25,36 @@ if __name__ == "__main__":
             Property(name='styleMask', Type='uint', go_alias_type='WindowStyleMask', description='the style mask'),
         ],
         methods=[
-            Method(name='center', params=[], return_value=ReturnValue(''),
+            Method(name='center', params=[],
                    description='sets the window’s location to the center of the screen'),
-            Method(name='makeKeyAndOrderFront', params=[Param(name='sender', Type='foundation.Object')], return_value=ReturnValue(''),
+            Method(name='makeKeyAndOrderFront', params=[Param(name='sender', Type='foundation.Object')],
                    description='moves the window to the front of the screen list, within its level, and makes it the key window; that is, it shows the window.'),
+            Method(name='makeFirstResponder', params=[Param(name='responder', Type='appkit.Responder')], return_value=Return('bool'),
+                   description='attempts to make a given responder the first responder for the window.nil makes the window its first responder.'),
         ],
         delegate_methods=[
             DelegateMethod(
                 name='windowDidResize',
                 params=[Param(name='notification', Type='foundation.Notification')],
-                return_value=ReturnValue(''),
+                return_value=Return(''),
                 description='the window has been resized'
             ),
             DelegateMethod(
                 name='windowDidMove',
                 params=[Param(name='notification', Type='foundation.Notification')],
-                return_value=ReturnValue(''),
+                return_value=Return(''),
                 description='the window has moved'
             ),
             DelegateMethod(
                 name='windowDidMiniaturize',
                 params=[Param(name='notification', Type='foundation.Notification')],
-                return_value=ReturnValue(''),
+                return_value=Return(''),
                 description='the window has been minimized'
             ),
             DelegateMethod(
                 name='windowDidDeminiaturize',
                 params=[Param(name='notification', Type='foundation.Notification')],
-                return_value=ReturnValue(''),
+                return_value=Return(''),
                 description='the window has been deminimized'
             )
         ]

@@ -106,9 +106,9 @@ func (c *NSControl) StringValue() string {
 }
 
 func (c *NSControl) SetStringValue(stringValue string) {
-	c_stringValue := C.CString(stringValue)
-	defer C.free(unsafe.Pointer(c_stringValue))
-	C.Control_SetStringValue(c.Ptr(), c_stringValue)
+	cStringValue := C.CString(stringValue)
+	defer C.free(unsafe.Pointer(cStringValue))
+	C.Control_SetStringValue(c.Ptr(), cStringValue)
 }
 
 func (c *NSControl) Cell() Cell {

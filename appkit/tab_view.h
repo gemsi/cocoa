@@ -1,6 +1,7 @@
 #import <Foundation/NSGeometry.h>
 #import <stdbool.h>
 #import <stdlib.h>
+#import <utils.h>
 
 void* TabView_initWithFrame(long goID, NSRect frame);
 

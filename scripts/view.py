@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import Component, Property, InitMethod, Method, ReturnValue, Param
+from .generate import Component, Property, InitMethod, Method, Return, Param
 
 
 if __name__ == "__main__":
@@ -20,7 +20,7 @@ if __name__ == "__main__":
             Method(
                 name='addSubview',
                 params=[Param(name='subView', Type='appkit.View')],
-                return_value=ReturnValue(''),
+                return_value=Return(''),
                 description='adds a view to the view’s subviews so it’s displayed above its siblings.'
             ),
         ]

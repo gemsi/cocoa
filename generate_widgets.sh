@@ -20,6 +20,7 @@ python3 -m scripts.button
 python3 -m scripts.split_view
 python3 -m scripts.tab_view_item
 python3 -m scripts.tab_view
+python3 -m scripts.stack_view
 
 echo 'format go code...'
 go fmt ./appkit

@@ -79,9 +79,9 @@ func (t *NSTabViewItem) Label() string {
 }
 
 func (t *NSTabViewItem) SetLabel(label string) {
-	c_label := C.CString(label)
-	defer C.free(unsafe.Pointer(c_label))
-	C.TabViewItem_SetLabel(t.Ptr(), c_label)
+	cLabel := C.CString(label)
+	defer C.free(unsafe.Pointer(cLabel))
+	C.TabViewItem_SetLabel(t.Ptr(), cLabel)
 }
 
 func (t *NSTabViewItem) ToolTip() string {
@@ -89,9 +89,9 @@ func (t *NSTabViewItem) ToolTip() string {
 }
 
 func (t *NSTabViewItem) SetToolTip(toolTip string) {
-	c_toolTip := C.CString(toolTip)
-	defer C.free(unsafe.Pointer(c_toolTip))
-	C.TabViewItem_SetToolTip(t.Ptr(), c_toolTip)
+	cToolTip := C.CString(toolTip)
+	defer C.free(unsafe.Pointer(cToolTip))
+	C.TabViewItem_SetToolTip(t.Ptr(), cToolTip)
 }
 
 func (t *NSTabViewItem) TabState() TabState {

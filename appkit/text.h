@@ -1,6 +1,7 @@
 #import <Foundation/NSGeometry.h>
 #import <stdbool.h>
 #import <stdlib.h>
+#import <utils.h>
 
 const char* Text_String(void* ptr);
 void Text_SetString(void* ptr, const char* string);

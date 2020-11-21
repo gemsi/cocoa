@@ -73,9 +73,9 @@ func (t *NSText) String() string {
 }
 
 func (t *NSText) SetString(string string) {
-	c_string := C.CString(string)
-	defer C.free(unsafe.Pointer(c_string))
-	C.Text_SetString(t.Ptr(), c_string)
+	cString := C.CString(string)
+	defer C.free(unsafe.Pointer(cString))
+	C.Text_SetString(t.Ptr(), cString)
 }
 
 func (t *NSText) IsEditable() bool {

@@ -68,9 +68,9 @@ func (b *NSButton) Title() string {
 }
 
 func (b *NSButton) SetTitle(title string) {
-	c_title := C.CString(title)
-	defer C.free(unsafe.Pointer(c_title))
-	C.Button_SetTitle(b.Ptr(), c_title)
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	C.Button_SetTitle(b.Ptr(), cTitle)
 }
 
 func (b *NSButton) BezelStyle() BezelStyle {

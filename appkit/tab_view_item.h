@@ -1,4 +1,5 @@
 #import <stdlib.h>
+#import <utils.h>
 
 void* TabViewItem_initWithIdentifier(long goID, void* identifier);
 

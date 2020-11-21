@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import Component, Property, InitMethod, Method, Param, ReturnValue
+from .generate import Component, Property, InitMethod, Method, Param, Return
 
 if __name__ == "__main__":
     w = Component(
@@ -24,17 +24,17 @@ if __name__ == "__main__":
         methods=[
             Method(name="startAnimation",
                    params=[Param(name='sender', Type='foundation.Object')],
-                   return_value=ReturnValue(''),
+                   return_value=Return(''),
                    description='starts the animation of an indeterminate progress indicator',
                    ),
             Method(name="stopAnimation",
                    params=[Param(name='sender', Type='foundation.Object')],
-                   return_value=ReturnValue(''),
+                   return_value=Return(''),
                    description='stops the animation of an indeterminate progress indicator',
                    ),
             Method(name="incrementBy",
                    params=[Param(name='delta', Type='float64')],
-                   return_value=ReturnValue(''),
+                   return_value=Return(''),
                    description='advances the progress bar of a determinate progress indicator by the specified amount',
                    ),
         ],

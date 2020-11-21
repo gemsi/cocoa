@@ -1,5 +1,6 @@
 #import <Foundation/NSGeometry.h>
 #import <stdlib.h>
+#import <utils.h>
 
 NSPoint Event_LocationInWindow(void* ptr);
 void* Event_Window(void* ptr);

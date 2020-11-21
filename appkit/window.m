@@ -69,3 +69,8 @@ void Window_MakeKeyAndOrderFront(void* ptr, void* sender) {
 	NSWindow* window = (NSWindow*)ptr;
 	[window makeKeyAndOrderFront:sender];
 }
+
+bool Window_MakeFirstResponder(void* ptr, void* responder) {
+	NSWindow* window = (NSWindow*)ptr;
+	return [window makeFirstResponder:responder];
+}

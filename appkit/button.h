@@ -1,5 +1,6 @@
 #import <Foundation/NSGeometry.h>
 #import <stdlib.h>
+#import <utils.h>
 
 void* Button_initWithFrame(long goID, NSRect frame);
 
