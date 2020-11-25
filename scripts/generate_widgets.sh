@@ -22,6 +22,8 @@ python3 tab_view_item.py
 python3 tab_view.py
 python3 stack_view.py
 python3 layout_guide.py
+python3 menu.py
+python3 menu_item.py
 
 echo 'format go code...'
 cd ..&& go fmt ./appkit
