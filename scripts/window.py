@@ -1,6 +1,6 @@
 #!env python3
 
-from scripts.generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
+from generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
 
 
 if __name__ == "__main__":

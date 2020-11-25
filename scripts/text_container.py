@@ -1,6 +1,6 @@
 #!env python3
 
-from .generate import *
+from generate import *
 
 
 if __name__ == "__main__":

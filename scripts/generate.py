@@ -121,7 +121,8 @@ class Param:
 
     def c_def_code(self) -> str:
         if self.array:
-            return f'{c_type(self.Type)}* {self.name}, size_t {self.name}_len'
+            # Note: only support NSObject array
+            return f'Array {self.name}'
         return c_type(self.Type) + ' ' + self.name
 
     def objc_def_code(self) -> str:
@@ -139,12 +140,13 @@ class Param:
             # Note: only support NSObject array
             c_name = 'c' + cap(self.name)
             codes = [
-                f'{c_name} := make([]unsafe.Pointer, len({self.name}))',
+                f'{c_name}Data := make([]unsafe.Pointer, len({self.name}))',
                 f'for idx, v := range {self.name} {{',
-                f'\t{c_name}[idx] = unsafe.Pointer(v.Ptr())',
+                f'\t{c_name}Data[idx] = v.Ptr()',
                 '}',
+                f'{c_name} := C.Array{{data:unsafe.Pointer(&{c_name}Data[0]), len:C.int(len({self.name}))}}',
             ]
-            return codes, f'&{c_name}[0], C.size_t(len({self.name}))'
+            return codes, c_name
         elif self.Type in cgo_type_dict:
             return [], f'C.{cgo_type_dict[self.Type]}({self.name})'
         elif self.Type == 'string':
@@ -163,11 +165,13 @@ class Param:
         """convert c types to objc types"""
         pkg, type_name = split_type(self.go_alias if self.go_alias else self.Type)
         if self.array:
+            # Note: only support NSObject array
             objc_name = f'objc{cap(self.name)}'
             codes = [
-                f'NSMutableArray* {objc_name} = [[NSMutableArray alloc] init];;',
-                f'for (int i = 0; i < {self.name}_len; i++) {{',
-                f'\t[{objc_name} addObject:(NS{type_name}*){self.name}[i]];',
+                f'NSMutableArray* {objc_name} = [[NSMutableArray alloc] init];',
+                f'NS{type_name}** {self.name}Data = (NS{type_name}**){self.name}.data;',
+                f'for (int i = 0; i < {self.name}.len; i++) {{',
+                f'    [{objc_name} addObject:{self.name}Data[i]];',
                 '}',
             ]
             return codes, objc_name
@@ -684,7 +688,7 @@ class Component:
             super_ns_name = super_package + '.NS' + super_type_name
             super_make_name = super_package + '.Make' + super_type_name
 
-        go_file_path = f'./{self.pkg}/{self.file_name}.go'
+        go_file_path = f'../{self.pkg}/{self.file_name}.go'
 
         cgo_imports_str = textwrap.dedent(f'''
         // #cgo CFLAGS: -x objective-c
@@ -822,16 +826,10 @@ class Component:
 
     def generate_c_header_file(self):
         pkg, type_name = split_type(self.Type)
-        ns_name = 'NS' + type_name
         file_name = camel_to_underscore(type_name)
-        package_path = './' + pkg
-        try:
-            os.makedirs(package_path)
-        except FileExistsError:
-            pass
 
         # header files
-        header_file_path = f'{package_path}/{file_name}.h'
+        header_file_path = f'../{pkg}/{file_name}.h'
         with open(header_file_path, 'w+') as out:
             for s in self.get_c_imports():
                 print(f'#import <{s}>', file=out)
@@ -859,7 +857,7 @@ class Component:
     def generate_delegate_header_file(self):
         if not self.delegate_methods and not self.action_methods and not self.extend_delegate:
             return
-        delegate_header_file_path = f'./{self.pkg}/{self.file_name}_delegate.h'
+        delegate_header_file_path = f'../{self.pkg}/{self.file_name}_delegate.h'
         with open(delegate_header_file_path, 'w+') as out:
             print(f'#import <Appkit/{self.ns_type}.h>', file=out)
             print(f'#import "_cgo_export.h"', file=out)
@@ -881,7 +879,7 @@ class Component:
                 print(f'@end', file=out)
 
     def generate_objc_m_file(self):
-        m_file_path = f'./{self.pkg}/{self.file_name}.m'
+        m_file_path = f'../{self.pkg}/{self.file_name}.m'
         with open(m_file_path, 'w+') as out:
             print(f'#import <Appkit/{self.ns_type}.h>', file=out)
             print(f'#import "{self.file_name}.h"', file=out)
@@ -954,7 +952,7 @@ class Component:
 
     def generate_code(self):
         print('generate code for', self.Type)
-        package_path = './' + self.pkg
+        package_path = '../' + self.pkg
         try:
             os.makedirs(package_path)
         except FileExistsError:

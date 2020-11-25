@@ -36,12 +36,13 @@ func MakeStackView(ptr unsafe.Pointer) *NSStackView {
 
 // NewStackViewWithViews create new StackView
 func NewStackViewWithViews(views []View) StackView {
-	cViews := make([]unsafe.Pointer, len(views))
+	cViewsData := make([]unsafe.Pointer, len(views))
 	for idx, v := range views {
-		cViews[idx] = unsafe.Pointer(v.Ptr())
+		cViewsData[idx] = v.Ptr()
 	}
+	cViews := C.Array{data: unsafe.Pointer(&cViewsData[0]), len: C.int(len(views))}
 	id := resources.NextId()
-	ptr := C.StackView_stackViewWithViews(C.long(id), &cViews[0], C.size_t(len(views)))
+	ptr := C.StackView_stackViewWithViews(C.long(id), cViews)
 	v := &NSStackView{
 		NSView: *MakeView(ptr),
 	}

@@ -1,10 +1,11 @@
 #import <Appkit/NSStackView.h>
 #import "stack_view.h"
 
-void* StackView_stackViewWithViews(long goID, void** views, size_t views_len) {
-	NSMutableArray* objcViews = [[NSMutableArray alloc] init];;
-	for (int i = 0; i < views_len; i++) {
-		[objcViews addObject:(NSView*)views[i]];
+void* StackView_stackViewWithViews(long goID, Array views) {
+	NSMutableArray* objcViews = [[NSMutableArray alloc] init];
+	NSView** viewsData = (NSView**)views.data;
+	for (int i = 0; i < views.len; i++) {
+	    [objcViews addObject:viewsData[i]];
 	}
 	NSStackView* stack_view = [[NSStackView stackViewWithViews:objcViews] autorelease];
 	return (void*)stack_view;
