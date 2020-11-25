@@ -22,10 +22,14 @@ type View interface {
 	AutoresizingMask() AutoresizingMaskOptions
 	// SetAutoresizingMask set the view’s frame rectangle, which defines its position and size in its superview’s coordinate system
 	SetAutoresizingMask(autoresizingMask AutoresizingMaskOptions)
-	// NeedsDisplay return whether the view needs to be redrawn before being displayed.
+	// NeedsDisplay return whether the view needs to be redrawn before being displayed
 	NeedsDisplay() bool
-	// SetNeedsDisplay set whether the view needs to be redrawn before being displayed.
+	// SetNeedsDisplay set whether the view needs to be redrawn before being displayed
 	SetNeedsDisplay(needsDisplay bool)
+	// TranslatesAutoresizingMaskIntoConstraints return whether the view’s autoresizing mask is translated into Auto Layout constraints
+	TranslatesAutoresizingMaskIntoConstraints() bool
+	// SetTranslatesAutoresizingMaskIntoConstraints set whether the view’s autoresizing mask is translated into Auto Layout constraints
+	SetTranslatesAutoresizingMaskIntoConstraints(translatesAutoresizingMaskIntoConstraints bool)
 	// AddSubview adds a view to the view’s subviews so it’s displayed above its siblings.
 	AddSubview(subView View)
 }
@@ -68,6 +72,14 @@ func (v *NSView) NeedsDisplay() bool {
 
 func (v *NSView) SetNeedsDisplay(needsDisplay bool) {
 	C.View_SetNeedsDisplay(v.Ptr(), C.bool(needsDisplay))
+}
+
+func (v *NSView) TranslatesAutoresizingMaskIntoConstraints() bool {
+	return bool(C.View_TranslatesAutoresizingMaskIntoConstraints(v.Ptr()))
+}
+
+func (v *NSView) SetTranslatesAutoresizingMaskIntoConstraints(translatesAutoresizingMaskIntoConstraints bool) {
+	C.View_SetTranslatesAutoresizingMaskIntoConstraints(v.Ptr(), C.bool(translatesAutoresizingMaskIntoConstraints))
 }
 
 func (v *NSView) AddSubview(subView View) {

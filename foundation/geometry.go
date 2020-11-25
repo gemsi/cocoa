@@ -4,7 +4,7 @@ import "C"
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
-// #include "rect.h"
+// #include "geometry.h"
 import "C"
 import "math"
 
@@ -99,4 +99,48 @@ func MakeSize(width, height float64) Size {
 // MakePoint create a Point struct
 func MakePoint(x, y float64) Point {
 	return Point{C.double(x), C.double(y)}
+}
+
+// EdgeInsets is a description of the distance between the edges of two rectangles.
+type EdgeInsets C.NSEdgeInsets
+
+func (e *EdgeInsets) Top() float64 {
+	return float64(e.top)
+}
+
+func (e *EdgeInsets) Left() float64 {
+	return float64(e.left)
+}
+
+func (e *EdgeInsets) Bottom() float64 {
+	return float64(e.bottom)
+}
+
+func (e *EdgeInsets) Right() float64 {
+	return float64(e.right)
+}
+
+func (e *EdgeInsets) SetTop(value float64) {
+	e.top = C.double(value)
+}
+
+func (e *EdgeInsets) SetLeft(value float64) {
+	e.left = C.double(value)
+}
+
+func (e *EdgeInsets) SetBottom(value float64) {
+	e.bottom = C.double(value)
+}
+
+func (e *EdgeInsets) SetRight(value float64) {
+	e.right = C.double(value)
+}
+
+func MakeEdgeInsets(top, left, bottom, right float64) EdgeInsets {
+	return EdgeInsets{
+		top:    C.double(top),
+		left:   C.double(left),
+		bottom: C.double(bottom),
+		right:  C.double(right),
+	}
 }

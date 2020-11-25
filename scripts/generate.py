@@ -38,7 +38,7 @@ c_type_dict = {
     'float64': 'double',
 }
 
-geo_struct_types = {'foundation.Rect', 'foundation.Point', 'foundation.Size'}
+geo_struct_types = {'foundation.Rect', 'foundation.Point', 'foundation.Size', 'foundation.EdgeInsets'}
 
 
 def type_part(Type: str) -> str:
@@ -346,9 +346,15 @@ class Method:
         ]
         call_code = '[' + ns_var_name + ' ' + de_cap(self.name)
         if len(self.params) > 0:
-            call_code += ':' + self.params[0].c_to_objc_code()[1]
+            convert_codes, arg = self.params[0].c_to_objc_code()
+            for c in convert_codes:
+                codes.append('    ' + c)
+            call_code += ':' + arg
             for param in self.params[1:]:
-                call_code += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + param.name
+                convert_codes, arg = param.c_to_objc_code()
+                for c in convert_codes:
+                    codes.append('    ' + c)
+                call_code += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + arg
         call_code += ']'
         convert_codes, call_code = self.return_value.objc_to_c_code(call_code)
         for c in convert_codes:
@@ -658,6 +664,7 @@ class Component:
     delegate_methods: List[DelegateMethod] = field(default_factory=list)
     action_methods: List[ActionMethod] = field(default_factory=list)
     extend_delegate: bool = False
+    additional_objc_imports: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         self.pkg, self.type_name = split_type(self.Type)
@@ -883,6 +890,8 @@ class Component:
         with open(m_file_path, 'w+') as out:
             print(f'#import <Appkit/{self.ns_type}.h>', file=out)
             print(f'#import "{self.file_name}.h"', file=out)
+            for import_ in self.additional_objc_imports:
+                print(f'#import <{import_}.h>', file=out)
             if self.delegate_methods or self.extend_delegate or self.action_methods:
                 print(f'#import "{self.file_name}_delegate.h"', file=out)
 

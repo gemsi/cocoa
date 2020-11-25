@@ -9,5 +9,7 @@ unsigned long View_AutoresizingMask(void* ptr);
 void View_SetAutoresizingMask(void* ptr, unsigned long autoresizingMask);
 bool View_NeedsDisplay(void* ptr);
 void View_SetNeedsDisplay(void* ptr, bool needsDisplay);
+bool View_TranslatesAutoresizingMaskIntoConstraints(void* ptr);
+void View_SetTranslatesAutoresizingMaskIntoConstraints(void* ptr, bool translatesAutoresizingMaskIntoConstraints);
 
 void View_AddSubview(void* ptr, void* subView);

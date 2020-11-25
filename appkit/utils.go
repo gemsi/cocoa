@@ -26,6 +26,13 @@ func toSize(size C.NSSize) foundation.Size {
 	return *(*foundation.Size)(unsafe.Pointer(&size))
 }
 
+func toNSEdgeInsets(insets foundation.EdgeInsets) C.NSEdgeInsets {
+	return *(*C.NSEdgeInsets)(unsafe.Pointer(&insets))
+}
+func toEdgeInsets(insets C.NSEdgeInsets) foundation.EdgeInsets {
+	return *(*foundation.EdgeInsets)(unsafe.Pointer(&insets))
+}
+
 func toNSPoint(pointer foundation.Point) C.NSPoint {
 	return *(*C.NSPoint)(unsafe.Pointer(&pointer))
 }
