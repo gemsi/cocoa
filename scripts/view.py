@@ -20,6 +20,23 @@ if __name__ == "__main__":
                     #  description='whether the view depends on the constraint-based layout system'),
             Property(name='translatesAutoresizingMaskIntoConstraints', Type='bool', getter_prefix_is=False,
                      description='whether the view’s autoresizing mask is translated into Auto Layout constraints'),
+
+            Property(name='bottomAnchor', Type='appkit.LayoutYAxisAnchor', readonly=True,
+                     description='a layout anchor representing the bottom edge of the view’s frame'),
+            Property(name='centerXAnchor', Type='appkit.LayoutXAxisAnchor',readonly=True,
+                     description='a layout anchor representing the horizontal center of the view’s frame'),
+            Property(name='centerYAnchor', Type='appkit.LayoutYAxisAnchor',readonly=True,
+                     description='a layout anchor representing the vertical center of the view’s frame'),
+            Property(name='firstBaselineAnchor', Type='appkit.LayoutYAxisAnchor', readonly=True, description=''),
+            Property(name='heightAnchor', Type='appkit.LayoutDimension', readonly=True, description=''),
+            Property(name='lastBaselineAnchor', Type='appkit.LayoutYAxisAnchor', readonly=True, description=''),
+            Property(name='leadingAnchor', Type='appkit.LayoutXAxisAnchor', readonly=True, description=''),
+            Property(name='leftAnchor', Type='appkit.LayoutXAxisAnchor', readonly=True, description=''),
+            Property(name='rightAnchor', Type='appkit.LayoutXAxisAnchor', readonly=True, description=''),
+            Property(name='topAnchor', Type='appkit.LayoutYAxisAnchor', readonly=True, description=''),
+            Property(name='trailingAnchor', Type='appkit.LayoutXAxisAnchor', readonly=True, description=''),
+            Property(name='widthAnchor', Type='appkit.LayoutDimension', readonly=True, description=''),
+
         ],
         methods=[
             Method(

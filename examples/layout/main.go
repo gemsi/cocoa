@@ -29,6 +29,7 @@ func main() {
 	sv.SetDistribution(appkit.NSStackViewDistributionFillEqually)
 	sv.SetAlignment(appkit.LayoutAttributeCenterX)
 	sv.SetSpacing(10)
+	//sv.LeadingAnchor().ConstraintEqualTo(label.LeadingAnchor()).Active()
 	views := sv.Views()
 	fmt.Println(views)
 	w.ContentView().AddSubview(sv)

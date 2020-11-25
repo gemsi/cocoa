@@ -42,6 +42,66 @@ void View_SetTranslatesAutoresizingMaskIntoConstraints(void* ptr, bool translate
 	[view setTranslatesAutoresizingMaskIntoConstraints:translatesAutoresizingMaskIntoConstraints];
 }
 
+void* View_BottomAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view bottomAnchor];
+}
+
+void* View_CenterXAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view centerXAnchor];
+}
+
+void* View_CenterYAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view centerYAnchor];
+}
+
+void* View_FirstBaselineAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view firstBaselineAnchor];
+}
+
+void* View_HeightAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view heightAnchor];
+}
+
+void* View_LastBaselineAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view lastBaselineAnchor];
+}
+
+void* View_LeadingAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view leadingAnchor];
+}
+
+void* View_LeftAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view leftAnchor];
+}
+
+void* View_RightAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view rightAnchor];
+}
+
+void* View_TopAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view topAnchor];
+}
+
+void* View_TrailingAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view trailingAnchor];
+}
+
+void* View_WidthAnchor(void* ptr) {
+	NSView* view = (NSView*)ptr;
+	return [view widthAnchor];
+}
+
 void View_AddSubview(void* ptr, void* subView) {
 	NSView* view = (NSView*)ptr;
 	[view addSubview:subView];
