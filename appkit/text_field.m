@@ -17,13 +17,11 @@
 }
 
 @end
-
-void* TextField_initWithFrame(long goID, NSRect frame) {
-	NSTextField* text_field = [[[NSTextField alloc] initWithFrame:frame] autorelease];
-	GoNSTextFieldDelegate* delegate = [[GoNSTextFieldDelegate alloc] init];
+void TextField_RegisterDelegate(void *ptr, long goID) {
+	NSTextField* textField = (NSTextField*)ptr;
+	GoNSTextFieldDelegate* delegate = [[[GoNSTextFieldDelegate alloc] init] autorelease];
 	[delegate setGoID:goID];
-	[text_field setDelegate:delegate];
-	return (void*)text_field;
+	[textField setDelegate:delegate];
 }
 
 bool TextField_IsBezeled(void* ptr) {
@@ -84,4 +82,9 @@ void* TextField_BackgroundColor(void* ptr) {
 void TextField_SetBackgroundColor(void* ptr, void* backgroundColor) {
 	NSTextField* textField = (NSTextField*)ptr;
 	[textField setBackgroundColor:backgroundColor];
+}
+
+void* TextField_InitWithFrame(NSRect frame) {
+	NSTextField* textField = [NSTextField alloc];
+	return [[textField initWithFrame:frame] autorelease];
 }

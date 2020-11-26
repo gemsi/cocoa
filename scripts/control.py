@@ -1,6 +1,6 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Method
+from generate import Component, Property, Method
 
 if __name__ == "__main__":
     w = Component(

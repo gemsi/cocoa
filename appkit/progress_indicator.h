@@ -3,8 +3,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* ProgressIndicator_initWithFrame(long goID, NSRect frame);
-
 bool ProgressIndicator_UsesThreadedAnimation(void* ptr);
 void ProgressIndicator_SetUsesThreadedAnimation(void* ptr, bool usesThreadedAnimation);
 double ProgressIndicator_DoubleValue(void* ptr);
@@ -20,6 +18,7 @@ void ProgressIndicator_SetBezeled(void* ptr, bool bezeled);
 bool ProgressIndicator_IsDisplayedWhenStopped(void* ptr);
 void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool displayedWhenStopped);
 
+void* ProgressIndicator_InitWithFrame(NSRect frame);
 void ProgressIndicator_StartAnimation(void* ptr, void* sender);
 void ProgressIndicator_StopAnimation(void* ptr, void* sender);
 void ProgressIndicator_IncrementBy(void* ptr, double delta);

@@ -9,14 +9,12 @@
 }
 
 @end
-
-void* Button_initWithFrame(long goID, NSRect frame) {
-	NSButton* button = [[[NSButton alloc] initWithFrame:frame] autorelease];
+void Button_RegisterDelegate(void *ptr, long goID) {
+	NSButton* button = (NSButton*)ptr;
 	NSButtonHandler* handler = [[[NSButtonHandler alloc] init] autorelease];
 	[handler setGoID:goID];
 	[button setTarget:handler];
 	[button setAction:@selector(onAction:)];
-	return (void*)button;
 }
 
 const char* Button_Title(void* ptr) {
@@ -47,6 +45,11 @@ long Button_State(void* ptr) {
 void Button_SetState(void* ptr, long state) {
 	NSButton* button = (NSButton*)ptr;
 	[button setState:state];
+}
+
+void* Button_InitWithFrame(NSRect frame) {
+	NSButton* button = [NSButton alloc];
+	return [[button initWithFrame:frame] autorelease];
 }
 
 void Button_SetButtonType(void* ptr, unsigned long buttonType) {

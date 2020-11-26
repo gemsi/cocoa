@@ -1,6 +1,6 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
+from generate import Component, Property, init_method, Param, Method, Return, DelegateMethod
 
 
 if __name__ == "__main__":
@@ -8,7 +8,6 @@ if __name__ == "__main__":
         Type="appkit.TextField",
         super_type='appkit.Control',
         description="text that the user can select or edit and that sends its action message to its target when the user presses the Return key",
-        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
         properties=[
             Property(name='bezeled', Type='bool',
                      description='whether the receiver draws a bezeled border around its contents'),
@@ -18,7 +17,9 @@ if __name__ == "__main__":
             Property(name='textColor', Type='appkit.Color', description='the color used to draw the receiver’s text'),
             Property(name='backgroundColor', Type='appkit.Color', description='the color of the background that the receiver’s cell draws behind the text.'),
         ],
-        methods=[ ],
+        methods=[ 
+            init_method(name="initWithFrame", Type="appkit.TextField", params=[Param(name='frame', Type='foundation.Rect')]),
+        ],
         delegate_methods=[
             DelegateMethod(
                 name='controlTextDidChange',

@@ -1,11 +1,6 @@
 #import <Appkit/NSProgressIndicator.h>
 #import "progress_indicator.h"
 
-void* ProgressIndicator_initWithFrame(long goID, NSRect frame) {
-	NSProgressIndicator* progress_indicator = [[[NSProgressIndicator alloc] initWithFrame:frame] autorelease];
-	return (void*)progress_indicator;
-}
-
 bool ProgressIndicator_UsesThreadedAnimation(void* ptr) {
 	NSProgressIndicator* progressIndicator = (NSProgressIndicator*)ptr;
 	return [progressIndicator usesThreadedAnimation];
@@ -74,6 +69,11 @@ bool ProgressIndicator_IsDisplayedWhenStopped(void* ptr) {
 void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool displayedWhenStopped) {
 	NSProgressIndicator* progressIndicator = (NSProgressIndicator*)ptr;
 	[progressIndicator setDisplayedWhenStopped:displayedWhenStopped];
+}
+
+void* ProgressIndicator_InitWithFrame(NSRect frame) {
+	NSProgressIndicator* progressIndicator = [NSProgressIndicator alloc];
+	return [[progressIndicator initWithFrame:frame] autorelease];
 }
 
 void ProgressIndicator_StartAnimation(void* ptr, void* sender) {

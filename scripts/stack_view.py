@@ -1,14 +1,12 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param, Method, Return
+from generate import Component, Property, init_method, Param, Method, Return
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.StackView",
         super_type='appkit.View',
         description="a view that arranges an array of views horizontally or vertically and updates their placement and sizing when the window size changes",
-        init_method=InitMethod(name="stackViewWithViews", is_factory=True,
-                               params=[Param(name='views', Type='appkit.View', array=True)]),
         properties=[
             Property(name='views', Type='appkit.View', readonly=True, array=True,
                      description='the array of views owned by the stack view'),
@@ -28,9 +26,17 @@ if __name__ == "__main__":
                      description='the array of views arranged by the stack view'),
             Property(name='detachesHiddenViews', Type='bool', getter_prefix_is=False,
                      description='whether the stack view removes hidden views from its view hierarchy'),
-                     
+
         ],
         methods=[
+            Method(
+                name='stackViewWithViews',
+                register_delegate=True,
+                static=True,
+                params=[Param(name='views', Type='appkit.View', array=True)],
+                return_value=Return(Type='appkit.StackView'),
+                description='return a stack view with views',
+            ),
             Method(
                 name='viewsInGravity',
                 params=[Param(name='gravity', Type='int', go_alias='StackViewGravity')],
@@ -103,7 +109,8 @@ if __name__ == "__main__":
                 name='setClippingResistancePriority',
                 params=[
                     Param(name='clippingResistancePriority', Type='float32', go_alias='LayoutPriority'),
-                    Param(name='orientation', Type='int', go_alias='LayoutConstraintOrientation', objc_param_name='forOrientation'),
+                    Param(name='orientation', Type='int', go_alias='LayoutConstraintOrientation',
+                          objc_param_name='forOrientation'),
                 ],
                 description='sets the Auto Layout priority for resisting clipping of views in the stack view when Auto Layout attempts to reduce the stack view’s size',
             ),
@@ -119,7 +126,8 @@ if __name__ == "__main__":
                 name='setHuggingPriority',
                 params=[
                     Param(name='huggingPriority', Type='float32', go_alias='LayoutPriority'),
-                    Param(name='orientation', Type='int', go_alias='LayoutConstraintOrientation', objc_param_name='forOrientation'),
+                    Param(name='orientation', Type='int', go_alias='LayoutConstraintOrientation',
+                          objc_param_name='forOrientation'),
                 ],
                 description='sets the Auto Layout priority for the stack view to minimize its size, for a specified user interface axis',
             ),
@@ -155,7 +163,7 @@ if __name__ == "__main__":
                 ],
                 description='sets the Auto Layout priority for a view to remain attached to the stack view when Auto Layout reduces the stack view’s size',
             ),
-            
+
         ]
     )
     w.generate_code()

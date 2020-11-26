@@ -3,8 +3,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* StackView_stackViewWithViews(long goID, Array views);
-
 Array StackView_Views(void* ptr);
 Array StackView_DetachedViews(void* ptr);
 long StackView_Orientation(void* ptr);
@@ -21,6 +19,7 @@ Array StackView_ArrangedSubviews(void* ptr);
 bool StackView_DetachesHiddenViews(void* ptr);
 void StackView_SetDetachesHiddenViews(void* ptr, bool detachesHiddenViews);
 
+void* StackView_StackViewWithViews(Array views);
 Array StackView_ViewsInGravity(void* ptr, long gravity);
 void StackView_AddView(void* ptr, void* view, long gravity);
 void StackView_InsertView(void* ptr, void* view, unsigned long index, long gravity);

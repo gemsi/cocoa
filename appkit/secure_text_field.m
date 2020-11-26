@@ -5,11 +5,14 @@
 @implementation GoNSSecureTextFieldDelegate
 
 @end
-
-void* SecureTextField_initWithFrame(long goID, NSRect frame) {
-	NSSecureTextField* secure_text_field = [[[NSSecureTextField alloc] initWithFrame:frame] autorelease];
-	GoNSSecureTextFieldDelegate* delegate = [[GoNSSecureTextFieldDelegate alloc] init];
+void SecureTextField_RegisterDelegate(void *ptr, long goID) {
+	NSSecureTextField* secureTextField = (NSSecureTextField*)ptr;
+	GoNSSecureTextFieldDelegate* delegate = [[[GoNSSecureTextFieldDelegate alloc] init] autorelease];
 	[delegate setGoID:goID];
-	[secure_text_field setDelegate:delegate];
-	return (void*)secure_text_field;
+	[secureTextField setDelegate:delegate];
+}
+
+void* SecureTextField_InitWithFrame(NSRect frame) {
+	NSSecureTextField* secureTextField = [NSSecureTextField alloc];
+	return [[secureTextField initWithFrame:frame] autorelease];
 }

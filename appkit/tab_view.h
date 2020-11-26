@@ -3,8 +3,7 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* TabView_initWithFrame(long goID, NSRect frame);
-
+void TabView_RegisterDelegate(void *ptr, long goID);
 long TabView_NumberOfTabViewItems(void* ptr);
 unsigned long TabView_TabViewType(void* ptr);
 void TabView_SetTabViewType(void* ptr, unsigned long tabViewType);
@@ -21,6 +20,7 @@ NSSize TabView_MinimumSize(void* ptr);
 unsigned long TabView_ControlSize(void* ptr);
 void TabView_SetControlSize(void* ptr, unsigned long controlSize);
 
+void* TabView_InitWithFrame(NSRect frame);
 void TabView_AddTabViewItem(void* ptr, void* tabViewItem);
 void TabView_InsertTabViewItem(void* ptr, void* tabViewItem, long index);
 void TabView_RemoveTabViewItem(void* ptr, void* tabViewItem);

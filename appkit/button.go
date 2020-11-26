@@ -48,19 +48,13 @@ func MakeButton(ptr unsafe.Pointer) *NSButton {
 		NSControl: *MakeControl(ptr),
 	}
 }
-
-// NewButton create new Button
-func NewButton(frame foundation.Rect) Button {
+func (b *NSButton) setDelegate() {
 	id := resources.NextId()
-	ptr := C.Button_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSButton{
-		NSControl: *MakeControl(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
+	C.Button_RegisterDelegate(b.Ptr(), C.long(id))
+	resources.Store(id, b)
+	foundation.AddDeallocHook(b, func() {
 		resources.Delete(id)
 	})
-	return v
 }
 
 func (b *NSButton) Title() string {
@@ -87,6 +81,12 @@ func (b *NSButton) State() ControlStateValue {
 
 func (b *NSButton) SetState(state ControlStateValue) {
 	C.Button_SetState(b.Ptr(), C.long(state))
+}
+
+func NewButton(frame foundation.Rect) Button {
+	instance := MakeButton(C.Button_InitWithFrame(toNSRect(frame)))
+	instance.setDelegate()
+	return instance
 }
 
 func (b *NSButton) SetButtonType(buttonType ButtonType) {

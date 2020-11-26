@@ -1,13 +1,12 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param, Method, Return
+from generate import Component, Property, init_method, Param, Method, Return
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.SplitView",
         super_type='appkit.View',
         description="a view that arranges two or more views in a linear stack running horizontally or vertically",
-        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
         properties=[
             Property(name='arrangesAllSubviews', Type='bool', getter_prefix_is=False,
                      description='whether the split view arranges all of its subviews as split panes'),
@@ -21,6 +20,8 @@ if __name__ == "__main__":
                      description='the style of divider between views'),
         ],
         methods=[
+            init_method(name="initWithFrame", Type="appkit.SplitView",
+                        params=[Param(name='frame', Type='foundation.Rect')]),
             Method(
                 name='minPossiblePositionOfDividerAtIndex',
                 params=[Param(name='dividerIndex', Type='int')],

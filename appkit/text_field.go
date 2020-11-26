@@ -67,19 +67,13 @@ func MakeTextField(ptr unsafe.Pointer) *NSTextField {
 		NSControl: *MakeControl(ptr),
 	}
 }
-
-// NewTextField create new TextField
-func NewTextField(frame foundation.Rect) TextField {
+func (t *NSTextField) setDelegate() {
 	id := resources.NextId()
-	ptr := C.TextField_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSTextField{
-		NSControl: *MakeControl(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
+	C.TextField_RegisterDelegate(t.Ptr(), C.long(id))
+	resources.Store(id, t)
+	foundation.AddDeallocHook(t, func() {
 		resources.Delete(id)
 	})
-	return v
 }
 
 func (t *NSTextField) IsBezeled() bool {
@@ -128,6 +122,12 @@ func (t *NSTextField) BackgroundColor() Color {
 
 func (t *NSTextField) SetBackgroundColor(backgroundColor Color) {
 	C.TextField_SetBackgroundColor(t.Ptr(), toPointer(backgroundColor))
+}
+
+func NewTextField(frame foundation.Rect) TextField {
+	instance := MakeTextField(C.TextField_InitWithFrame(toNSRect(frame)))
+	instance.setDelegate()
+	return instance
 }
 
 func (t *NSTextField) ControlTextDidChange(callback func(notification foundation.Notification)) {

@@ -44,20 +44,6 @@ func MakeTextContainer(ptr unsafe.Pointer) *NSTextContainer {
 	}
 }
 
-// NewTextContainer create new TextContainer
-func NewTextContainer(size foundation.Size) TextContainer {
-	id := resources.NextId()
-	ptr := C.TextContainer_initWithSize(C.long(id), toNSSize(size))
-	v := &NSTextContainer{
-		NSObject: *foundation.MakeObject(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (t *NSTextContainer) Size() foundation.Size {
 	return toSize(C.TextContainer_Size(t.Ptr()))
 }
@@ -80,4 +66,8 @@ func (t *NSTextContainer) HeightTracksTextView() bool {
 
 func (t *NSTextContainer) SetHeightTracksTextView(heightTracksTextView bool) {
 	C.TextContainer_SetHeightTracksTextView(t.Ptr(), C.bool(heightTracksTextView))
+}
+
+func NewTextContainer(size foundation.Size) TextContainer {
+	return MakeTextContainer(C.TextContainer_InitWithSize(toNSSize(size)))
 }

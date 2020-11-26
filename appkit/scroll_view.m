@@ -1,11 +1,6 @@
 #import <Appkit/NSScrollView.h>
 #import "scroll_view.h"
 
-void* ScrollView_initWithFrame(long goID, NSRect frame) {
-	NSScrollView* scroll_view = [[[NSScrollView alloc] initWithFrame:frame] autorelease];
-	return (void*)scroll_view;
-}
-
 bool ScrollView_HasVerticalScroller(void* ptr) {
 	NSScrollView* scrollView = (NSScrollView*)ptr;
 	return [scrollView hasVerticalScroller];
@@ -49,4 +44,9 @@ void ScrollView_SetBorderType(void* ptr, unsigned long borderType) {
 NSSize ScrollView_ContentSize(void* ptr) {
 	NSScrollView* scrollView = (NSScrollView*)ptr;
 	return [scrollView contentSize];
+}
+
+void* ScrollView_InitWithFrame(NSRect frame) {
+	NSScrollView* scrollView = [NSScrollView alloc];
+	return [[scrollView initWithFrame:frame] autorelease];
 }

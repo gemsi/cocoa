@@ -68,22 +68,6 @@ func MakeMenu(ptr unsafe.Pointer) *NSMenu {
 	}
 }
 
-// NewMenu create new Menu
-func NewMenu(title string) Menu {
-	cTitle := C.CString(title)
-	defer C.free(unsafe.Pointer(cTitle))
-	id := resources.NextId()
-	ptr := C.Menu_initWithTitle(C.long(id), cTitle)
-	v := &NSMenu{
-		NSObject: *foundation.MakeObject(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (m *NSMenu) MenuBarHeight() float64 {
 	return float64(C.Menu_MenuBarHeight(m.Ptr()))
 }
@@ -156,4 +140,10 @@ func (m *NSMenu) UserInterfaceLayoutDirection() UserInterfaceLayoutDirection {
 
 func (m *NSMenu) SetUserInterfaceLayoutDirection(userInterfaceLayoutDirection UserInterfaceLayoutDirection) {
 	C.Menu_SetUserInterfaceLayoutDirection(m.Ptr(), C.long(userInterfaceLayoutDirection))
+}
+
+func NewMenu(title string) Menu {
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	return MakeMenu(C.Menu_InitWithTitle(cTitle))
 }

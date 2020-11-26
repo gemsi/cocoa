@@ -21,13 +21,11 @@
 }
 
 @end
-
-void* Window_initWithContentRect(long goID, NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer) {
-	NSWindow* window = [[[NSWindow alloc] initWithContentRect:rect styleMask:styleMask backing:backing defer:Defer] autorelease];
-	GoNSWindowDelegate* delegate = [[GoNSWindowDelegate alloc] init];
+void Window_RegisterDelegate(void *ptr, long goID) {
+	NSWindow* window = (NSWindow*)ptr;
+	GoNSWindowDelegate* delegate = [[[GoNSWindowDelegate alloc] init] autorelease];
 	[delegate setGoID:goID];
 	[window setDelegate:delegate];
-	return (void*)window;
 }
 
 const char* Window_Title(void* ptr) {
@@ -58,6 +56,11 @@ unsigned long Window_StyleMask(void* ptr) {
 void Window_SetStyleMask(void* ptr, unsigned long styleMask) {
 	NSWindow* window = (NSWindow*)ptr;
 	[window setStyleMask:styleMask];
+}
+
+void* Window_InitWithContentRect(NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer) {
+	NSWindow* window = [NSWindow alloc];
+	return [[window initWithContentRect:rect styleMask:styleMask backing:backing defer:Defer] autorelease];
 }
 
 void Window_Center(void* ptr) {

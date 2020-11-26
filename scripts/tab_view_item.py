@@ -1,13 +1,12 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param
+from generate import Component, Property, init_method, Param
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.TabViewItem",
         super_type='foundation.Object',
         description="an item in a tab view",
-        init_method=InitMethod(name="initWithIdentifier", params=[Param(name='identifier', Type='foundation.Object')]),
         properties=[
             Property(name='label', Type='string',
                      description='the label text for the receiver to label'),
@@ -27,5 +26,9 @@ if __name__ == "__main__":
                      description='the parent tab view for the receiver'),
 
         ],
+        methods=[
+            init_method(name="initWithIdentifier", Type="appkit.TabViewItem",
+                        params=[Param(name='identifier', Type='foundation.Object')]),
+        ]
     )
     w.generate_code()

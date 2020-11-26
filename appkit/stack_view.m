@@ -1,16 +1,6 @@
 #import <Appkit/NSStackView.h>
 #import "stack_view.h"
 
-void* StackView_stackViewWithViews(long goID, Array views) {
-	NSMutableArray* objcViews = [[NSMutableArray alloc] init];
-	NSView** viewsData = (NSView**)views.data;
-	for (int i = 0; i < views.len; i++) {
-	    [objcViews addObject:viewsData[i]];
-	}
-	NSStackView* stack_view = [[NSStackView stackViewWithViews:objcViews] autorelease];
-	return (void*)stack_view;
-}
-
 Array StackView_Views(void* ptr) {
 	NSStackView* stackView = (NSStackView*)ptr;
 	NSArray* array = [stackView views];
@@ -111,6 +101,15 @@ bool StackView_DetachesHiddenViews(void* ptr) {
 void StackView_SetDetachesHiddenViews(void* ptr, bool detachesHiddenViews) {
 	NSStackView* stackView = (NSStackView*)ptr;
 	[stackView setDetachesHiddenViews:detachesHiddenViews];
+}
+
+void* StackView_StackViewWithViews(Array views) {
+    NSMutableArray* objcViews = [[NSMutableArray alloc] init];
+    NSView** viewsData = (NSView**)views.data;
+    for (int i = 0; i < views.len; i++) {
+        [objcViews addObject:viewsData[i]];
+    }
+	return [NSStackView stackViewWithViews:objcViews];
 }
 
 Array StackView_ViewsInGravity(void* ptr, long gravity) {

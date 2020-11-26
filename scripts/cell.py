@@ -1,6 +1,6 @@
 #!env python3
 
-from generate import Component, Property, InitMethod
+from generate import Component, Property
 
 
 if __name__ == "__main__":

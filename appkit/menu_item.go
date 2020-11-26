@@ -27,17 +27,17 @@ type MenuItem interface {
 	// SetTitle set the menu item's title
 	SetTitle(title string)
 	// Submenu return the submenu of the menu item
-	Submenu() Mennu
+	Submenu() Menu
 	// SetSubmenu set the submenu of the menu item
-	SetSubmenu(submenu Mennu)
+	SetSubmenu(submenu Menu)
 	// HasSubmenu return whether the menu item has a submenu
 	HasSubmenu() bool
 	// IsSeparatorItem return a menu item that is used to separate logical groups of menu commands
 	IsSeparatorItem() bool
 	// Menu return the menu item’s menu
-	Menu() Mennu
+	Menu() Menu
 	// SetMenu set the menu item’s menu
-	SetMenu(menu Mennu)
+	SetMenu(menu Menu)
 	// ToolTip return a help tag for the menu item
 	ToolTip() string
 	// SetToolTip set a help tag for the menu item
@@ -88,11 +88,11 @@ func (m *NSMenuItem) SetTitle(title string) {
 	C.MenuItem_SetTitle(m.Ptr(), cTitle)
 }
 
-func (m *NSMenuItem) Submenu() Mennu {
-	return MakeMennu(C.MenuItem_Submenu(m.Ptr()))
+func (m *NSMenuItem) Submenu() Menu {
+	return MakeMenu(C.MenuItem_Submenu(m.Ptr()))
 }
 
-func (m *NSMenuItem) SetSubmenu(submenu Mennu) {
+func (m *NSMenuItem) SetSubmenu(submenu Menu) {
 	C.MenuItem_SetSubmenu(m.Ptr(), toPointer(submenu))
 }
 
@@ -104,11 +104,11 @@ func (m *NSMenuItem) IsSeparatorItem() bool {
 	return bool(C.MenuItem_IsSeparatorItem(m.Ptr()))
 }
 
-func (m *NSMenuItem) Menu() Mennu {
-	return MakeMennu(C.MenuItem_Menu(m.Ptr()))
+func (m *NSMenuItem) Menu() Menu {
+	return MakeMenu(C.MenuItem_Menu(m.Ptr()))
 }
 
-func (m *NSMenuItem) SetMenu(menu Mennu) {
+func (m *NSMenuItem) SetMenu(menu Menu) {
 	C.MenuItem_SetMenu(m.Ptr(), toPointer(menu))
 }
 

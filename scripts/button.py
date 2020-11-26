@@ -1,6 +1,6 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param, Method, Return, ActionMethod
+from generate import Component, Property, init_method, Param, Method, Return, ActionMethod
 
 
 if __name__ == "__main__":
@@ -8,7 +8,6 @@ if __name__ == "__main__":
         Type="appkit.Button",
         super_type='appkit.Control',
         description="a control that defines an area on the screen that can be used to trigger actions",
-        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
 
         properties=[
             Property(name='title', Type='string',
@@ -18,6 +17,7 @@ if __name__ == "__main__":
             Property(name='state', Type='int', go_alias_type='ControlStateValue', description='the button’s state'),
         ],
         methods=[
+            init_method(name="initWithFrame", Type='appkit.Button', params=[Param(name='frame', Type='foundation.Rect')]),
             Method(
                 name='setButtonType',
                 params=[Param(name='buttonType', Type='uint', go_alias='ButtonType')],

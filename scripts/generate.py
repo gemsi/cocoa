@@ -288,9 +288,22 @@ class Method:
     description: str
     params: List[Param] = field(default_factory=list)
     return_value: Return = Return('')
+    do_alloc: bool = False  # for init method
+    static: bool = False  # for static method
+    register_delegate: bool = False  # if register delegate and action target
+    go_func_name: str = ''
+
+    def init_env(self, has_delegate: bool, has_target: bool):
+        self.has_delegate = has_delegate
+        self.has_target = has_target
 
     def go_interface_code(self, current_pkg: str) -> List[str]:
-        name = cap(self.name)
+        if self.do_alloc or self.static:
+            return []
+        if self.go_func_name:
+            name = self.go_func_name
+        else:
+            name = cap(self.name)
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
@@ -301,24 +314,38 @@ class Method:
         ]
 
     def go_impl_code(self, current_pkg: str, receiver_type: str) -> List[str]:
-        receiver = receiver_type[0].lower()
-        name = cap(self.name)
+        if self.go_func_name:
+            go_func_name = self.go_func_name
+        else:
+            go_func_name = cap(self.name)
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
-        receiver_str = receiver + ' *NS' + receiver_type
+
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
             go_def_return = ' ' + go_def_return
-        codes = ['func (' + receiver_str + ') ' + name + '(' + params_str + ')' + go_def_return + ' {', ]
-        args = [f'{receiver}.Ptr()']
+        if not self.do_alloc and not self.static:
+            receiver = receiver_type[0].lower()
+            receiver_str = receiver + ' *NS' + receiver_type
+            codes = ['func (' + receiver_str + ') ' + go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
+            args = [f'{receiver}.Ptr()']
+        else:
+            codes = ['func ' + go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
+            args = []
+
         for param in self.params:
             convert_codes, arg = param.go_to_c_code()
             for convert_code in convert_codes:
                 codes.append('\t' + convert_code)
             args.append(arg)
         c_args_str = ', '.join(args)
-        convert_codes, return_str = self.return_value.c_to_go_code(f'C.{receiver_type}_{name}({c_args_str})', current_pkg)
+        convert_codes, return_str = self.return_value.c_to_go_code(
+            f'C.{receiver_type}_{cap(self.name)}({c_args_str})', current_pkg)
         for convert_code in convert_codes:
             codes.append('\t' + convert_code)
+        if self.register_delegate and (self.has_delegate or self.has_target) and self.return_value.Type != '':
+            codes.append(f'\tinstance := {return_str}')
+            codes.append(f'\tinstance.setDelegate()')
+            return_str = 'instance'
         if self.return_value.Type != '':
             return_str = 'return ' + return_str
         codes.append('\t' + return_str)
@@ -326,24 +353,29 @@ class Method:
         return codes
 
     def c_h_code(self, receiver_type: str) -> List[str]:
-        c_params_str = ', '.join([p.c_def_code() for p in self.params])
-        if c_params_str:
-            c_params_str = f'void* ptr, {c_params_str}'
-        else:
-            c_params_str = f'void* ptr'
+        params: List[str] = []
+        if not self.do_alloc and not self.static:
+            params.append('void* ptr')
+        params.extend([p.c_def_code() for p in self.params])
+        c_params_str = ', '.join(params)
         return [f'{self.return_value.c_def_code()} {receiver_type}_{cap(self.name)}({c_params_str});']
 
     def objc_m_code(self, receiver_type: str) -> List[str]:
-        c_params_str = ', '.join([p.c_def_code() for p in self.params])
-        if c_params_str:
-            c_params_str = f'void* ptr, {c_params_str}'
-        else:
-            c_params_str = f'void* ptr'
+        params: List[str] = []
+        if not self.do_alloc and not self.static:
+            params.append('void* ptr')
+        params.extend([p.c_def_code() for p in self.params])
+        c_params_str = ', '.join(params)
         ns_var_name = de_cap(receiver_type)
         codes = [
             f'{self.return_value.c_def_code()} {receiver_type}_{cap(self.name)}({c_params_str}) {{',
-            f'\tNS{receiver_type}* {ns_var_name} = (NS{receiver_type}*)ptr;',
         ]
+        if self.do_alloc:
+            codes.append(f'\tNS{receiver_type}* {ns_var_name} = [NS{receiver_type} alloc];')
+        elif not self.static:
+            codes.append(f'\tNS{receiver_type}* {ns_var_name} = (NS{receiver_type}*)ptr;')
+        else:
+            ns_var_name = f'NS{receiver_type}'
         call_code = '[' + ns_var_name + ' ' + de_cap(self.name)
         if len(self.params) > 0:
             convert_codes, arg = self.params[0].c_to_objc_code()
@@ -359,11 +391,23 @@ class Method:
         convert_codes, call_code = self.return_value.objc_to_c_code(call_code)
         for c in convert_codes:
             codes.append('\t' + c)
+        if self.do_alloc:
+            call_code = f'[{call_code} autorelease]'
         if self.return_value.Type != '':
             call_code = 'return ' + call_code
         codes.append('\t' + call_code + ';')
         codes.append('}')
         return codes
+
+
+def init_method(name: str, Type: str, params: List[Param] = field(default_factory=list), go_func_name: str = '', description: str = '') -> Method:
+    Type = type_part(Type)
+    if not go_func_name:
+        go_func_name = f'New{Type}'
+    if not description:
+        description = f'return a new {Type} instance'
+
+    return Method(name=name, params=params, return_value=Return(Type=Type), go_func_name=go_func_name, description=description, do_alloc=True, register_delegate=True)
 
 
 @dataclass
@@ -523,107 +567,6 @@ class ActionMethod:
 
 
 @dataclass
-class InitMethod:
-    name: str
-    params: List[Param] = field(default_factory=list)
-    is_factory: bool = False  # TODO: how do handle factory method
-
-    def init_env(self, has_delegate: bool, action_methods: List[ActionMethod]):
-        self.has_delegate = has_delegate
-        self.action_methods = action_methods
-
-    def go_code(self, Type: str, super_type: str) -> List[str]:
-        current_pkg, type_name = split_type(Type)
-        params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
-        func_name = f'New{type_name}' if not self.is_factory else f'New{cap((self.name))}'
-        codes = [
-            f"// {func_name} create new {type_name}",
-            f'func {func_name}({params_str}) {type_name} {{',
-        ]
-        args = []
-        for param in self.params:
-            convert_codes, arg = param.go_to_c_code()
-            for convert_code in convert_codes:
-                codes.append('\t' + convert_code)
-            else:
-                args.append(arg)
-        c_args_str = ', '.join(args)
-        pkg, type_name = split_type(Type)
-        super_package, super_type_name = split_type(super_type)
-        if super_package == pkg:
-            super_make_name = 'Make' + super_type_name
-        else:
-            super_make_name = super_package + '.Make' + super_type_name
-        codes.extend([
-            '\tid := resources.NextId()',
-            f'\tptr := C.{type_name}_{self.name}(C.long(id), {c_args_str})',
-            f'\tv := &NS{type_name}{{',
-            f'\t\tNS{super_type_name}: *{super_make_name}(ptr),',
-            '\t}',
-            '\tresources.Store(id, v)',
-            '\tfoundation.AddDeallocHook(v, func() {',
-            '\t\tresources.Delete(id)',
-            '\t})',
-            '\treturn v',
-            '}',
-        ])
-        return codes
-
-    def c_h_code(self, Type: str) -> List[str]:
-        c_params_str = ', '.join([p.c_def_code() for p in self.params])
-        if c_params_str:
-            c_params_str = f'long goID, {c_params_str}'
-        else:
-            c_params_str = f'long goID'
-        return [f'void* {Type}_{self.name}({c_params_str});']
-
-    def objc_m_code(self, Type: str) -> List[str]:
-        c_params_str = ', '.join([p.c_def_code() for p in self.params])
-        if c_params_str:
-            c_params_str = f'long goID, {c_params_str}'
-        else:
-            c_params_str = f'long goID'
-        var_name = camel_to_underscore(Type)
-        codes = [
-            f'void* {Type}_{self.name}({c_params_str}) {{',
-        ]
-        convert_codes, arg = self.params[0].c_to_objc_code()
-        for l in convert_codes:
-            codes.append('\t' + l)
-        args_str = arg
-        for param in self.params[1:]:
-            convert_codes, arg = param.c_to_objc_code()
-            for l in convert_codes:
-                codes.append('\t' + l)
-            args_str += ' ' + (param.objc_param_name if param.objc_param_name else param.name) + ':' + arg
-
-        if self.is_factory:
-            codes.append(f'\tNS{Type}* {var_name} = [[NS{Type} {self.name}:{args_str}] autorelease];', )
-        else:
-            codes.append(f'\tNS{Type}* {var_name} = [[[NS{Type} alloc] {self.name}:{args_str}] autorelease];', )
-
-        if self.has_delegate:
-            codes.extend([
-                f'\tGoNS{Type}Delegate* delegate = [[GoNS{Type}Delegate alloc] init];',
-                '\t[delegate setGoID:goID];',
-                f'\t[{var_name} setDelegate:delegate];'
-            ])
-        if self.action_methods:
-            codes.extend([
-                f'\tNS{Type}Handler* handler = [[[NS{Type}Handler alloc] init] autorelease];',
-                '\t[handler setGoID:goID];',
-                f'\t[{var_name} setTarget:handler];',
-            ])
-            for method in self.action_methods:
-                codes.append(f'\t[{var_name} set{cap(method.name)}:@selector(on{cap(method.name)}:)];')
-        codes.extend([
-            f'\treturn (void*){var_name};',
-            '}',
-        ])
-        return codes
-
-
-@dataclass
 class Property:
     name: str  # the property name
     Type: str  # the property type
@@ -658,7 +601,6 @@ class Component:
     super_type: str
     description: str
     properties: List[Property]
-    init_method: Optional[InitMethod] = None
     methods: List[Method] = field(default_factory=list)
     delegate_type: str = ''
     delegate_methods: List[DelegateMethod] = field(default_factory=list)
@@ -673,8 +615,8 @@ class Component:
         self.super_package, self.super_type_name = split_type(self.super_type)
         if self.delegate_type == '':
             self.delegate_type = type_part(self.Type) + 'Delegate'
-        if self.init_method is not None:
-            self.init_method.init_env(self.delegate_methods or self.extend_delegate, self.action_methods)
+        for method in self.methods:
+            method.init_env(self.delegate_methods or self.extend_delegate, self.action_methods)
         for method in self.delegate_methods:
             pkg, type_name = split_type(self.Type)
             method.init_env(pkg, type_name)
@@ -768,10 +710,19 @@ class Component:
                     print(f'\t{line}', file=out)
             print('}', file=out)
             print(make_method_str, file=out)
-            if self.init_method is not None:
-                print(file=out)
-                for line in self.init_method.go_code(self.Type, self.super_type):
-                    print(line, file=out)
+
+            # delegate and target
+            if self.delegate_methods or self.extend_delegate or self.action_methods:
+                receiver = self.type_name[0].lower()
+                receiver_str = receiver + ' *' + self.ns_type
+                print(f'func ({receiver_str}) setDelegate() {{', file=out)
+                print('\tid := resources.NextId()', file=out)
+                print(f'\tC.{self.type_name}_RegisterDelegate({receiver}.Ptr(), C.long(id))', file=out)
+                print(f'\tresources.Store(id, {receiver})', file=out)
+                print(f'\tfoundation.AddDeallocHook({receiver}, func() {{', file=out)
+                print('\t\tresources.Delete(id)', file=out)
+                print('\t})', file=out)
+                print('}', file=out)
             # properties impl
             for p in self.properties:
                 getter = p.getter()
@@ -814,9 +765,6 @@ class Component:
         }
         pkg = package_part(self.Type)
         types: List[str] = [self.super_type]
-        if self.init_method is not None:
-            types.extend([param.Type for param in self.init_method.params])
-            imports.add('github.com/hsiafan/cocoa/foundation')
         types.extend([p.Type for p in self.properties])
         for method in self.methods:
             types.extend([param.Type for param in method.params])
@@ -840,12 +788,10 @@ class Component:
         with open(header_file_path, 'w+') as out:
             for s in self.get_c_imports():
                 print(f'#import <{s}>', file=out)
-            if self.init_method is not None:
-                print(file=out)
-                for line in self.init_method.c_h_code(type_name):
-                    print(line, file=out)
 
             print(file=out)
+            if self.delegate_methods or self.extend_delegate or self.action_methods:
+                print(f'void {self.type_name}_RegisterDelegate(void *ptr, long goID);', file=out)
             # properties header definition
             for p in self.properties:
                 getter = p.getter()
@@ -916,11 +862,25 @@ class Component:
                 print(file=out)
                 print(f'@end', file=out)
 
-            # init method
-            if self.init_method is not None:
-                print(file=out)
-                for line in self.init_method.objc_m_code(self.type_name):
-                    print(line, file=out)
+            # set delegate
+            if self.delegate_methods or self.extend_delegate or self.action_methods:
+                print(f'void {self.type_name}_RegisterDelegate(void *ptr, long goID) {{', file=out)
+                var_name = de_cap(self.type_name)
+                print(f'\t{self.ns_type}* {var_name} = ({self.ns_type}*)ptr;', file=out)
+                if self.delegate_methods or self.extend_delegate:
+                    print(
+                        f'\tGoNS{self.type_name}Delegate* delegate = [[[GoNS{self.type_name}Delegate alloc] init] autorelease];', file=out)
+                    print('\t[delegate setGoID:goID];', file=out)
+                    print(f'\t[{var_name} setDelegate:delegate];', file=out)
+                if self.action_methods:
+                    print(
+                        f'\tNS{self.type_name}Handler* handler = [[[NS{self.type_name}Handler alloc] init] autorelease];', file=out)
+                    print('\t[handler setGoID:goID];', file=out)
+                    print(f'\t[{var_name} setTarget:handler];', file=out)
+                    for method in self.action_methods:
+                        print(f'\t[{var_name} set{cap(method.name)}:@selector(on{cap(method.name)}:)];', file=out)
+                print('}', file=out)
+
             # properties header definition
             for p in self.properties:
                 getter = p.getter()
@@ -944,8 +904,6 @@ class Component:
             'utils.h'
         }
         types: List[str] = []
-        if self.init_method is not None:
-            types.extend([param.Type for param in self.init_method.params])
         types.extend([p.Type for p in self.properties])
         for method in self.methods:
             types.extend([param.Type for param in method.params])

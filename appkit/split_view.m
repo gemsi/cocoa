@@ -1,11 +1,6 @@
 #import <Appkit/NSSplitView.h>
 #import "split_view.h"
 
-void* SplitView_initWithFrame(long goID, NSRect frame) {
-	NSSplitView* split_view = [[[NSSplitView alloc] initWithFrame:frame] autorelease];
-	return (void*)split_view;
-}
-
 bool SplitView_ArrangesAllSubviews(void* ptr) {
 	NSSplitView* splitView = (NSSplitView*)ptr;
 	return [splitView arrangesAllSubviews];
@@ -44,6 +39,11 @@ long SplitView_DividerStyle(void* ptr) {
 void SplitView_SetDividerStyle(void* ptr, long dividerStyle) {
 	NSSplitView* splitView = (NSSplitView*)ptr;
 	[splitView setDividerStyle:dividerStyle];
+}
+
+void* SplitView_InitWithFrame(NSRect frame) {
+	NSSplitView* splitView = [NSSplitView alloc];
+	return [[splitView initWithFrame:frame] autorelease];
 }
 
 double SplitView_MinPossiblePositionOfDividerAtIndex(void* ptr, long dividerIndex) {

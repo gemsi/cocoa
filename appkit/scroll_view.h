@@ -3,8 +3,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* ScrollView_initWithFrame(long goID, NSRect frame);
-
 bool ScrollView_HasVerticalScroller(void* ptr);
 void ScrollView_SetHasVerticalScroller(void* ptr, bool hasVerticalScroller);
 bool ScrollView_HasHorizontalScroller(void* ptr);
@@ -15,3 +13,4 @@ unsigned long ScrollView_BorderType(void* ptr);
 void ScrollView_SetBorderType(void* ptr, unsigned long borderType);
 NSSize ScrollView_ContentSize(void* ptr);
 
+void* ScrollView_InitWithFrame(NSRect frame);

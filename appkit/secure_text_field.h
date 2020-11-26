@@ -2,6 +2,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* SecureTextField_initWithFrame(long goID, NSRect frame);
+void SecureTextField_RegisterDelegate(void *ptr, long goID);
 
-
+void* SecureTextField_InitWithFrame(NSRect frame);

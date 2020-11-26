@@ -1,11 +1,6 @@
 #import <Appkit/NSTabViewItem.h>
 #import "tab_view_item.h"
 
-void* TabViewItem_initWithIdentifier(long goID, void* identifier) {
-	NSTabViewItem* tab_view_item = [[[NSTabViewItem alloc] initWithIdentifier:identifier] autorelease];
-	return (void*)tab_view_item;
-}
-
 const char* TabViewItem_Label(void* ptr) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
 	return [[tabViewItem label] UTF8String];
@@ -74,4 +69,9 @@ void TabViewItem_SetInitialFirstResponder(void* ptr, void* initialFirstResponder
 void* TabViewItem_TabView(void* ptr) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
 	return [tabViewItem tabView];
+}
+
+void* TabViewItem_InitWithIdentifier(void* identifier) {
+	NSTabViewItem* tabViewItem = [NSTabViewItem alloc];
+	return [[tabViewItem initWithIdentifier:identifier] autorelease];
 }

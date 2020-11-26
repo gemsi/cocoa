@@ -94,25 +94,6 @@ func MakeStackView(ptr unsafe.Pointer) *NSStackView {
 	}
 }
 
-// NewStackViewWithViews create new StackView
-func NewStackViewWithViews(views []View) StackView {
-	cViewsData := make([]unsafe.Pointer, len(views))
-	for idx, v := range views {
-		cViewsData[idx] = v.Ptr()
-	}
-	cViews := C.Array{data: unsafe.Pointer(&cViewsData[0]), len: C.int(len(views))}
-	id := resources.NextId()
-	ptr := C.StackView_stackViewWithViews(C.long(id), cViews)
-	v := &NSStackView{
-		NSView: *MakeView(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (s *NSStackView) Views() []View {
 	var cArray C.Array = C.StackView_Views(s.Ptr())
 	defer C.free(cArray.data)
@@ -192,6 +173,15 @@ func (s *NSStackView) DetachesHiddenViews() bool {
 
 func (s *NSStackView) SetDetachesHiddenViews(detachesHiddenViews bool) {
 	C.StackView_SetDetachesHiddenViews(s.Ptr(), C.bool(detachesHiddenViews))
+}
+
+func StackViewWithViews(views []View) StackView {
+	cViewsData := make([]unsafe.Pointer, len(views))
+	for idx, v := range views {
+		cViewsData[idx] = v.Ptr()
+	}
+	cViews := C.Array{data: unsafe.Pointer(&cViewsData[0]), len: C.int(len(views))}
+	return MakeStackView(C.StackView_StackViewWithViews(cViews))
 }
 
 func (s *NSStackView) ViewsInGravity(gravity StackViewGravity) []View {

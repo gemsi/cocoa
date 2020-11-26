@@ -50,20 +50,6 @@ func MakeScrollView(ptr unsafe.Pointer) *NSScrollView {
 	}
 }
 
-// NewScrollView create new ScrollView
-func NewScrollView(frame foundation.Rect) ScrollView {
-	id := resources.NextId()
-	ptr := C.ScrollView_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSScrollView{
-		NSView: *MakeView(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (s *NSScrollView) HasVerticalScroller() bool {
 	return bool(C.ScrollView_HasVerticalScroller(s.Ptr()))
 }
@@ -98,4 +84,8 @@ func (s *NSScrollView) SetBorderType(borderType BorderType) {
 
 func (s *NSScrollView) ContentSize() foundation.Size {
 	return toSize(C.ScrollView_ContentSize(s.Ptr()))
+}
+
+func NewScrollView(frame foundation.Rect) ScrollView {
+	return MakeScrollView(C.ScrollView_InitWithFrame(toNSRect(frame)))
 }

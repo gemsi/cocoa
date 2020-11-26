@@ -54,20 +54,6 @@ func MakeSplitView(ptr unsafe.Pointer) *NSSplitView {
 	}
 }
 
-// NewSplitView create new SplitView
-func NewSplitView(frame foundation.Rect) SplitView {
-	id := resources.NextId()
-	ptr := C.SplitView_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSSplitView{
-		NSView: *MakeView(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (s *NSSplitView) ArrangesAllSubviews() bool {
 	return bool(C.SplitView_ArrangesAllSubviews(s.Ptr()))
 }
@@ -98,6 +84,10 @@ func (s *NSSplitView) DividerStyle() SplitViewDividerStyle {
 
 func (s *NSSplitView) SetDividerStyle(dividerStyle SplitViewDividerStyle) {
 	C.SplitView_SetDividerStyle(s.Ptr(), C.long(dividerStyle))
+}
+
+func NewSplitView(frame foundation.Rect) SplitView {
+	return MakeSplitView(C.SplitView_InitWithFrame(toNSRect(frame)))
 }
 
 func (s *NSSplitView) MinPossiblePositionOfDividerAtIndex(dividerIndex int) float64 {

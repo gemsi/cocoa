@@ -1,13 +1,12 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Method, Param, Return
+from generate import Component, Property, init_method, Method, Param, Return
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.ProgressIndicator",
         super_type='appkit.View',
         description="an interface that provides visual feedback to the user about the status of an ongoing task",
-        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
         properties=[
             Property(name="usesThreadedAnimation", Type='bool', getter_prefix_is=False,
                      description='whether the progress indicator implements animation in a separate thread'),
@@ -22,6 +21,7 @@ if __name__ == "__main__":
                      description='whether the progress indicator hides itself when it isn’t animating'),
         ],
         methods=[
+            init_method(name="initWithFrame", Type='appkit.ProgressIndicator', params=[Param(name='frame', Type='foundation.Rect')]),
             Method(name="startAnimation",
                    params=[Param(name='sender', Type='foundation.Object')],
                    return_value=Return(''),

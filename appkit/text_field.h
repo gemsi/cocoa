@@ -3,8 +3,7 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* TextField_initWithFrame(long goID, NSRect frame);
-
+void TextField_RegisterDelegate(void *ptr, long goID);
 bool TextField_IsBezeled(void* ptr);
 void TextField_SetBezeled(void* ptr, bool bezeled);
 bool TextField_DrawsBackground(void* ptr);
@@ -18,3 +17,4 @@ void TextField_SetTextColor(void* ptr, void* textColor);
 void* TextField_BackgroundColor(void* ptr);
 void TextField_SetBackgroundColor(void* ptr, void* backgroundColor);
 
+void* TextField_InitWithFrame(NSRect frame);

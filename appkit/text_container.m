@@ -1,11 +1,6 @@
 #import <Appkit/NSTextContainer.h>
 #import "text_container.h"
 
-void* TextContainer_initWithSize(long goID, NSSize size) {
-	NSTextContainer* text_container = [[[NSTextContainer alloc] initWithSize:size] autorelease];
-	return (void*)text_container;
-}
-
 NSSize TextContainer_Size(void* ptr) {
 	NSTextContainer* textContainer = (NSTextContainer*)ptr;
 	return [textContainer size];
@@ -34,4 +29,9 @@ bool TextContainer_HeightTracksTextView(void* ptr) {
 void TextContainer_SetHeightTracksTextView(void* ptr, bool heightTracksTextView) {
 	NSTextContainer* textContainer = (NSTextContainer*)ptr;
 	[textContainer setHeightTracksTextView:heightTracksTextView];
+}
+
+void* TextContainer_InitWithSize(NSSize size) {
+	NSTextContainer* textContainer = [NSTextContainer alloc];
+	return [[textContainer initWithSize:size] autorelease];
 }

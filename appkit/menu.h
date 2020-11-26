@@ -3,8 +3,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* Menu_initWithTitle(long goID, const char* title);
-
 double Menu_MenuBarHeight(void* ptr);
 void* Menu_Font(void* ptr);
 void Menu_SetFont(void* ptr, void* font);
@@ -24,3 +22,4 @@ void* Menu_HighlightedItem(void* ptr);
 long Menu_UserInterfaceLayoutDirection(void* ptr);
 void Menu_SetUserInterfaceLayoutDirection(void* ptr, long userInterfaceLayoutDirection);
 
+void* Menu_InitWithTitle(const char* title);

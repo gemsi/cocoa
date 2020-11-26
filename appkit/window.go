@@ -65,19 +65,13 @@ func MakeWindow(ptr unsafe.Pointer) *NSWindow {
 		NSResponder: *MakeResponder(ptr),
 	}
 }
-
-// NewWindow create new Window
-func NewWindow(rect foundation.Rect, styleMask WindowStyleMask, backing BackingStoreType, Defer bool) Window {
+func (w *NSWindow) setDelegate() {
 	id := resources.NextId()
-	ptr := C.Window_initWithContentRect(C.long(id), toNSRect(rect), C.ulong(styleMask), C.ulong(backing), C.bool(Defer))
-	v := &NSWindow{
-		NSResponder: *MakeResponder(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
+	C.Window_RegisterDelegate(w.Ptr(), C.long(id))
+	resources.Store(id, w)
+	foundation.AddDeallocHook(w, func() {
 		resources.Delete(id)
 	})
-	return v
 }
 
 func (w *NSWindow) Title() string {
@@ -104,6 +98,12 @@ func (w *NSWindow) StyleMask() WindowStyleMask {
 
 func (w *NSWindow) SetStyleMask(styleMask WindowStyleMask) {
 	C.Window_SetStyleMask(w.Ptr(), C.ulong(styleMask))
+}
+
+func NewWindow(rect foundation.Rect, styleMask WindowStyleMask, backing BackingStoreType, Defer bool) Window {
+	instance := MakeWindow(C.Window_InitWithContentRect(toNSRect(rect), C.ulong(styleMask), C.ulong(backing), C.bool(Defer)))
+	instance.setDelegate()
+	return instance
 }
 
 func (w *NSWindow) Center() {

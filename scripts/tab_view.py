@@ -1,13 +1,12 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Param, Method, Return, DelegateMethod
+from generate import Component, Property, init_method, Param, Method, Return, DelegateMethod
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.TabView",
         super_type='appkit.View',
         description="a multipage interface that displays one page at a time",
-        init_method=InitMethod(name="initWithFrame", params=[Param(name='frame', Type='foundation.Rect')]),
         properties=[
             Property(name='numberOfTabViewItems', Type='int', readonly=True,
                      description='the number of items in the tab view’s array of tab view items'),
@@ -26,6 +25,7 @@ if __name__ == "__main__":
                      description='the size of the tab view'),
         ],
         methods=[
+            init_method(name="initWithFrame", Type="appkit.TabView", params=[Param(name='frame', Type='foundation.Rect')]),
             Method(
                 name='addTabViewItem',
                 params=[Param(name='tabViewItem', Type='appkit.TabViewItem')],

@@ -1,11 +1,6 @@
 #import <Appkit/NSMenu.h>
 #import "menu.h"
 
-void* Menu_initWithTitle(long goID, const char* title) {
-	NSMenu* menu = [[[NSMenu alloc] initWithTitle:[NSString stringWithUTF8String:title]] autorelease];
-	return (void*)menu;
-}
-
 double Menu_MenuBarHeight(void* ptr) {
 	NSMenu* menu = (NSMenu*)ptr;
 	return [menu menuBarHeight];
@@ -94,4 +89,9 @@ long Menu_UserInterfaceLayoutDirection(void* ptr) {
 void Menu_SetUserInterfaceLayoutDirection(void* ptr, long userInterfaceLayoutDirection) {
 	NSMenu* menu = (NSMenu*)ptr;
 	[menu setUserInterfaceLayoutDirection:userInterfaceLayoutDirection];
+}
+
+void* Menu_InitWithTitle(const char* title) {
+	NSMenu* menu = [NSMenu alloc];
+	return [[menu initWithTitle:[NSString stringWithUTF8String:title]] autorelease];
 }

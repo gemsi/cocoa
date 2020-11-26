@@ -99,19 +99,13 @@ func MakeTabView(ptr unsafe.Pointer) *NSTabView {
 		NSView: *MakeView(ptr),
 	}
 }
-
-// NewTabView create new TabView
-func NewTabView(frame foundation.Rect) TabView {
+func (t *NSTabView) setDelegate() {
 	id := resources.NextId()
-	ptr := C.TabView_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSTabView{
-		NSView: *MakeView(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
+	C.TabView_RegisterDelegate(t.Ptr(), C.long(id))
+	resources.Store(id, t)
+	foundation.AddDeallocHook(t, func() {
 		resources.Delete(id)
 	})
-	return v
 }
 
 func (t *NSTabView) NumberOfTabViewItems() int {
@@ -172,6 +166,12 @@ func (t *NSTabView) ControlSize() ControlSize {
 
 func (t *NSTabView) SetControlSize(controlSize ControlSize) {
 	C.TabView_SetControlSize(t.Ptr(), C.ulong(controlSize))
+}
+
+func NewTabView(frame foundation.Rect) TabView {
+	instance := MakeTabView(C.TabView_InitWithFrame(toNSRect(frame)))
+	instance.setDelegate()
+	return instance
 }
 
 func (t *NSTabView) AddTabViewItem(tabViewItem TabViewItem) {

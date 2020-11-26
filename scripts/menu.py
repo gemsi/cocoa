@@ -1,6 +1,6 @@
 #!env python3
 
-from generate import Component, Property, InitMethod, Method, Return, Param
+from generate import Component, Property, init_method, Method, Return, Param
 
 
 if __name__ == "__main__":
@@ -8,7 +8,6 @@ if __name__ == "__main__":
         Type="appkit.Menu",
         super_type='foundation.Object',
         description="an object that manages an app’s menus",
-        init_method=InitMethod(name="initWithTitle", params=[Param(name='title', Type='string')]),
         properties=[
             Property(name='menuBarHeight', Type='float64', readonly=True,
                      description='the menu bar height for the main menu in pixels'),
@@ -30,11 +29,9 @@ if __name__ == "__main__":
                      description='indicates the currently highlighted item in the menu'),
             Property(name='userInterfaceLayoutDirection', Type='int', go_alias_type='UserInterfaceLayoutDirection',
                      description='the layout direction of menu items in the menu'),
-
-
-
-
-
+        ],
+        methods= [
+        init_method(name="initWithTitle", Type='appkit.Menu', params=[Param(name='title', Type='string')]),
         ],
     )
     w.generate_code()

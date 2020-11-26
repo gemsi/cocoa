@@ -21,13 +21,11 @@
 }
 
 @end
-
-void* TabView_initWithFrame(long goID, NSRect frame) {
-	NSTabView* tab_view = [[[NSTabView alloc] initWithFrame:frame] autorelease];
-	GoNSTabViewDelegate* delegate = [[GoNSTabViewDelegate alloc] init];
+void TabView_RegisterDelegate(void *ptr, long goID) {
+	NSTabView* tabView = (NSTabView*)ptr;
+	GoNSTabViewDelegate* delegate = [[[GoNSTabViewDelegate alloc] init] autorelease];
 	[delegate setGoID:goID];
-	[tab_view setDelegate:delegate];
-	return (void*)tab_view;
+	[tabView setDelegate:delegate];
 }
 
 long TabView_NumberOfTabViewItems(void* ptr) {
@@ -103,6 +101,11 @@ unsigned long TabView_ControlSize(void* ptr) {
 void TabView_SetControlSize(void* ptr, unsigned long controlSize) {
 	NSTabView* tabView = (NSTabView*)ptr;
 	[tabView setControlSize:controlSize];
+}
+
+void* TabView_InitWithFrame(NSRect frame) {
+	NSTabView* tabView = [NSTabView alloc];
+	return [[tabView initWithFrame:frame] autorelease];
 }
 
 void TabView_AddTabViewItem(void* ptr, void* tabViewItem) {

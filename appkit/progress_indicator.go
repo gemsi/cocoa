@@ -66,20 +66,6 @@ func MakeProgressIndicator(ptr unsafe.Pointer) *NSProgressIndicator {
 	}
 }
 
-// NewProgressIndicator create new ProgressIndicator
-func NewProgressIndicator(frame foundation.Rect) ProgressIndicator {
-	id := resources.NextId()
-	ptr := C.ProgressIndicator_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSProgressIndicator{
-		NSView: *MakeView(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (p *NSProgressIndicator) UsesThreadedAnimation() bool {
 	return bool(C.ProgressIndicator_UsesThreadedAnimation(p.Ptr()))
 }
@@ -134,6 +120,10 @@ func (p *NSProgressIndicator) IsDisplayedWhenStopped() bool {
 
 func (p *NSProgressIndicator) SetDisplayedWhenStopped(displayedWhenStopped bool) {
 	C.ProgressIndicator_SetDisplayedWhenStopped(p.Ptr(), C.bool(displayedWhenStopped))
+}
+
+func NewProgressIndicator(frame foundation.Rect) ProgressIndicator {
+	return MakeProgressIndicator(C.ProgressIndicator_InitWithFrame(toNSRect(frame)))
 }
 
 func (p *NSProgressIndicator) StartAnimation(sender foundation.Object) {

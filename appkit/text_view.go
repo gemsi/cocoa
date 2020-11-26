@@ -36,24 +36,14 @@ func MakeTextView(ptr unsafe.Pointer) *NSTextView {
 	}
 }
 
-// NewTextView create new TextView
-func NewTextView(frame foundation.Rect) TextView {
-	id := resources.NextId()
-	ptr := C.TextView_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSTextView{
-		NSText: *MakeText(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (t *NSTextView) TextContainer() TextContainer {
 	return MakeTextContainer(C.TextView_TextContainer(t.Ptr()))
 }
 
 func (t *NSTextView) SetTextContainer(textContainer TextContainer) {
 	C.TextView_SetTextContainer(t.Ptr(), toPointer(textContainer))
+}
+
+func NewTextView(frame foundation.Rect) TextView {
+	return MakeTextView(C.TextView_InitWithFrame(toNSRect(frame)))
 }

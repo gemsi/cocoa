@@ -30,17 +30,17 @@ func MakeSecureTextField(ptr unsafe.Pointer) *NSSecureTextField {
 		NSTextField: *MakeTextField(ptr),
 	}
 }
-
-// NewSecureTextField create new SecureTextField
-func NewSecureTextField(frame foundation.Rect) SecureTextField {
+func (s *NSSecureTextField) setDelegate() {
 	id := resources.NextId()
-	ptr := C.SecureTextField_initWithFrame(C.long(id), toNSRect(frame))
-	v := &NSSecureTextField{
-		NSTextField: *MakeTextField(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
+	C.SecureTextField_RegisterDelegate(s.Ptr(), C.long(id))
+	resources.Store(id, s)
+	foundation.AddDeallocHook(s, func() {
 		resources.Delete(id)
 	})
-	return v
+}
+
+func NewSecureTextField(frame foundation.Rect) SecureTextField {
+	instance := MakeSecureTextField(C.SecureTextField_InitWithFrame(toNSRect(frame)))
+	instance.setDelegate()
+	return instance
 }

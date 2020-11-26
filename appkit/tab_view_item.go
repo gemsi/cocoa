@@ -60,20 +60,6 @@ func MakeTabViewItem(ptr unsafe.Pointer) *NSTabViewItem {
 	}
 }
 
-// NewTabViewItem create new TabViewItem
-func NewTabViewItem(identifier foundation.Object) TabViewItem {
-	id := resources.NextId()
-	ptr := C.TabViewItem_initWithIdentifier(C.long(id), toPointer(identifier))
-	v := &NSTabViewItem{
-		NSObject: *foundation.MakeObject(ptr),
-	}
-	resources.Store(id, v)
-	foundation.AddDeallocHook(v, func() {
-		resources.Delete(id)
-	})
-	return v
-}
-
 func (t *NSTabViewItem) Label() string {
 	return C.GoString(C.TabViewItem_Label(t.Ptr()))
 }
@@ -132,4 +118,8 @@ func (t *NSTabViewItem) SetInitialFirstResponder(initialFirstResponder View) {
 
 func (t *NSTabViewItem) TabView() TabView {
 	return MakeTabView(C.TabViewItem_TabView(t.Ptr()))
+}
+
+func NewTabViewItem(identifier foundation.Object) TabViewItem {
+	return MakeTabViewItem(C.TabViewItem_InitWithIdentifier(toPointer(identifier)))
 }

@@ -1,8 +1,6 @@
 #import <stdlib.h>
 #import <utils.h>
 
-void* TabViewItem_initWithIdentifier(long goID, void* identifier);
-
 const char* TabViewItem_Label(void* ptr);
 void TabViewItem_SetLabel(void* ptr, const char* label);
 const char* TabViewItem_ToolTip(void* ptr);
@@ -18,3 +16,4 @@ void* TabViewItem_InitialFirstResponder(void* ptr);
 void TabViewItem_SetInitialFirstResponder(void* ptr, void* initialFirstResponder);
 void* TabViewItem_TabView(void* ptr);
 
+void* TabViewItem_InitWithIdentifier(void* identifier);
