@@ -71,19 +71,19 @@ void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool displayedWhenStop
 	[progressIndicator setDisplayedWhenStopped:displayedWhenStopped];
 }
 
-void* ProgressIndicator_InitWithFrame(NSRect frame) {
+void* ProgressIndicator_NewProgressIndicator(NSRect frame) {
 	NSProgressIndicator* progressIndicator = [NSProgressIndicator alloc];
 	return [[progressIndicator initWithFrame:frame] autorelease];
 }
 
 void ProgressIndicator_StartAnimation(void* ptr, void* sender) {
 	NSProgressIndicator* progressIndicator = (NSProgressIndicator*)ptr;
-	[progressIndicator startAnimation:sender];
+	[progressIndicator startAnimation:(NSObject*)sender];
 }
 
 void ProgressIndicator_StopAnimation(void* ptr, void* sender) {
 	NSProgressIndicator* progressIndicator = (NSProgressIndicator*)ptr;
-	[progressIndicator stopAnimation:sender];
+	[progressIndicator stopAnimation:(NSObject*)sender];
 }
 
 void ProgressIndicator_IncrementBy(void* ptr, double delta) {

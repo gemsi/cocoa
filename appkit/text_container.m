@@ -31,7 +31,7 @@ void TextContainer_SetHeightTracksTextView(void* ptr, bool heightTracksTextView)
 	[textContainer setHeightTracksTextView:heightTracksTextView];
 }
 
-void* TextContainer_InitWithSize(NSSize size) {
+void* TextContainer_NewTextContainer(NSSize size) {
 	NSTextContainer* textContainer = [NSTextContainer alloc];
 	return [[textContainer initWithSize:size] autorelease];
 }

@@ -11,7 +11,7 @@ void Window_SetContentView(void* ptr, void* contentView);
 unsigned long Window_StyleMask(void* ptr);
 void Window_SetStyleMask(void* ptr, unsigned long styleMask);
 
-void* Window_InitWithContentRect(NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer);
+void* Window_NewWindow(NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer);
 void Window_Center(void* ptr);
 void Window_MakeKeyAndOrderFront(void* ptr, void* sender);
 bool Window_MakeFirstResponder(void* ptr, void* responder);

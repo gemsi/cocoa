@@ -47,7 +47,7 @@ void Button_SetState(void* ptr, long state) {
 	[button setState:state];
 }
 
-void* Button_InitWithFrame(NSRect frame) {
+void* Button_NewButton(NSRect frame) {
 	NSButton* button = [NSButton alloc];
 	return [[button initWithFrame:frame] autorelease];
 }

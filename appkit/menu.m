@@ -13,7 +13,7 @@ void* Menu_Font(void* ptr) {
 
 void Menu_SetFont(void* ptr, void* font) {
 	NSMenu* menu = (NSMenu*)ptr;
-	[menu setFont:font];
+	[menu setFont:(NSFont*)font];
 }
 
 bool Menu_AutoenablesItems(void* ptr) {
@@ -91,7 +91,7 @@ void Menu_SetUserInterfaceLayoutDirection(void* ptr, long userInterfaceLayoutDir
 	[menu setUserInterfaceLayoutDirection:userInterfaceLayoutDirection];
 }
 
-void* Menu_InitWithTitle(const char* title) {
+void* Menu_NewMenu(const char* title) {
 	NSMenu* menu = [NSMenu alloc];
 	return [[menu initWithTitle:[NSString stringWithUTF8String:title]] autorelease];
 }

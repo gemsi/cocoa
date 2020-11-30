@@ -18,7 +18,7 @@ void ProgressIndicator_SetBezeled(void* ptr, bool bezeled);
 bool ProgressIndicator_IsDisplayedWhenStopped(void* ptr);
 void ProgressIndicator_SetDisplayedWhenStopped(void* ptr, bool displayedWhenStopped);
 
-void* ProgressIndicator_InitWithFrame(NSRect frame);
+void* ProgressIndicator_NewProgressIndicator(NSRect frame);
 void ProgressIndicator_StartAnimation(void* ptr, void* sender);
 void ProgressIndicator_StopAnimation(void* ptr, void* sender);
 void ProgressIndicator_IncrementBy(void* ptr, double delta);

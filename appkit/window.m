@@ -45,7 +45,7 @@ void* Window_ContentView(void* ptr) {
 
 void Window_SetContentView(void* ptr, void* contentView) {
 	NSWindow* window = (NSWindow*)ptr;
-	[window setContentView:contentView];
+	[window setContentView:(NSView*)contentView];
 }
 
 unsigned long Window_StyleMask(void* ptr) {
@@ -58,7 +58,7 @@ void Window_SetStyleMask(void* ptr, unsigned long styleMask) {
 	[window setStyleMask:styleMask];
 }
 
-void* Window_InitWithContentRect(NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer) {
+void* Window_NewWindow(NSRect rect, unsigned long styleMask, unsigned long backing, bool Defer) {
 	NSWindow* window = [NSWindow alloc];
 	return [[window initWithContentRect:rect styleMask:styleMask backing:backing defer:Defer] autorelease];
 }
@@ -70,10 +70,10 @@ void Window_Center(void* ptr) {
 
 void Window_MakeKeyAndOrderFront(void* ptr, void* sender) {
 	NSWindow* window = (NSWindow*)ptr;
-	[window makeKeyAndOrderFront:sender];
+	[window makeKeyAndOrderFront:(NSObject*)sender];
 }
 
 bool Window_MakeFirstResponder(void* ptr, void* responder) {
 	NSWindow* window = (NSWindow*)ptr;
-	return [window makeFirstResponder:responder];
+	return [window makeFirstResponder:(NSResponder*)responder];
 }

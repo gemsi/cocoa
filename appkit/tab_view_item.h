@@ -16,4 +16,4 @@ void* TabViewItem_InitialFirstResponder(void* ptr);
 void TabViewItem_SetInitialFirstResponder(void* ptr, void* initialFirstResponder);
 void* TabViewItem_TabView(void* ptr);
 
-void* TabViewItem_InitWithIdentifier(void* identifier);
+void* TabViewItem_NewTabViewItem(void* identifier);

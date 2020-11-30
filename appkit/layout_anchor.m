@@ -1,115 +1,62 @@
-#import <AppKit/NSLayoutAnchor.h>
-#import "layout_constraint.h"
+#import <Appkit/NSLayoutAnchor.h>
+#import <Appkit/NSLayoutConstraint.h>
+#import "layout_anchor.h"
 
-void* LayoutAnchor_ConstraintEqualTo(void* ptr, void* anchorPtr) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintEqualToAnchor:anchor];
-}
-
-void* LayoutAnchor_ConstraintEqualTo2(void* ptr, void* anchorPtr, double constant) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintEqualToAnchor:anchor constant:constant];
-}
-
-void* LayoutAnchor_ConstraintGreaterThanOrEqualTo(void* ptr, void* anchorPtr) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintGreaterThanOrEqualToAnchor:anchor];
+Array LayoutAnchor_ConstraintsAffectingLayout(void* ptr) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	NSArray* array = [layoutAnchor constraintsAffectingLayout];
+	int count = [array count];
+	void** data = malloc(count * sizeof(void*));
+	for (int i = 0; i < count; i++) {
+		 data[i] = [array objectAtIndex:i];
+	}
+	Array result;
+	result.data = data;
+	result.len = count;
+	return result;
 }
 
-void* LayoutAnchor_ConstraintGreaterThanOrEqualTo2(void* ptr, void* anchorPtr, double constant) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintGreaterThanOrEqualToAnchor:anchor constant:constant];
+bool LayoutAnchor_HasAmbiguousLayout(void* ptr) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor hasAmbiguousLayout];
 }
 
-void* LayoutAnchor_ConstraintLessThanOrEqualTo(void* ptr, void* anchorPtr) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintLessThanOrEqualToAnchor:anchor];
+const char* LayoutAnchor_Name(void* ptr) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [[layoutAnchor name] UTF8String];
 }
 
-void* LayoutAnchor_ConstraintLessThanOrEqualTo2(void* ptr, void* anchorPtr, double constant) {
-    NSLayoutAnchor* self = (NSLayoutAnchor*)ptr;
-    NSLayoutAnchor* anchor = (NSLayoutAnchor*)anchorPtr;
-    return [self constraintLessThanOrEqualToAnchor:anchor constant:constant];
+void* LayoutAnchor_Item(void* ptr) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor item];
 }
 
-void* LayoutDimension_ConstraintEqualTo3(void* ptr, void* anchorPtr, double multiplier, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    NSLayoutDimension* anchor = (NSLayoutDimension*)anchorPtr;
-    return [self constraintEqualToAnchor:anchor multiplier:multiplier constant:constant];
+void* LayoutAnchor_ConstraintEqualToAnchor(void* ptr, void* anchor) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintEqualToAnchor:(NSLayoutAnchor*)anchor];
 }
 
-void* LayoutDimension_ConstraintEqualToConstant(void* ptr, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    return [self constraintEqualToConstant:constant];
+void* LayoutAnchor_ConstraintEqualToAnchor2(void* ptr, void* anchor, double constant) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintEqualToAnchor:(NSLayoutAnchor*)anchor constant:constant];
 }
 
-void* LayoutDimension_ConstraintGreaterThanOrEqualTo3(void* ptr, void* anchorPtr, double multiplier, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    NSLayoutDimension* anchor = (NSLayoutDimension*)anchorPtr;
-    return [self constraintGreaterThanOrEqualToAnchor:anchor multiplier:multiplier constant:constant];
+void* LayoutAnchor_ConstraintGreaterThanOrEqualToAnchor(void* ptr, void* anchor) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintGreaterThanOrEqualToAnchor:(NSLayoutAnchor*)anchor];
 }
 
-void* LayoutDimension_ConstraintGreaterThanOrEqualToConstant(void* ptr, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    return [self constraintGreaterThanOrEqualToConstant:constant];
+void* LayoutAnchor_ConstraintGreaterThanOrEqualToAnchor2(void* ptr, void* anchor, double constant) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintGreaterThanOrEqualToAnchor:(NSLayoutAnchor*)anchor constant:constant];
 }
 
-void* LayoutDimension_ConstraintLessThanOrEqualTo3(void* ptr, void* anchorPtr, double multiplier, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    NSLayoutDimension* anchor = (NSLayoutDimension*)anchorPtr;
-    return [self constraintLessThanOrEqualToAnchor:anchor multiplier:multiplier constant:constant];
+void* LayoutAnchor_ConstraintLessThanOrEqualToAnchor(void* ptr, void* anchor) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintLessThanOrEqualToAnchor:(NSLayoutAnchor*)anchor];
 }
 
-void* LayoutDimension_ConstraintLessThanOrEqualToConstant(void* ptr, double constant) {
-    NSLayoutDimension* self = (NSLayoutDimension*)ptr;
-    return [self constraintLessThanOrEqualToConstant:constant];
-}
-
-void* LayoutXAxisAnchor_ConstraintEqualToSystemSpacingAfter(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutXAxisAnchor* self = (NSLayoutXAxisAnchor*)ptr;
-    NSLayoutXAxisAnchor* anchor = (NSLayoutXAxisAnchor*)anchorPtr;
-    return [self constraintEqualToSystemSpacingAfterAnchor:anchor multiplier:multiplier];
-}
-
-void* LayoutXAxisAnchor_ConstraintGreaterThanOrEqualToSystemSpacingAfter(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutXAxisAnchor* self = (NSLayoutXAxisAnchor*)ptr;
-    NSLayoutXAxisAnchor* anchor = (NSLayoutXAxisAnchor*)anchorPtr;
-    return [self constraintGreaterThanOrEqualToSystemSpacingAfterAnchor:anchor multiplier:multiplier];
-}
-
-void* LayoutXAxisAnchor_ConstraintLessThanOrEqualToSystemSpacingAfter(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutXAxisAnchor* self = (NSLayoutXAxisAnchor*)ptr;
-    NSLayoutXAxisAnchor* anchor = (NSLayoutXAxisAnchor*)anchorPtr;
-    return [self constraintLessThanOrEqualToSystemSpacingAfterAnchor:anchor multiplier:multiplier];
-}
-void* LayoutXAxisAnchor_AnchorWithOffsetTo(void* ptr, void* anchorPtr) {
-    NSLayoutXAxisAnchor* self = (NSLayoutXAxisAnchor*)ptr;
-    NSLayoutXAxisAnchor* anchor = (NSLayoutXAxisAnchor*)anchorPtr;
-    return [self anchorWithOffsetToAnchor:anchor];
-}
-
-void* LayoutYAxisAnchor_ConstraintEqualToSystemSpacingBelow(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutYAxisAnchor* self = (NSLayoutYAxisAnchor*)ptr;
-    NSLayoutYAxisAnchor* anchor = (NSLayoutYAxisAnchor*)anchorPtr;
-    return [self constraintEqualToSystemSpacingBelowAnchor:anchor multiplier:multiplier];
-}
-void* LayoutYAxisAnchor_ConstraintGreaterThanOrEqualToSystemSpacingBelow(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutYAxisAnchor* self = (NSLayoutYAxisAnchor*)ptr;
-    NSLayoutYAxisAnchor* anchor = (NSLayoutYAxisAnchor*)anchorPtr;
-    return [self constraintGreaterThanOrEqualToSystemSpacingBelowAnchor:anchor multiplier:multiplier];
-}
-void* LayoutYAxisAnchor_ConstraintLessThanOrEqualToSystemSpacingBelow(void* ptr, void* anchorPtr, double multiplier) {
-    NSLayoutYAxisAnchor* self = (NSLayoutYAxisAnchor*)ptr;
-    NSLayoutYAxisAnchor* anchor = (NSLayoutYAxisAnchor*)anchorPtr;
-    return [self constraintLessThanOrEqualToSystemSpacingBelowAnchor:anchor multiplier:multiplier];
-}
-void* LayoutYAxisAnchor_AnchorWithOffsetTo(void* ptr, void* anchorPtr) {
-    NSLayoutYAxisAnchor* self = (NSLayoutYAxisAnchor*)ptr;
-    NSLayoutYAxisAnchor* anchor = (NSLayoutYAxisAnchor*)anchorPtr;
-    return [self anchorWithOffsetToAnchor:anchor];
+void* LayoutAnchor_ConstraintLessThanOrEqualToAnchor2(void* ptr, void* anchor, double constant) {
+	NSLayoutAnchor* layoutAnchor = (NSLayoutAnchor*)ptr;
+	return [layoutAnchor constraintLessThanOrEqualToAnchor:(NSLayoutAnchor*)anchor constant:constant];
 }

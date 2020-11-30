@@ -87,7 +87,7 @@ func (s *NSSplitView) SetDividerStyle(dividerStyle SplitViewDividerStyle) {
 }
 
 func NewSplitView(frame foundation.Rect) SplitView {
-	return MakeSplitView(C.SplitView_InitWithFrame(toNSRect(frame)))
+	return MakeSplitView(C.SplitView_NewSplitView(toNSRect(frame)))
 }
 
 func (s *NSSplitView) MinPossiblePositionOfDividerAtIndex(dividerIndex int) float64 {

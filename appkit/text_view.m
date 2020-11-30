@@ -8,10 +8,10 @@ void* TextView_TextContainer(void* ptr) {
 
 void TextView_SetTextContainer(void* ptr, void* textContainer) {
 	NSTextView* textView = (NSTextView*)ptr;
-	[textView setTextContainer:textContainer];
+	[textView setTextContainer:(NSTextContainer*)textContainer];
 }
 
-void* TextView_InitWithFrame(NSRect frame) {
+void* TextView_NewTextView(NSRect frame) {
 	NSTextView* textView = [NSTextView alloc];
 	return [[textView initWithFrame:frame] autorelease];
 }

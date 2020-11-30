@@ -40,7 +40,7 @@ func (s *NSSecureTextField) setDelegate() {
 }
 
 func NewSecureTextField(frame foundation.Rect) SecureTextField {
-	instance := MakeSecureTextField(C.SecureTextField_InitWithFrame(toNSRect(frame)))
+	instance := MakeSecureTextField(C.SecureTextField_NewSecureTextField(toNSRect(frame)))
 	instance.setDelegate()
 	return instance
 }

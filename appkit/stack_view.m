@@ -128,12 +128,12 @@ Array StackView_ViewsInGravity(void* ptr, long gravity) {
 
 void StackView_AddView(void* ptr, void* view, long gravity) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView addView:view inGravity:gravity];
+	[stackView addView:(NSView*)view inGravity:gravity];
 }
 
 void StackView_InsertView(void* ptr, void* view, unsigned long index, long gravity) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView insertView:view atIndex:index inGravity:gravity];
+	[stackView insertView:(NSView*)view atIndex:index inGravity:gravity];
 }
 
 void StackView_SetViews(void* ptr, Array views, long gravity) {
@@ -148,22 +148,22 @@ void StackView_SetViews(void* ptr, Array views, long gravity) {
 
 void StackView_RemoveView(void* ptr, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView removeView:view];
+	[stackView removeView:(NSView*)view];
 }
 
 void StackView_AddArrangedSubview(void* ptr, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView addArrangedSubview:view];
+	[stackView addArrangedSubview:(NSView*)view];
 }
 
 void StackView_InsertArrangedSubview(void* ptr, void* view, unsigned long index) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView insertArrangedSubview:view atIndex:index];
+	[stackView insertArrangedSubview:(NSView*)view atIndex:index];
 }
 
 void StackView_RemoveArrangedSubview(void* ptr, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView removeArrangedSubview:view];
+	[stackView removeArrangedSubview:(NSView*)view];
 }
 
 float StackView_ClippingResistancePriorityForOrientation(void* ptr, long orientation) {
@@ -188,20 +188,20 @@ void StackView_SetHuggingPriority(void* ptr, float huggingPriority, long orienta
 
 double StackView_CustomSpacingAfterView(void* ptr, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	return [stackView customSpacingAfterView:view];
+	return [stackView customSpacingAfterView:(NSView*)view];
 }
 
 void StackView_SetCustomSpacing(void* ptr, double spacing, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView setCustomSpacing:spacing afterView:view];
+	[stackView setCustomSpacing:spacing afterView:(NSView*)view];
 }
 
 float StackView_VisibilityPriorityForView(void* ptr, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	return [stackView visibilityPriorityForView:view];
+	return [stackView visibilityPriorityForView:(NSView*)view];
 }
 
 void StackView_SetVisibilityPriority(void* ptr, float priority, void* view) {
 	NSStackView* stackView = (NSStackView*)ptr;
-	[stackView setVisibilityPriority:priority forView:view];
+	[stackView setVisibilityPriority:priority forView:(NSView*)view];
 }

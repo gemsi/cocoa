@@ -21,9 +21,15 @@ python3 split_view.py
 python3 tab_view_item.py
 python3 tab_view.py
 python3 stack_view.py
-python3 layout_guide.py
 python3 menu.py
 python3 menu_item.py
+
+python3 layout_guide.py
+python3 layout_constraint.py
+python3 layout_anchor.py
+python3 layout_dimension.py
+python3 layout_x_axis_anchor.py
+python3 layout_y_axis_anchor.py
 
 echo 'format go code...'
 cd ..&& go fmt ./appkit

@@ -4,4 +4,4 @@
 
 void SecureTextField_RegisterDelegate(void *ptr, long goID);
 
-void* SecureTextField_InitWithFrame(NSRect frame);
+void* SecureTextField_NewSecureTextField(NSRect frame);

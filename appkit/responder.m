@@ -13,7 +13,7 @@ void* Responder_NextResponder(void* ptr) {
 
 void Responder_SetNextResponder(void* ptr, void* nextResponder) {
 	NSResponder* responder = (NSResponder*)ptr;
-	[responder setNextResponder:nextResponder];
+	[responder setNextResponder:(NSResponder*)nextResponder];
 }
 
 bool Responder_BecomeFirstResponder(void* ptr) {

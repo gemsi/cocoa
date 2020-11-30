@@ -123,7 +123,7 @@ func (p *NSProgressIndicator) SetDisplayedWhenStopped(displayedWhenStopped bool)
 }
 
 func NewProgressIndicator(frame foundation.Rect) ProgressIndicator {
-	return MakeProgressIndicator(C.ProgressIndicator_InitWithFrame(toNSRect(frame)))
+	return MakeProgressIndicator(C.ProgressIndicator_NewProgressIndicator(toNSRect(frame)))
 }
 
 func (p *NSProgressIndicator) StartAnimation(sender foundation.Object) {

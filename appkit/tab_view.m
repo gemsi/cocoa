@@ -85,7 +85,7 @@ void* TabView_Font(void* ptr) {
 
 void TabView_SetFont(void* ptr, void* font) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView setFont:font];
+	[tabView setFont:(NSFont*)font];
 }
 
 NSSize TabView_MinimumSize(void* ptr) {
@@ -103,29 +103,29 @@ void TabView_SetControlSize(void* ptr, unsigned long controlSize) {
 	[tabView setControlSize:controlSize];
 }
 
-void* TabView_InitWithFrame(NSRect frame) {
+void* TabView_NewTabView(NSRect frame) {
 	NSTabView* tabView = [NSTabView alloc];
 	return [[tabView initWithFrame:frame] autorelease];
 }
 
 void TabView_AddTabViewItem(void* ptr, void* tabViewItem) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView addTabViewItem:tabViewItem];
+	[tabView addTabViewItem:(NSTabViewItem*)tabViewItem];
 }
 
 void TabView_InsertTabViewItem(void* ptr, void* tabViewItem, long index) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView insertTabViewItem:tabViewItem atIndex:index];
+	[tabView insertTabViewItem:(NSTabViewItem*)tabViewItem atIndex:index];
 }
 
 void TabView_RemoveTabViewItem(void* ptr, void* tabViewItem) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView removeTabViewItem:tabViewItem];
+	[tabView removeTabViewItem:(NSTabViewItem*)tabViewItem];
 }
 
 long TabView_IndexOfTabViewItem(void* ptr, void* tabViewItem) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	return [tabView indexOfTabViewItem:tabViewItem];
+	return [tabView indexOfTabViewItem:(NSTabViewItem*)tabViewItem];
 }
 
 void* TabView_TabViewItemAtIndex(void* ptr, long index) {
@@ -135,27 +135,27 @@ void* TabView_TabViewItemAtIndex(void* ptr, long index) {
 
 void TabView_SelectFirstTabViewItem(void* ptr, void* sender) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView selectFirstTabViewItem:sender];
+	[tabView selectFirstTabViewItem:(NSObject*)sender];
 }
 
 void TabView_SelectLastTabViewItem(void* ptr, void* sender) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView selectLastTabViewItem:sender];
+	[tabView selectLastTabViewItem:(NSObject*)sender];
 }
 
 void TabView_SelectNextTabViewItem(void* ptr, void* sender) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView selectNextTabViewItem:sender];
+	[tabView selectNextTabViewItem:(NSObject*)sender];
 }
 
 void TabView_SelectPreviousTabViewItem(void* ptr, void* sender) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView selectPreviousTabViewItem:sender];
+	[tabView selectPreviousTabViewItem:(NSObject*)sender];
 }
 
 void TabView_SelectTabViewItem(void* ptr, void* tabViewItem) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	[tabView selectTabViewItem:tabViewItem];
+	[tabView selectTabViewItem:(NSTabViewItem*)tabViewItem];
 }
 
 void TabView_SelectTabViewItemAtIndex(void* ptr, long index) {

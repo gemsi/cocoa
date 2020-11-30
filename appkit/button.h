@@ -10,5 +10,5 @@ void Button_SetBezelStyle(void* ptr, unsigned long bezelStyle);
 long Button_State(void* ptr);
 void Button_SetState(void* ptr, long state);
 
-void* Button_InitWithFrame(NSRect frame);
+void* Button_NewButton(NSRect frame);
 void Button_SetButtonType(void* ptr, unsigned long buttonType);

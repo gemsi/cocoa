@@ -84,7 +84,7 @@ func (b *NSButton) SetState(state ControlStateValue) {
 }
 
 func NewButton(frame foundation.Rect) Button {
-	instance := MakeButton(C.Button_InitWithFrame(toNSRect(frame)))
+	instance := MakeButton(C.Button_NewButton(toNSRect(frame)))
 	instance.setDelegate()
 	return instance
 }

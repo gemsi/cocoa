@@ -10,4 +10,4 @@ void TextContainer_SetWidthTracksTextView(void* ptr, bool widthTracksTextView);
 bool TextContainer_HeightTracksTextView(void* ptr);
 void TextContainer_SetHeightTracksTextView(void* ptr, bool heightTracksTextView);
 
-void* TextContainer_InitWithSize(NSSize size);
+void* TextContainer_NewTextContainer(NSSize size);

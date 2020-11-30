@@ -125,7 +125,7 @@ func (t *NSTextField) SetBackgroundColor(backgroundColor Color) {
 }
 
 func NewTextField(frame foundation.Rect) TextField {
-	instance := MakeTextField(C.TextField_InitWithFrame(toNSRect(frame)))
+	instance := MakeTextField(C.TextField_NewTextField(toNSRect(frame)))
 	instance.setDelegate()
 	return instance
 }

@@ -1,13 +1,12 @@
 #!env python3
 
-from generate import Component, Property, Method, Return, Param
+from generate import Component, Property, Method, Return, Param, init_method
 
 
 if __name__ == "__main__":
     w = Component(
         Type="appkit.LayoutGuide",
         super_type='foundation.Object',
-        additional_objc_imports=["Appkit/NSLayoutConstraint"],
         description="a rectangular area that can interact with Auto Layout",
         properties=[
             Property(name='frame', Type='foundation.Rect', readonly=True,
@@ -28,5 +27,8 @@ if __name__ == "__main__":
             Property(name='widthAnchor', Type='appkit.LayoutDimension', readonly=True, description=''),
             Property(name='owningView', Type='appkit.View', readonly=True, description=''),
         ],
+        methods=[
+            init_method(name="init", Type="appkit.LayoutGuide"),
+        ]
     )
     w.generate_code()

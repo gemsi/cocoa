@@ -13,4 +13,4 @@ unsigned long ScrollView_BorderType(void* ptr);
 void ScrollView_SetBorderType(void* ptr, unsigned long borderType);
 NSSize ScrollView_ContentSize(void* ptr);
 
-void* ScrollView_InitWithFrame(NSRect frame);
+void* ScrollView_NewScrollView(NSRect frame);

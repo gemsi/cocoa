@@ -69,5 +69,5 @@ func (t *NSTextContainer) SetHeightTracksTextView(heightTracksTextView bool) {
 }
 
 func NewTextContainer(size foundation.Size) TextContainer {
-	return MakeTextContainer(C.TextContainer_InitWithSize(toNSSize(size)))
+	return MakeTextContainer(C.TextContainer_NewTextContainer(toNSSize(size)))
 }

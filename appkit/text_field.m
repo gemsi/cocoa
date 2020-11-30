@@ -71,7 +71,7 @@ void* TextField_TextColor(void* ptr) {
 
 void TextField_SetTextColor(void* ptr, void* textColor) {
 	NSTextField* textField = (NSTextField*)ptr;
-	[textField setTextColor:textColor];
+	[textField setTextColor:(NSColor*)textColor];
 }
 
 void* TextField_BackgroundColor(void* ptr) {
@@ -81,10 +81,10 @@ void* TextField_BackgroundColor(void* ptr) {
 
 void TextField_SetBackgroundColor(void* ptr, void* backgroundColor) {
 	NSTextField* textField = (NSTextField*)ptr;
-	[textField setBackgroundColor:backgroundColor];
+	[textField setBackgroundColor:(NSColor*)backgroundColor];
 }
 
-void* TextField_InitWithFrame(NSRect frame) {
+void* TextField_NewTextField(NSRect frame) {
 	NSTextField* textField = [NSTextField alloc];
 	return [[textField initWithFrame:frame] autorelease];
 }

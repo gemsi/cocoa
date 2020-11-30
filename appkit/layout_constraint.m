@@ -1,107 +1,109 @@
-#import <AppKit/NSLayoutConstraint.h>
+#import <Appkit/NSLayoutConstraint.h>
 #import "layout_constraint.h"
 
-
-void* LayoutConstraint_New(void* view1, int attr1, int relation, void* view2, int attr2, double multiplier, double constant) {
-    return [NSLayoutConstraint
-             constraintWithItem:view1
-             attribute:attr1
-             relatedBy:relation
-             toItem:view2
-             attribute:attr2
-             multiplier:multiplier
-             constant:constant];
-}
-
 bool LayoutConstraint_IsActive(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c isActive];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint isActive];
 }
 
 void LayoutConstraint_SetActive(void* ptr, bool active) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    [c setActive:active];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	[layoutConstraint setActive:active];
 }
 
 void* LayoutConstraint_FirstItem(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c firstItem];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint firstItem];
 }
 
-int LayoutConstraint_FirstAttribute(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c firstAttribute];
+long LayoutConstraint_FirstAttribute(void* ptr) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint firstAttribute];
 }
 
-int LayoutConstraint_Relation(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c relation];
+long LayoutConstraint_Relation(void* ptr) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint relation];
 }
 
 void* LayoutConstraint_SecondItem(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c secondItem];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint secondItem];
 }
 
-int LayoutConstraint_SecondAttribute(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c secondAttribute];
+long LayoutConstraint_SecondAttribute(void* ptr) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint secondAttribute];
 }
 
 double LayoutConstraint_Multiplier(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c multiplier];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint multiplier];
 }
 
 double LayoutConstraint_Constant(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c constant];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint constant];
 }
 
-void LayoutConstraint_SetConstant(void* ptr, double constant) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    [c setConstant:constant];
+void* LayoutConstraint_FirstAnchor(void* ptr) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint firstAnchor];
+}
+
+void* LayoutConstraint_SecondAnchor(void* ptr) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint secondAnchor];
 }
 
 float LayoutConstraint_Priority(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c priority];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint priority];
 }
 
 void LayoutConstraint_SetPriority(void* ptr, float priority) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    [c setPriority:priority];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	[layoutConstraint setPriority:priority];
 }
 
 const char* LayoutConstraint_Identifier(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [[c identifier] UTF8String];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [[layoutConstraint identifier] UTF8String];
+}
+
+void LayoutConstraint_SetIdentifier(void* ptr, const char* identifier) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	[layoutConstraint setIdentifier:[NSString stringWithUTF8String:identifier]];
 }
 
 bool LayoutConstraint_ShouldBeArchived(void* ptr) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    return [c shouldBeArchived];
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	return [layoutConstraint shouldBeArchived];
 }
 
-void LayoutConstraint_SetShouldBeArchived(void* ptr, bool value) {
-    NSLayoutConstraint* c = (NSLayoutConstraint*)ptr;
-    [c setShouldBeArchived:value];
+void LayoutConstraint_SetShouldBeArchived(void* ptr, bool shouldBeArchived) {
+	NSLayoutConstraint* layoutConstraint = (NSLayoutConstraint*)ptr;
+	[layoutConstraint setShouldBeArchived:shouldBeArchived];
+}
+
+void LayoutConstraint_ConstraintWithItem(void* view1, long attr1, long relation, void* view2, long attr2, double multiplier, double c) {
+	[NSLayoutConstraint constraintWithItem:(NSObject*)view1 attribute:attr1 relatedBy:relation toItem:(NSObject*)view2 attribute:attr2 multiplier:multiplier constant:c];
 }
 
 void LayoutConstraint_ActivateConstraints(Array constraints) {
-    NSMutableArray* objcArray = [[NSMutableArray alloc] init];
-    NSLayoutConstraint** data = (NSLayoutConstraint**)constraints.data;
+    NSMutableArray* objcConstraints = [[NSMutableArray alloc] init];
+    NSLayoutConstraint** constraintsData = (NSLayoutConstraint**)constraints.data;
     for (int i = 0; i < constraints.len; i++) {
-        [objcArray addObject:data[i]];
+        [objcConstraints addObject:constraintsData[i]];
     }
-    return [NSLayoutConstraint activateConstraints:objcArray];
+	[NSLayoutConstraint activateConstraints:objcConstraints];
 }
 
 void LayoutConstraint_DeactivateConstraints(Array constraints) {
-    NSMutableArray* objcArray = [[NSMutableArray alloc] init];
-    NSLayoutConstraint** data = (NSLayoutConstraint**)constraints.data;
+    NSMutableArray* objcConstraints = [[NSMutableArray alloc] init];
+    NSLayoutConstraint** constraintsData = (NSLayoutConstraint**)constraints.data;
     for (int i = 0; i < constraints.len; i++) {
-        [objcArray addObject:data[i]];
+        [objcConstraints addObject:constraintsData[i]];
     }
-    return [NSLayoutConstraint deactivateConstraints:objcArray];
+	[NSLayoutConstraint deactivateConstraints:objcConstraints];
 }

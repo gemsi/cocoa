@@ -68,7 +68,7 @@ void* Control_Cell(void* ptr) {
 
 void Control_SetCell(void* ptr, void* cell) {
 	NSControl* control = (NSControl*)ptr;
-	[control setCell:cell];
+	[control setCell:(NSCell*)cell];
 }
 
 void Control_SizeToFit(void* ptr) {

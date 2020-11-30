@@ -41,7 +41,7 @@ void SplitView_SetDividerStyle(void* ptr, long dividerStyle) {
 	[splitView setDividerStyle:dividerStyle];
 }
 
-void* SplitView_InitWithFrame(NSRect frame) {
+void* SplitView_NewSplitView(NSRect frame) {
 	NSSplitView* splitView = [NSSplitView alloc];
 	return [[splitView initWithFrame:frame] autorelease];
 }

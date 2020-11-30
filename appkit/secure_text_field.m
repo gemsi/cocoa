@@ -12,7 +12,7 @@ void SecureTextField_RegisterDelegate(void *ptr, long goID) {
 	[secureTextField setDelegate:delegate];
 }
 
-void* SecureTextField_InitWithFrame(NSRect frame) {
+void* SecureTextField_NewSecureTextField(NSRect frame) {
 	NSSecureTextField* secureTextField = [NSSecureTextField alloc];
 	return [[secureTextField initWithFrame:frame] autorelease];
 }

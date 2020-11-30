@@ -103,3 +103,7 @@ func (l *NSLayoutGuide) WidthAnchor() LayoutDimension {
 func (l *NSLayoutGuide) OwningView() View {
 	return MakeView(C.LayoutGuide_OwningView(l.Ptr()))
 }
+
+func NewLayoutGuide() LayoutGuide {
+	return MakeLayoutGuide(C.LayoutGuide_NewLayoutGuide())
+}

@@ -7,7 +7,7 @@ if __name__ == "__main__":
     w = Component(
         Type="appkit.View",
         super_type='appkit.Responder',
-        additional_objc_imports=["Appkit/NSLayoutConstraint"],
+        objc_imports=["Appkit/NSView", "Appkit/NSLayoutConstraint"],
         description="The infrastructure for drawing, printing, and handling events in an app.",
         properties=[
             Property(name='frame', Type='foundation.Rect', readonly=False,

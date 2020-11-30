@@ -20,7 +20,7 @@ NSSize TabView_MinimumSize(void* ptr);
 unsigned long TabView_ControlSize(void* ptr);
 void TabView_SetControlSize(void* ptr, unsigned long controlSize);
 
-void* TabView_InitWithFrame(NSRect frame);
+void* TabView_NewTabView(NSRect frame);
 void TabView_AddTabViewItem(void* ptr, void* tabViewItem);
 void TabView_InsertTabViewItem(void* ptr, void* tabViewItem, long index);
 void TabView_RemoveTabViewItem(void* ptr, void* tabViewItem);

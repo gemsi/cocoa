@@ -177,8 +177,12 @@ class Param:
             return codes, objc_name
         elif self.Type == 'string':
             return [], f'[NSString stringWithUTF8String:{self.name}]'
-        else:
+        elif self.Type in geo_struct_types:
             return [], self.name
+        elif self.Type in cgo_type_dict:
+            return [], self.name
+        else:
+            return [], f'(NS{type_name}*){self.name}'
 
     def objc_to_c_code(self) -> str:
         """convert objc type to c type"""
@@ -293,6 +297,10 @@ class Method:
     register_delegate: bool = False  # if register delegate and action target
     go_func_name: str = ''
 
+    def __post_init__(self):
+        if not self.go_func_name:
+            self.go_func_name = cap(self.name)
+
     def init_env(self, has_delegate: bool, has_target: bool):
         self.has_delegate = has_delegate
         self.has_target = has_target
@@ -300,24 +308,16 @@ class Method:
     def go_interface_code(self, current_pkg: str) -> List[str]:
         if self.do_alloc or self.static:
             return []
-        if self.go_func_name:
-            name = self.go_func_name
-        else:
-            name = cap(self.name)
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
             go_def_return = ' ' + go_def_return
         return [
-            f'// {name} {self.description}',
-            name + '(' + params_str + ')' + go_def_return,
+            f'// {self.go_func_name} {self.description}',
+            self.go_func_name + '(' + params_str + ')' + go_def_return,
         ]
 
     def go_impl_code(self, current_pkg: str, receiver_type: str) -> List[str]:
-        if self.go_func_name:
-            go_func_name = self.go_func_name
-        else:
-            go_func_name = cap(self.name)
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
 
         go_def_return = self.return_value.go_def_code(current_pkg)
@@ -326,10 +326,10 @@ class Method:
         if not self.do_alloc and not self.static:
             receiver = receiver_type[0].lower()
             receiver_str = receiver + ' *NS' + receiver_type
-            codes = ['func (' + receiver_str + ') ' + go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
+            codes = ['func (' + receiver_str + ') ' + self.go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
             args = [f'{receiver}.Ptr()']
         else:
-            codes = ['func ' + go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
+            codes = ['func ' + self.go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
             args = []
 
         for param in self.params:
@@ -339,7 +339,7 @@ class Method:
             args.append(arg)
         c_args_str = ', '.join(args)
         convert_codes, return_str = self.return_value.c_to_go_code(
-            f'C.{receiver_type}_{cap(self.name)}({c_args_str})', current_pkg)
+            f'C.{receiver_type}_{self.go_func_name}({c_args_str})', current_pkg)
         for convert_code in convert_codes:
             codes.append('\t' + convert_code)
         if self.register_delegate and (self.has_delegate or self.has_target) and self.return_value.Type != '':
@@ -358,7 +358,7 @@ class Method:
             params.append('void* ptr')
         params.extend([p.c_def_code() for p in self.params])
         c_params_str = ', '.join(params)
-        return [f'{self.return_value.c_def_code()} {receiver_type}_{cap(self.name)}({c_params_str});']
+        return [f'{self.return_value.c_def_code()} {receiver_type}_{self.go_func_name}({c_params_str});']
 
     def objc_m_code(self, receiver_type: str) -> List[str]:
         params: List[str] = []
@@ -368,7 +368,7 @@ class Method:
         c_params_str = ', '.join(params)
         ns_var_name = de_cap(receiver_type)
         codes = [
-            f'{self.return_value.c_def_code()} {receiver_type}_{cap(self.name)}({c_params_str}) {{',
+            f'{self.return_value.c_def_code()} {receiver_type}_{self.go_func_name}({c_params_str}) {{',
         ]
         if self.do_alloc:
             codes.append(f'\tNS{receiver_type}* {ns_var_name} = [NS{receiver_type} alloc];')
@@ -400,7 +400,7 @@ class Method:
         return codes
 
 
-def init_method(name: str, Type: str, params: List[Param] = field(default_factory=list), go_func_name: str = '', description: str = '') -> Method:
+def init_method(name: str, Type: str, params: List[Param] = [], go_func_name: str = '', description: str = '') -> Method:
     Type = type_part(Type)
     if not go_func_name:
         go_func_name = f'New{Type}'
@@ -606,7 +606,7 @@ class Component:
     delegate_methods: List[DelegateMethod] = field(default_factory=list)
     action_methods: List[ActionMethod] = field(default_factory=list)
     extend_delegate: bool = False
-    additional_objc_imports: List[str] = field(default_factory=list)
+    objc_imports: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         self.pkg, self.type_name = split_type(self.Type)
@@ -834,10 +834,12 @@ class Component:
     def generate_objc_m_file(self):
         m_file_path = f'../{self.pkg}/{self.file_name}.m'
         with open(m_file_path, 'w+') as out:
-            print(f'#import <Appkit/{self.ns_type}.h>', file=out)
+            if self.objc_imports:
+                for import_ in self.objc_imports:
+                    print(f'#import <{import_}.h>', file=out)
+            else:
+                print(f'#import <Appkit/{self.ns_type}.h>', file=out)
             print(f'#import "{self.file_name}.h"', file=out)
-            for import_ in self.additional_objc_imports:
-                print(f'#import <{import_}.h>', file=out)
             if self.delegate_methods or self.extend_delegate or self.action_methods:
                 print(f'#import "{self.file_name}_delegate.h"', file=out)
 

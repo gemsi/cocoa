@@ -33,7 +33,7 @@ void* TabViewItem_Identifier(void* ptr) {
 
 void TabViewItem_SetIdentifier(void* ptr, void* identifier) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
-	[tabViewItem setIdentifier:identifier];
+	[tabViewItem setIdentifier:(NSObject*)identifier];
 }
 
 void* TabViewItem_Color(void* ptr) {
@@ -43,7 +43,7 @@ void* TabViewItem_Color(void* ptr) {
 
 void TabViewItem_SetColor(void* ptr, void* color) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
-	[tabViewItem setColor:color];
+	[tabViewItem setColor:(NSColor*)color];
 }
 
 void* TabViewItem_View(void* ptr) {
@@ -53,7 +53,7 @@ void* TabViewItem_View(void* ptr) {
 
 void TabViewItem_SetView(void* ptr, void* view) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
-	[tabViewItem setView:view];
+	[tabViewItem setView:(NSView*)view];
 }
 
 void* TabViewItem_InitialFirstResponder(void* ptr) {
@@ -63,7 +63,7 @@ void* TabViewItem_InitialFirstResponder(void* ptr) {
 
 void TabViewItem_SetInitialFirstResponder(void* ptr, void* initialFirstResponder) {
 	NSTabViewItem* tabViewItem = (NSTabViewItem*)ptr;
-	[tabViewItem setInitialFirstResponder:initialFirstResponder];
+	[tabViewItem setInitialFirstResponder:(NSView*)initialFirstResponder];
 }
 
 void* TabViewItem_TabView(void* ptr) {
@@ -71,7 +71,7 @@ void* TabViewItem_TabView(void* ptr) {
 	return [tabViewItem tabView];
 }
 
-void* TabViewItem_InitWithIdentifier(void* identifier) {
+void* TabViewItem_NewTabViewItem(void* identifier) {
 	NSTabViewItem* tabViewItem = [NSTabViewItem alloc];
-	return [[tabViewItem initWithIdentifier:identifier] autorelease];
+	return [[tabViewItem initWithIdentifier:(NSObject*)identifier] autorelease];
 }

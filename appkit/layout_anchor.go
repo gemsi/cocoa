@@ -2,32 +2,38 @@ package appkit
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
-// #import "layout_anchor.h"
+// #include "layout_anchor.h"
 import "C"
-import "C"
+
 import (
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
 
-//LayoutAnchor is a factory class for creating layout constraint objects using a fluent API.
+// LayoutAnchor is a factory class for creating layout constraint objects using a fluent API
 type LayoutAnchor interface {
 	foundation.Object
-	ConstraintEqualTo(anchor LayoutAnchor) LayoutConstraint
-	ConstraintEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint
-	ConstraintGreaterThanOrEqualTo(anchor LayoutAnchor) LayoutConstraint
-	ConstraintGreaterThanOrEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint
-	ConstraintLessThanOrEqualTo(anchor LayoutAnchor) LayoutConstraint
-	ConstraintLessThanOrEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint
 
-	// The constraints that impact the layout of the anchor.
+	// ConstraintsAffectingLayout return the constraints that impact the layout of the anchor
 	ConstraintsAffectingLayout() []LayoutConstraint
-	// whether the constraints impacting the anchor specify its location ambiguously
+	// HasAmbiguousLayout return whether the constraints impacting the anchor specify its location ambiguously
 	HasAmbiguousLayout() bool
-	// The layout item used to calculate the anchor's position.
-	Item() foundation.Object
-	// The name assigned to the anchor for debugging purposes.
+	// Name return the name assigned to the anchor for debugging purposes
 	Name() string
+	// Item return the layout item used to calculate the anchor's position
+	Item() foundation.Object
+	// ConstraintEqualToAnchor returns a constraint that defines one item’s attribute as equal to another
+	ConstraintEqualToAnchor(anchor LayoutAnchor) LayoutConstraint
+	// ConstraintEqualToAnchor2 returns a constraint that defines one item’s attribute as equal to another item’s attribute plus a constant offset
+	ConstraintEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint
+	// ConstraintGreaterThanOrEqualToAnchor returns a constraint that defines one item’s attribute as greater than or equal to another
+	ConstraintGreaterThanOrEqualToAnchor(anchor LayoutAnchor) LayoutConstraint
+	// ConstraintGreaterThanOrEqualToAnchor2 returns a constraint that defines one item’s attribute as greater than or equal to another item’s attribute plus a constant offset
+	ConstraintGreaterThanOrEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint
+	// ConstraintLessThanOrEqualToAnchor returns a constraint that defines one item’s attribute as less than or equal to another
+	ConstraintLessThanOrEqualToAnchor(anchor LayoutAnchor) LayoutConstraint
+	// ConstraintLessThanOrEqualToAnchor2 returns a constraint that defines one item’s attribute as less than or equal to another item’s attribute plus a constant offset
+	ConstraintLessThanOrEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint
 }
 
 var _ LayoutAnchor = (*NSLayoutAnchor)(nil)
@@ -36,171 +42,59 @@ type NSLayoutAnchor struct {
 	foundation.NSObject
 }
 
-func (a *NSLayoutAnchor) ConstraintEqualTo(anchor LayoutAnchor) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintEqualTo(a.Ptr(), anchor.Ptr()))
-}
-
-func (a *NSLayoutAnchor) ConstraintEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintEqualTo2(a.Ptr(), anchor.Ptr(), C.double(constant)))
-}
-
-func (a *NSLayoutAnchor) ConstraintGreaterThanOrEqualTo(anchor LayoutAnchor) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintGreaterThanOrEqualTo(a.Ptr(), anchor.Ptr()))
-}
-
-func (a *NSLayoutAnchor) ConstraintGreaterThanOrEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintGreaterThanOrEqualTo2(a.Ptr(), anchor.Ptr(), C.double(constant)))
-}
-
-func (a *NSLayoutAnchor) ConstraintLessThanOrEqualTo(anchor LayoutAnchor) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintLessThanOrEqualTo(a.Ptr(), anchor.Ptr()))
-}
-
-func (a *NSLayoutAnchor) ConstraintLessThanOrEqualTo2(anchor LayoutAnchor, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintLessThanOrEqualTo2(a.Ptr(), anchor.Ptr(), C.double(constant)))
-}
-
-func (a *NSLayoutAnchor) ConstraintsAffectingLayout() []LayoutConstraint {
-	panic("implement me")
-}
-
-func (a *NSLayoutAnchor) HasAmbiguousLayout() bool {
-	panic("implement me")
-}
-
-func (a *NSLayoutAnchor) Item() foundation.Object {
-	panic("implement me")
-}
-
-func (a *NSLayoutAnchor) Name() string {
-	panic("implement me")
-}
-
+// MakeLayoutAnchor create a LayoutAnchor from native pointer
 func MakeLayoutAnchor(ptr unsafe.Pointer) *NSLayoutAnchor {
+	if ptr == nil {
+		return nil
+	}
 	return &NSLayoutAnchor{
 		NSObject: *foundation.MakeObject(ptr),
 	}
 }
 
-type LayoutDimension interface {
-	LayoutAnchor
-	// Returns a constraint that defines the anchor’s size attribute as equal to the specified size attribute multiplied by a constant plus an offset.
-	ConstraintEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint
-	// Returns a constraint that defines a constant size for the anchor’s size attribute.
-	ConstraintEqualToConstant(constant float64) LayoutConstraint
-	// Returns a constraint that defines the anchor’s size attribute as greater than or equal to the specified anchor multiplied by the constant.
-	ConstraintGreaterThanOrEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint
-	ConstraintGreaterThanOrEqualToConstant(constant float64) LayoutConstraint
-	ConstraintLessThanOrEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint
-	ConstraintLessThanOrEqualToConstant(constant float64) LayoutConstraint
-}
-
-var _ LayoutDimension = (*NSLayoutDimension)(nil)
-
-type NSLayoutDimension struct {
-	NSLayoutAnchor
-}
-
-func (d *NSLayoutDimension) ConstraintEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintEqualTo3(d.Ptr(), anchor.Ptr(), C.double(multiplier), C.double(constant)))
-}
-
-func (d *NSLayoutDimension) ConstraintEqualToConstant(constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintEqualToConstant(d.Ptr(), C.double(constant)))
-}
-
-func (d *NSLayoutDimension) ConstraintGreaterThanOrEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintGreaterThanOrEqualTo3(d.Ptr(), anchor.Ptr(), C.double(multiplier), C.double(constant)))
-}
-
-func (d *NSLayoutDimension) ConstraintGreaterThanOrEqualToConstant(constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintGreaterThanOrEqualToConstant(d.Ptr(), C.double(constant)))
-}
-
-func (d *NSLayoutDimension) ConstraintLessThanOrEqualTo3(anchor LayoutDimension, multiplier float64, constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintLessThanOrEqualTo3(d.Ptr(), anchor.Ptr(), C.double(multiplier), C.double(constant)))
-}
-
-func (d *NSLayoutDimension) ConstraintLessThanOrEqualToConstant(constant float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutDimension_ConstraintLessThanOrEqualToConstant(d.Ptr(), C.double(constant)))
-}
-
-func MakeLayoutDimension(ptr unsafe.Pointer) *NSLayoutDimension {
-	return &NSLayoutDimension{
-		NSLayoutAnchor: *MakeLayoutAnchor(ptr),
+func (l *NSLayoutAnchor) ConstraintsAffectingLayout() []LayoutConstraint {
+	var cArray C.Array = C.LayoutAnchor_ConstraintsAffectingLayout(l.Ptr())
+	defer C.free(cArray.data)
+	result := (*[1 << 28]unsafe.Pointer)(unsafe.Pointer(cArray.data))[:cArray.len:cArray.len]
+	var goResult = make([]LayoutConstraint, len(result))
+	for idx, r := range result {
+		goResult[idx] = MakeLayoutConstraint(r)
 	}
+	return goResult
 }
 
-type LayoutXAxisAnchor interface {
-	LayoutAnchor
-	// Returns a constraint that defines by how much the current anchor trails the specified anchor.
-	ConstraintEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint
-	ConstraintGreaterThanOrEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint
-	ConstraintLessThanOrEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint
-	AnchorWithOffsetTo(anchor LayoutXAxisAnchor) LayoutDimension
+func (l *NSLayoutAnchor) HasAmbiguousLayout() bool {
+	return bool(C.LayoutAnchor_HasAmbiguousLayout(l.Ptr()))
 }
 
-var _ LayoutXAxisAnchor = (*NSLayoutXAxisAnchor)(nil)
-
-type NSLayoutXAxisAnchor struct {
-	NSLayoutAnchor
+func (l *NSLayoutAnchor) Name() string {
+	return C.GoString(C.LayoutAnchor_Name(l.Ptr()))
 }
 
-func (x *NSLayoutXAxisAnchor) ConstraintEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutXAxisAnchor_ConstraintEqualToSystemSpacingAfter(x.Ptr(), anchor.Ptr(), C.double(multiplier)))
+func (l *NSLayoutAnchor) Item() foundation.Object {
+	return foundation.MakeObject(C.LayoutAnchor_Item(l.Ptr()))
 }
 
-func (x *NSLayoutXAxisAnchor) ConstraintGreaterThanOrEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutXAxisAnchor_ConstraintGreaterThanOrEqualToSystemSpacingAfter(x.Ptr(), anchor.Ptr(), C.double(multiplier)))
+func (l *NSLayoutAnchor) ConstraintEqualToAnchor(anchor LayoutAnchor) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintEqualToAnchor(l.Ptr(), toPointer(anchor)))
 }
 
-func (x *NSLayoutXAxisAnchor) ConstraintLessThanOrEqualToSystemSpacingAfter(anchor LayoutXAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutXAxisAnchor_ConstraintLessThanOrEqualToSystemSpacingAfter(x.Ptr(), anchor.Ptr(), C.double(multiplier)))
+func (l *NSLayoutAnchor) ConstraintEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintEqualToAnchor2(l.Ptr(), toPointer(anchor), C.double(constant)))
 }
 
-func (x *NSLayoutXAxisAnchor) AnchorWithOffsetTo(anchor LayoutXAxisAnchor) LayoutDimension {
-	return MakeLayoutDimension(C.LayoutXAxisAnchor_AnchorWithOffsetTo(x.Ptr(), anchor.Ptr()))
+func (l *NSLayoutAnchor) ConstraintGreaterThanOrEqualToAnchor(anchor LayoutAnchor) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintGreaterThanOrEqualToAnchor(l.Ptr(), toPointer(anchor)))
 }
 
-func MakeLayoutXAxisAnchor(ptr unsafe.Pointer) *NSLayoutXAxisAnchor {
-	return &NSLayoutXAxisAnchor{
-		NSLayoutAnchor: *MakeLayoutAnchor(ptr),
-	}
+func (l *NSLayoutAnchor) ConstraintGreaterThanOrEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintGreaterThanOrEqualToAnchor2(l.Ptr(), toPointer(anchor), C.double(constant)))
 }
 
-type LayoutYAxisAnchor interface {
-	LayoutAnchor
-	// Returns a constraint that defines by how much the current anchor trails the specified anchor.
-	ConstraintEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint
-	ConstraintGreaterThanOrEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint
-	ConstraintLessThanOrEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint
-	AnchorWithOffsetTo(anchor LayoutYAxisAnchor) LayoutDimension
+func (l *NSLayoutAnchor) ConstraintLessThanOrEqualToAnchor(anchor LayoutAnchor) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintLessThanOrEqualToAnchor(l.Ptr(), toPointer(anchor)))
 }
 
-var _ LayoutYAxisAnchor = (*NSLayoutYAxisAnchor)(nil)
-
-type NSLayoutYAxisAnchor struct {
-	NSLayoutAnchor
-}
-
-func (y *NSLayoutYAxisAnchor) ConstraintEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutYAxisAnchor_ConstraintEqualToSystemSpacingBelow(y.Ptr(), anchor.Ptr(), C.double(multiplier)))
-}
-
-func (y *NSLayoutYAxisAnchor) ConstraintGreaterThanOrEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutYAxisAnchor_ConstraintGreaterThanOrEqualToSystemSpacingBelow(y.Ptr(), anchor.Ptr(), C.double(multiplier)))
-}
-
-func (y *NSLayoutYAxisAnchor) ConstraintLessThanOrEqualToSystemSpacingBelow(anchor LayoutYAxisAnchor, multiplier float64) LayoutConstraint {
-	return MakeLayoutConstraint(C.LayoutYAxisAnchor_ConstraintLessThanOrEqualToSystemSpacingBelow(y.Ptr(), anchor.Ptr(), C.double(multiplier)))
-}
-
-func (y *NSLayoutYAxisAnchor) AnchorWithOffsetTo(anchor LayoutYAxisAnchor) LayoutDimension {
-	return MakeLayoutDimension(C.LayoutYAxisAnchor_AnchorWithOffsetTo(y.Ptr(), anchor.Ptr()))
-}
-
-func MakeLayoutYAxisAnchor(ptr unsafe.Pointer) *NSLayoutYAxisAnchor {
-	return &NSLayoutYAxisAnchor{
-		NSLayoutAnchor: *MakeLayoutAnchor(ptr),
-	}
+func (l *NSLayoutAnchor) ConstraintLessThanOrEqualToAnchor2(anchor LayoutAnchor, constant float64) LayoutConstraint {
+	return MakeLayoutConstraint(C.LayoutAnchor_ConstraintLessThanOrEqualToAnchor2(l.Ptr(), toPointer(anchor), C.double(constant)))
 }

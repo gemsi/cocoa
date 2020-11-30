@@ -15,3 +15,4 @@ void* LayoutGuide_TrailingAnchor(void* ptr);
 void* LayoutGuide_WidthAnchor(void* ptr);
 void* LayoutGuide_OwningView(void* ptr);
 
+void* LayoutGuide_NewLayoutGuide();

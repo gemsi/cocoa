@@ -87,5 +87,5 @@ func (s *NSScrollView) ContentSize() foundation.Size {
 }
 
 func NewScrollView(frame foundation.Rect) ScrollView {
-	return MakeScrollView(C.ScrollView_InitWithFrame(toNSRect(frame)))
+	return MakeScrollView(C.ScrollView_NewScrollView(toNSRect(frame)))
 }

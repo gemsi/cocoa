@@ -121,5 +121,5 @@ func (t *NSTabViewItem) TabView() TabView {
 }
 
 func NewTabViewItem(identifier foundation.Object) TabViewItem {
-	return MakeTabViewItem(C.TabViewItem_InitWithIdentifier(toPointer(identifier)))
+	return MakeTabViewItem(C.TabViewItem_NewTabViewItem(toPointer(identifier)))
 }

@@ -45,5 +45,5 @@ func (t *NSTextView) SetTextContainer(textContainer TextContainer) {
 }
 
 func NewTextView(frame foundation.Rect) TextView {
-	return MakeTextView(C.TextView_InitWithFrame(toNSRect(frame)))
+	return MakeTextView(C.TextView_NewTextView(toNSRect(frame)))
 }

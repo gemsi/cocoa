@@ -38,7 +38,7 @@ void* MenuItem_Submenu(void* ptr) {
 
 void MenuItem_SetSubmenu(void* ptr, void* submenu) {
 	NSMenuItem* menuItem = (NSMenuItem*)ptr;
-	[menuItem setSubmenu:submenu];
+	[menuItem setSubmenu:(NSMenu*)submenu];
 }
 
 bool MenuItem_HasSubmenu(void* ptr) {
@@ -58,7 +58,7 @@ void* MenuItem_Menu(void* ptr) {
 
 void MenuItem_SetMenu(void* ptr, void* menu) {
 	NSMenuItem* menuItem = (NSMenuItem*)ptr;
-	[menuItem setMenu:menu];
+	[menuItem setMenu:(NSMenu*)menu];
 }
 
 const char* MenuItem_ToolTip(void* ptr) {

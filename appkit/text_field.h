@@ -17,4 +17,4 @@ void TextField_SetTextColor(void* ptr, void* textColor);
 void* TextField_BackgroundColor(void* ptr);
 void TextField_SetBackgroundColor(void* ptr, void* backgroundColor);
 
-void* TextField_InitWithFrame(NSRect frame);
+void* TextField_NewTextField(NSRect frame);

@@ -1,6 +1,5 @@
 #import <Appkit/NSLayoutGuide.h>
 #import "layout_guide.h"
-#import <Appkit/NSLayoutConstraint.h>
 
 NSRect LayoutGuide_Frame(void* ptr) {
 	NSLayoutGuide* layoutGuide = (NSLayoutGuide*)ptr;
@@ -60,4 +59,9 @@ void* LayoutGuide_WidthAnchor(void* ptr) {
 void* LayoutGuide_OwningView(void* ptr) {
 	NSLayoutGuide* layoutGuide = (NSLayoutGuide*)ptr;
 	return [layoutGuide owningView];
+}
+
+void* LayoutGuide_NewLayoutGuide() {
+	NSLayoutGuide* layoutGuide = [NSLayoutGuide alloc];
+	return [[layoutGuide init] autorelease];
 }

@@ -101,7 +101,7 @@ func (w *NSWindow) SetStyleMask(styleMask WindowStyleMask) {
 }
 
 func NewWindow(rect foundation.Rect, styleMask WindowStyleMask, backing BackingStoreType, Defer bool) Window {
-	instance := MakeWindow(C.Window_InitWithContentRect(toNSRect(rect), C.ulong(styleMask), C.ulong(backing), C.bool(Defer)))
+	instance := MakeWindow(C.Window_NewWindow(toNSRect(rect), C.ulong(styleMask), C.ulong(backing), C.bool(Defer)))
 	instance.setDelegate()
 	return instance
 }

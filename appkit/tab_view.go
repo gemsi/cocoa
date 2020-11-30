@@ -169,7 +169,7 @@ func (t *NSTabView) SetControlSize(controlSize ControlSize) {
 }
 
 func NewTabView(frame foundation.Rect) TabView {
-	instance := MakeTabView(C.TabView_InitWithFrame(toNSRect(frame)))
+	instance := MakeTabView(C.TabView_NewTabView(toNSRect(frame)))
 	instance.setDelegate()
 	return instance
 }

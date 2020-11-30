@@ -145,5 +145,5 @@ func (m *NSMenu) SetUserInterfaceLayoutDirection(userInterfaceLayoutDirection Us
 func NewMenu(title string) Menu {
 	cTitle := C.CString(title)
 	defer C.free(unsafe.Pointer(cTitle))
-	return MakeMenu(C.Menu_InitWithTitle(cTitle))
+	return MakeMenu(C.Menu_NewMenu(cTitle))
 }

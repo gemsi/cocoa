@@ -22,4 +22,4 @@ void* Menu_HighlightedItem(void* ptr);
 long Menu_UserInterfaceLayoutDirection(void* ptr);
 void Menu_SetUserInterfaceLayoutDirection(void* ptr, long userInterfaceLayoutDirection);
 
-void* Menu_InitWithTitle(const char* title);
+void* Menu_NewMenu(const char* title);

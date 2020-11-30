@@ -1,6 +1,6 @@
 #import <Appkit/NSView.h>
-#import "view.h"
 #import <Appkit/NSLayoutConstraint.h>
+#import "view.h"
 
 NSRect View_Frame(void* ptr) {
 	NSView* view = (NSView*)ptr;
@@ -104,5 +104,5 @@ void* View_WidthAnchor(void* ptr) {
 
 void View_AddSubview(void* ptr, void* subView) {
 	NSView* view = (NSView*)ptr;
-	[view addSubview:subView];
+	[view addSubview:(NSView*)subView];
 }
