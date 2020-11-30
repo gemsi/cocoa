@@ -105,9 +105,9 @@ void StackView_SetDetachesHiddenViews(void* ptr, bool detachesHiddenViews) {
 
 void* StackView_StackViewWithViews(Array views) {
     NSMutableArray* objcViews = [[NSMutableArray alloc] init];
-    NSView** viewsData = (NSView**)views.data;
+    void** viewsData = (void**)views.data;
     for (int i = 0; i < views.len; i++) {
-        [objcViews addObject:viewsData[i]];
+    	[objcViews addObject:(NSView*)viewsData[i]];
     }
 	return [NSStackView stackViewWithViews:objcViews];
 }
@@ -139,9 +139,9 @@ void StackView_InsertView(void* ptr, void* view, unsigned long index, long gravi
 void StackView_SetViews(void* ptr, Array views, long gravity) {
 	NSStackView* stackView = (NSStackView*)ptr;
     NSMutableArray* objcViews = [[NSMutableArray alloc] init];
-    NSView** viewsData = (NSView**)views.data;
+    void** viewsData = (void**)views.data;
     for (int i = 0; i < views.len; i++) {
-        [objcViews addObject:viewsData[i]];
+    	[objcViews addObject:(NSView*)viewsData[i]];
     }
 	[stackView setViews:objcViews inGravity:gravity];
 }

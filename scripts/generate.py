@@ -142,10 +142,25 @@ class Param:
             codes = [
                 f'{c_name}Data := make([]unsafe.Pointer, len({self.name}))',
                 f'for idx, v := range {self.name} {{',
-                f'\t{c_name}Data[idx] = v.Ptr()',
+            ]
+            if self.Type == 'string':
+                codes.extend([
+                    f'\t{c_name}Data[idx] = unsafe.Pointer(C.CString(v))'],
+                )
+            else:
+                codes.append(f'\t{c_name}Data[idx] = v.Ptr()')
+            codes.extend([
                 '}',
                 f'{c_name} := C.Array{{data:unsafe.Pointer(&{c_name}Data[0]), len:C.int(len({self.name}))}}',
-            ]
+            ])
+            if self.Type == 'string':
+                codes.extend([
+                    'defer func() {',
+                    f'\tfor _, p := range {c_name}Data {{',
+                    '\t\tC.free(p)',
+                    '\t}',
+                    '}()',
+                ])
             return codes, c_name
         elif self.Type in cgo_type_dict:
             return [], f'C.{cgo_type_dict[self.Type]}({self.name})'
@@ -169,11 +184,14 @@ class Param:
             objc_name = f'objc{cap(self.name)}'
             codes = [
                 f'NSMutableArray* {objc_name} = [[NSMutableArray alloc] init];',
-                f'NS{type_name}** {self.name}Data = (NS{type_name}**){self.name}.data;',
+                f'void** {self.name}Data = (void**){self.name}.data;',
                 f'for (int i = 0; i < {self.name}.len; i++) {{',
-                f'    [{objc_name} addObject:{self.name}Data[i]];',
-                '}',
             ]
+            if self.Type == 'string':
+                codes.append(f'\t[{objc_name} addObject:[NSString stringWithUTF8String:(const char*){self.name}Data[i]]];',)
+            else:
+                codes.append(f'\t[{objc_name} addObject:(NS{type_name}*){self.name}Data[i]];',)
+            codes.append('}')
             return codes, objc_name
         elif self.Type == 'string':
             return [], f'[NSString stringWithUTF8String:{self.name}]'
@@ -246,9 +264,12 @@ class Return:
                 f'result := (*[1 << 28]unsafe.Pointer)(unsafe.Pointer(cArray.data))[:cArray.len:cArray.len]',
                 f'var goResult = make([]{def_type}, len(result))',
                 f'for idx, r := range result {{',
-                f'\tgoResult[idx] = {make_func}(r)',
-                '}',
             ]
+            if self.Type == 'string':
+                codes.append('\tgoResult[idx] = C.GoString((*C.char)(r))')
+            else:
+                codes.append(f'\tgoResult[idx] = {make_func}(r)')
+            codes.append('}')
             return codes, 'goResult'
         elif self.Type in cgo_type_dict:
             if self.go_alias:
@@ -274,12 +295,17 @@ class Return:
                 'int count = [array count];',
                 'void** data = malloc(count * sizeof(void*));',
                 'for (int i = 0; i < count; i++) {',
-                '\t data[i] = [array objectAtIndex:i];',
+            ]
+            if self.Type == 'string':
+                codes.append('\t data[i] = (void*)[[array objectAtIndex:i] UTF8String];')
+            else:
+                codes.append('\t data[i] = [array objectAtIndex:i];')
+            codes.extend([
                 '}',
                 'Array result;',
                 'result.data = data;',
                 'result.len = count;',
-            ]
+            ])
             return codes, 'result'
         elif self.Type == 'string':
             return [], f'[{return_str} UTF8String]'
@@ -326,7 +352,8 @@ class Method:
         if not self.do_alloc and not self.static:
             receiver = receiver_type[0].lower()
             receiver_str = receiver + ' *NS' + receiver_type
-            codes = ['func (' + receiver_str + ') ' + self.go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]
+            codes = ['func (' + receiver_str + ') ' + self.go_func_name +
+                     '(' + params_str + ')' + go_def_return + ' {', ]
             args = [f'{receiver}.Ptr()']
         else:
             codes = ['func ' + self.go_func_name + '(' + params_str + ')' + go_def_return + ' {', ]

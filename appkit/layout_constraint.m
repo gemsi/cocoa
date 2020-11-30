@@ -92,18 +92,18 @@ void LayoutConstraint_ConstraintWithItem(void* view1, long attr1, long relation,
 
 void LayoutConstraint_ActivateConstraints(Array constraints) {
     NSMutableArray* objcConstraints = [[NSMutableArray alloc] init];
-    NSLayoutConstraint** constraintsData = (NSLayoutConstraint**)constraints.data;
+    void** constraintsData = (void**)constraints.data;
     for (int i = 0; i < constraints.len; i++) {
-        [objcConstraints addObject:constraintsData[i]];
+    	[objcConstraints addObject:(NSLayoutConstraint*)constraintsData[i]];
     }
 	[NSLayoutConstraint activateConstraints:objcConstraints];
 }
 
 void LayoutConstraint_DeactivateConstraints(Array constraints) {
     NSMutableArray* objcConstraints = [[NSMutableArray alloc] init];
-    NSLayoutConstraint** constraintsData = (NSLayoutConstraint**)constraints.data;
+    void** constraintsData = (void**)constraints.data;
     for (int i = 0; i < constraints.len; i++) {
-        [objcConstraints addObject:constraintsData[i]];
+    	[objcConstraints addObject:(NSLayoutConstraint*)constraintsData[i]];
     }
 	[NSLayoutConstraint deactivateConstraints:objcConstraints];
 }

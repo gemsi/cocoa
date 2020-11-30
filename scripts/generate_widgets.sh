@@ -31,5 +31,8 @@ python3 layout_dimension.py
 python3 layout_x_axis_anchor.py
 python3 layout_y_axis_anchor.py
 
+python3 popover.py
+python3 popup_button.py
+
 echo 'format go code...'
 cd ..&& go fmt ./appkit

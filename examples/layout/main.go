@@ -24,7 +24,7 @@ func main() {
 	tf2 := appkit.NewPlainButton(foundation.MakeRect(150, 380, 100, 20))
 	tf2.SetStringValue("button2")
 
-	sv := appkit.NewStackViewWithViews([]appkit.View{label, tf, tf2})
+	sv := appkit.StackViewWithViews([]appkit.View{label, tf, tf2})
 	sv.SetOrientation(appkit.UserInterfaceLayoutOrientationVertical)
 	sv.SetDistribution(appkit.NSStackViewDistributionFillEqually)
 	sv.SetAlignment(appkit.LayoutAttributeCenterX)

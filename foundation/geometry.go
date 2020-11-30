@@ -47,3 +47,17 @@ type EdgeInsets struct {
 	Bottom float64
 	Right  float64
 }
+
+type RectEdge int
+
+const (
+	RectEdgeMinX RectEdge = 0
+	RectEdgeMinY RectEdge = 1
+	RectEdgeMaxX RectEdge = 2
+	RectEdgeMaxY RectEdge = 3
+
+	MinXEdge RectEdge = RectEdgeMinX
+	MinYEdge RectEdge = RectEdgeMinY
+	MaxXEdge RectEdge = RectEdgeMaxX
+	MaxYEdge RectEdge = RectEdgeMaxY
+)
