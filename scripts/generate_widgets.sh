@@ -34,5 +34,10 @@ python3 layout_y_axis_anchor.py
 python3 popover.py
 python3 popup_button.py
 
+python3 grid_view.py
+python3 grid_row.py
+python3 grid_column.py
+python3 grid_cell.py
+
 echo 'format go code...'
 cd ..&& go fmt ./appkit

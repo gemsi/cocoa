@@ -3,6 +3,7 @@ package appkit
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
 // #include <Foundation/NSGeometry.h>
+// #include <Foundation/NSRange.h>
 import "C"
 import (
 	"github.com/hsiafan/cocoa/foundation"
@@ -46,6 +47,20 @@ func toEdgeInsets(insets C.NSEdgeInsets) foundation.EdgeInsets {
 		Left:   float64(insets.left),
 		Bottom: float64(insets.bottom),
 		Right:  float64(insets.right),
+	}
+}
+
+func toNSRange(r foundation.Range) C.NSRange {
+	return C.NSRange{
+		location: C.ulong(r.Location),
+		length:   C.ulong(r.Length),
+	}
+}
+
+func toRange(r C.NSRange) foundation.Range {
+	return foundation.Range{
+		Location: uint(r.location),
+		Length:   uint(r.length),
 	}
 }
 

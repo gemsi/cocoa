@@ -38,7 +38,13 @@ c_type_dict = {
     'float64': 'double',
 }
 
-geo_struct_types = {'foundation.Rect', 'foundation.Point', 'foundation.Size', 'foundation.EdgeInsets'}
+geo_struct_types = {
+    'foundation.Rect': 'Foundation/NSGeometry.h',
+    'foundation.Point': 'Foundation/NSGeometry.h',
+    'foundation.Size': 'Foundation/NSGeometry.h',
+    'foundation.EdgeInsets': 'Foundation/NSGeometry.h',
+    'foundation.Range': 'Foundation/NSRange.h',
+}
 
 
 def type_part(Type: str) -> str:
@@ -188,7 +194,8 @@ class Param:
                 f'for (int i = 0; i < {self.name}.len; i++) {{',
             ]
             if self.Type == 'string':
-                codes.append(f'\t[{objc_name} addObject:[NSString stringWithUTF8String:(const char*){self.name}Data[i]]];',)
+                codes.append(
+                    f'\t[{objc_name} addObject:[NSString stringWithUTF8String:(const char*){self.name}Data[i]]];',)
             else:
                 codes.append(f'\t[{objc_name} addObject:(NS{type_name}*){self.name}Data[i]];',)
             codes.append('}')
@@ -941,7 +948,7 @@ class Component:
             if not t:
                 continue
             if t in geo_struct_types:
-                imports.add('Foundation/NSGeometry.h')
+                imports.add(geo_struct_types[t])
             elif t == 'bool':
                 imports.add('stdbool.h')
         return sorted(list(imports))
