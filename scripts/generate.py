@@ -322,7 +322,7 @@ class Return:
 @dataclass
 class Method:
     name: str
-    description: str
+    description: str = ''
     params: List[Param] = field(default_factory=list)
     return_value: Return = Return('')
     do_alloc: bool = False  # for init method
@@ -345,10 +345,11 @@ class Method:
         go_def_return = self.return_value.go_def_code(current_pkg)
         if go_def_return:
             go_def_return = ' ' + go_def_return
-        return [
-            f'// {self.go_func_name} {self.description}',
-            self.go_func_name + '(' + params_str + ')' + go_def_return,
-        ]
+        codes = []
+        if self.description:
+            codes.append(f'// {self.go_func_name} {self.description}')
+        codes.append(self.go_func_name + '(' + params_str + ')' + go_def_return)
+        return codes
 
     def go_impl_code(self, current_pkg: str, receiver_type: str) -> List[str]:
         params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
@@ -441,14 +442,22 @@ def init_method(name: str, Type: str, params: List[Param] = [], go_func_name: st
     if not description:
         description = f'return a new {Type} instance'
 
-    return Method(name=name, params=params, return_value=Return(Type=Type), go_func_name=go_func_name, description=description, do_alloc=True, register_delegate=True)
+    return Method(
+        name=name,
+        params=params,
+        return_value=Return(Type=Type),
+        go_func_name=go_func_name,
+        description=description,
+        do_alloc=True,
+        register_delegate=True,
+    )
 
 
 @dataclass
 class DelegateMethod:
     name: str
     params: List[Param]
-    description: str
+    description: str = ''
     return_value: Return = Return('')
     go_func_name: str = ''
     default_return_value: str = ''
@@ -473,11 +482,14 @@ class DelegateMethod:
         self.callback_type = 'func(' + self.go_params_str + ')' + self.go_def_return
 
     def go_interface_code(self) -> List[str]:
-        return [
-            f'// {self.go_func_name} {self.description}',
+        codes = []
+        if self.description:
+            codes.append(f'// {self.go_func_name} {self.description}')
+        codes.extend([
             f'{self.go_func_name}(callback {self.callback_type})',
             f'{self.callback_get_func}() {self.callback_type}',
-        ]
+        ])
+        return codes
 
     def go_impl_code(self) -> List[str]:
         receiver_str = self.receiver_name + ' *NS' + self.receiver_type
@@ -509,10 +521,10 @@ class DelegateMethod:
             f'\tcallback := {param_name}.{self.callback_get_func}()',
             f'\tif callback != nil {{',
         ]
-        return_state = f'\t\tcallback({args_str})'
+        return_state = f'callback({args_str})'
         if return_str:
             return_state = 'return ' + return_state
-        codes.append(return_state)
+        codes.append('\t\t' + return_state)
         codes.append('\t}')
         if return_str:
             codes.append(f'\treturn {self.default_return_value}')
@@ -548,10 +560,11 @@ class ActionMethod:
         self.callback_field_name = de_cap(self.name)
 
     def go_interface_code(self) -> List[str]:
-        return [
-            f'// {self.go_func_name} {self.description}',
-            self.go_func_name + '(handler ActionHandler)',
-        ]
+        codes = []
+        if self.description:
+            codes.append(f'// {self.go_func_name} {self.description}')
+        codes.append(self.go_func_name + '(handler ActionHandler)')
+        return codes
 
     def go_impl_code(self) -> List[str]:
         receiver_str = self.receiver_name + ' *NS' + self.receiver_type
@@ -580,7 +593,7 @@ class ActionMethod:
     def objc_m_code(self) -> List[str]:
         # TODO: convert ns types to c types?
         return [
-            f'- (void){self.objc_func_name}:(NSObject*)sender {{',
+            f'- (void){self.objc_func_name}:(id)sender {{',
             f'\treturn {self.cgo_export_func_name}([self goID], sender);',
             '}',
         ]
@@ -590,18 +603,20 @@ class ActionMethod:
 class Property:
     name: str  # the property name
     Type: str  # the property type
-    description: str
+    description: str = ''
     readonly: bool = False
     go_alias_type: str = ''  # the go alias type, for enum etc..
     getter_prefix_is: bool = True
     array: bool = False
+    static: bool = False
 
     def getter(self) -> Method:
         return Method(
             name='is' + cap(self.name) if self.Type == 'bool' and self.getter_prefix_is else self.name,
             params=[],
             return_value=Return(Type=self.Type, go_alias=self.go_alias_type, array=self.array),
-            description='return ' + self.description,
+            description='return ' + self.description if self.description else '',
+            static=self.static,
         )
 
     def setter(self) -> Optional[Method]:
@@ -611,7 +626,8 @@ class Property:
             name='set' + cap(self.name),
             params=[Param(name=self.name, Type=self.Type, go_alias=self.go_alias_type, array=self.array)],
             return_value=Return(Type=''),
-            description='set ' + self.description,
+            description='set ' + self.description if self.description else '',
+            static=self.static,
         )
 
 
@@ -739,7 +755,7 @@ class Component:
                 print('\tid := resources.NextId()', file=out)
                 print(f'\tC.{self.type_name}_RegisterDelegate({receiver}.Ptr(), C.long(id))', file=out)
                 print(f'\tresources.Store(id, {receiver})', file=out)
-                print(f'\tfoundation.AddDeallocHook({receiver}, func() {{', file=out)
+                print(f'\tcocoa.AddDeallocHook({receiver}, func() {{', file=out)
                 print('\t\tresources.Delete(id)', file=out)
                 print('\t})', file=out)
                 print('}', file=out)
@@ -797,6 +813,8 @@ class Component:
                 continue
             if pkg != t_pkg:
                 imports.add(f'github.com/hsiafan/cocoa/{t_pkg}')
+        if self.delegate_methods or self.extend_delegate or self.action_methods:
+            imports.add(f'github.com/hsiafan/cocoa')
         return sorted(list(imports))
 
     def generate_c_header_file(self):
@@ -891,12 +909,12 @@ class Component:
                 print(f'\t{self.ns_type}* {var_name} = ({self.ns_type}*)ptr;', file=out)
                 if self.delegate_methods or self.extend_delegate:
                     print(
-                        f'\tGoNS{self.type_name}Delegate* delegate = [[[GoNS{self.type_name}Delegate alloc] init] autorelease];', file=out)
+                        f'\tGoNS{self.type_name}Delegate* delegate = [[GoNS{self.type_name}Delegate alloc] init];', file=out)
                     print('\t[delegate setGoID:goID];', file=out)
                     print(f'\t[{var_name} setDelegate:delegate];', file=out)
                 if self.action_methods:
                     print(
-                        f'\tNS{self.type_name}Handler* handler = [[[NS{self.type_name}Handler alloc] init] autorelease];', file=out)
+                        f'\tNS{self.type_name}Handler* handler = [[NS{self.type_name}Handler alloc] init];', file=out)
                     print('\t[handler setGoID:goID];', file=out)
                     print(f'\t[{var_name} setTarget:handler];', file=out)
                     for method in self.action_methods:

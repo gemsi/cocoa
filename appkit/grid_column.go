@@ -14,33 +14,19 @@ import (
 type GridColumn interface {
 	foundation.Object
 
-	// NumberOfCells return
 	NumberOfCells() int
-	// IsHidden return
 	IsHidden() bool
-	// SetHidden set
 	SetHidden(hidden bool)
-	// LeadingPadding return
 	LeadingPadding() float64
-	// SetLeadingPadding set
 	SetLeadingPadding(leadingPadding float64)
-	// TrailingPadding return
 	TrailingPadding() float64
-	// SetTrailingPadding set
 	SetTrailingPadding(trailingPadding float64)
-	// Width return
 	Width() float64
-	// SetWidth set
 	SetWidth(width float64)
-	// XPlacement return
 	XPlacement() GridCellPlacement
-	// SetXPlacement set
 	SetXPlacement(xPlacement GridCellPlacement)
-	// GridView return
 	GridView() GridView
-	// CellAtIndex
 	CellAtIndex(index int) GridCell
-	// MergeCellsInRange
 	MergeCellsInRange(r foundation.Range)
 }
 

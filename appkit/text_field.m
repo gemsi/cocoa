@@ -19,7 +19,7 @@
 @end
 void TextField_RegisterDelegate(void *ptr, long goID) {
 	NSTextField* textField = (NSTextField*)ptr;
-	GoNSTextFieldDelegate* delegate = [[[GoNSTextFieldDelegate alloc] init] autorelease];
+	GoNSTextFieldDelegate* delegate = [[GoNSTextFieldDelegate alloc] init];
 	[delegate setGoID:goID];
 	[textField setDelegate:delegate];
 }

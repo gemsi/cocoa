@@ -1,8 +1,21 @@
+#import <dispatch/dispatch.h>
 #import <Foundation/NSObject.h>
-#import "dealloc_hook.h"
+#import "base.h"
 #include "_cgo_export.h"
 #import <objc/runtime.h>
 
+
+void Dispatch_MainQueueAsync(long id) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+            runTask(id);
+    });
+}
+
+void Run_WithAutoreleasePool(long id) {
+    @autoreleasepool {
+        runTask(id);
+    }
+}
 
 @interface Parasite : NSObject
 @property(nonatomic, assign) long hookId;
@@ -10,7 +23,7 @@
 
 @implementation Parasite
 - (void)dealloc {
-    runDeallocHook(self.hookId);
+    runTask(self.hookId);
     [super dealloc];
 }
 @end

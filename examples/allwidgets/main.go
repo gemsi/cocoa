@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/appkit"
-	"github.com/hsiafan/cocoa/dispatch"
 	"github.com/hsiafan/cocoa/foundation"
 	"runtime"
 	"time"
@@ -14,8 +14,8 @@ func init() {
 	runtime.LockOSThread()
 }
 
-func main() {
-	appkit.Init()
+func initAndRun() {
+	app := appkit.InitSharedApplication()
 	w := appkit.NewPlainWindow(foundation.MakeRect(150, 150, 600, 400))
 	w.SetTitle("Test widgets")
 
@@ -35,7 +35,7 @@ func main() {
 	quitBtn := appkit.NewPlainButton(foundation.MakeRect(10, 130, 80, 25))
 	quitBtn.SetTitle("Quit")
 	quitBtn.SetAction(func(sender foundation.Object) {
-		appkit.Terminate()
+		app.Terminate(nil)
 	})
 	w.ContentView().AddSubview(quitBtn)
 
@@ -47,7 +47,7 @@ func main() {
 	label := appkit.NewLabel(foundation.MakeRect(170, 100, 150, 25))
 	w.ContentView().AddSubview(label)
 	tf.ControlTextDidChange(func(foundation.Notification) {
-		dispatch.MainQueueAsync(func() {
+		cocoa.MainQueueAsync(func() {
 			label.SetStringValue(tf.StringValue())
 		})
 	})
@@ -70,16 +70,16 @@ func main() {
 	progressIndicator.SetDisplayedWhenStopped(false)
 	w.ContentView().AddSubview(progressIndicator)
 	go func() {
-		dispatch.MainQueueAsync(func() {
+		cocoa.MainQueueAsync(func() {
 			progressIndicator.StartAnimation(progressIndicator)
 		})
 		for i := 0; i < 10; i++ {
 			time.Sleep(1 * time.Second)
-			dispatch.MainQueueAsync(func() {
+			cocoa.MainQueueAsync(func() {
 				progressIndicator.SetDoubleValue(0.1 * float64(i))
 			})
 		}
-		dispatch.MainQueueAsync(func() {
+		cocoa.MainQueueAsync(func() {
 			progressIndicator.StopAnimation(progressIndicator)
 		})
 	}()
@@ -94,5 +94,40 @@ func main() {
 	w.MakeKeyAndOrderFront(nil)
 	w.Center()
 
-	appkit.Run()
+	app.ApplicationWillFinishLaunching(func(notification foundation.Notification) {
+		menu := appkit.NewMenu("main")
+		app.SetMainMenu(menu)
+
+		testMenuItem := appkit.NewMenuItem("", "", func(sender foundation.Object) {
+		})
+		testMenu := appkit.NewMenu("Name1")
+		testMenu.AddItem(appkit.NewMenuItem("test", "c", func(sender foundation.Object) {
+			fmt.Println("click")
+		}))
+		testMenuItem.SetSubmenu(testMenu)
+		menu.AddItem(testMenuItem)
+
+		testMenuItem2 := appkit.NewMenuItem("", "", func(sender foundation.Object) {
+		})
+		testMenu2 := appkit.NewMenu("Name2")
+		ii := appkit.NewMenuItem("test2", "d", func(sender foundation.Object) {
+			fmt.Println("click")
+		})
+		testMenu2.AddItem(ii)
+		testMenuItem2.SetSubmenu(testMenu2)
+		menu.AddItem(testMenuItem2)
+	})
+
+	app.ApplicationDidFinishLaunching(func(notification foundation.Notification) {
+		app.SetActivationPolicy(appkit.ApplicationActivationPolicyRegular)
+		app.ActivateIgnoringOtherApps(true)
+	})
+
+	app.Run()
+}
+
+func main() {
+	cocoa.WithAutoreleasePool(func() {
+		initAndRun()
+	})
 }

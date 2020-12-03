@@ -6,6 +6,7 @@ package appkit
 import "C"
 
 import (
+	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -28,7 +29,6 @@ type Button interface {
 	SetState(state ControlStateValue)
 	// SetButtonType sets the button’s type, which affects its user interface and behavior when clicked
 	SetButtonType(buttonType ButtonType)
-	// SetAction
 	SetAction(handler ActionHandler)
 }
 
@@ -52,7 +52,7 @@ func (b *NSButton) setDelegate() {
 	id := resources.NextId()
 	C.Button_RegisterDelegate(b.Ptr(), C.long(id))
 	resources.Store(id, b)
-	foundation.AddDeallocHook(b, func() {
+	cocoa.AddDeallocHook(b, func() {
 		resources.Delete(id)
 	})
 }

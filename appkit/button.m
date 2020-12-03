@@ -4,14 +4,14 @@
 
 @implementation NSButtonHandler
 
-- (void)onAction:(NSObject*)sender {
+- (void)onAction:(id)sender {
 	return Button_Target_Action([self goID], sender);
 }
 
 @end
 void Button_RegisterDelegate(void *ptr, long goID) {
 	NSButton* button = (NSButton*)ptr;
-	NSButtonHandler* handler = [[[NSButtonHandler alloc] init] autorelease];
+	NSButtonHandler* handler = [[NSButtonHandler alloc] init];
 	[handler setGoID:goID];
 	[button setTarget:handler];
 	[button setAction:@selector(onAction:)];

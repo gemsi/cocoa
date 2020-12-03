@@ -36,23 +36,14 @@ type View interface {
 	CenterXAnchor() LayoutXAxisAnchor
 	// CenterYAnchor return a layout anchor representing the vertical center of the view’s frame
 	CenterYAnchor() LayoutYAxisAnchor
-	// FirstBaselineAnchor return
 	FirstBaselineAnchor() LayoutYAxisAnchor
-	// HeightAnchor return
 	HeightAnchor() LayoutDimension
-	// LastBaselineAnchor return
 	LastBaselineAnchor() LayoutYAxisAnchor
-	// LeadingAnchor return
 	LeadingAnchor() LayoutXAxisAnchor
-	// LeftAnchor return
 	LeftAnchor() LayoutXAxisAnchor
-	// RightAnchor return
 	RightAnchor() LayoutXAxisAnchor
-	// TopAnchor return
 	TopAnchor() LayoutYAxisAnchor
-	// TrailingAnchor return
 	TrailingAnchor() LayoutXAxisAnchor
-	// WidthAnchor return
 	WidthAnchor() LayoutDimension
 	// AddSubview adds a view to the view’s subviews so it’s displayed above its siblings.
 	AddSubview(subView View)

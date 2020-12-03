@@ -23,7 +23,7 @@
 @end
 void Window_RegisterDelegate(void *ptr, long goID) {
 	NSWindow* window = (NSWindow*)ptr;
-	GoNSWindowDelegate* delegate = [[[GoNSWindowDelegate alloc] init] autorelease];
+	GoNSWindowDelegate* delegate = [[GoNSWindowDelegate alloc] init];
 	[delegate setGoID:goID];
 	[window setDelegate:delegate];
 }

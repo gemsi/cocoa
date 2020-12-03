@@ -14,27 +14,16 @@ import (
 type GridCell interface {
 	foundation.Object
 
-	// Column return
 	Column() GridColumn
-	// Row return
 	Row() GridRow
-	// ContentView return
 	ContentView() View
-	// CustomPlacementConstraints return
 	CustomPlacementConstraints() []LayoutConstraint
-	// SetCustomPlacementConstraints set
 	SetCustomPlacementConstraints(customPlacementConstraints []LayoutConstraint)
-	// RowAlignment return
 	RowAlignment() GridRowAlignment
-	// SetRowAlignment set
 	SetRowAlignment(rowAlignment GridRowAlignment)
-	// XPlacement return
 	XPlacement() GridCellPlacement
-	// SetXPlacement set
 	SetXPlacement(xPlacement GridCellPlacement)
-	// YPlacement return
 	YPlacement() GridCellPlacement
-	// SetYPlacement set
 	SetYPlacement(yPlacement GridCellPlacement)
 }
 

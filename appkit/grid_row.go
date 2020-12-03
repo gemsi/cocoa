@@ -14,37 +14,21 @@ import (
 type GridRow interface {
 	foundation.Object
 
-	// NumberOfCells return
 	NumberOfCells() int
-	// IsHidden return
 	IsHidden() bool
-	// SetHidden set
 	SetHidden(hidden bool)
-	// TopPadding return
 	TopPadding() float64
-	// SetTopPadding set
 	SetTopPadding(topPadding float64)
-	// BottomPadding return
 	BottomPadding() float64
-	// SetBottomPadding set
 	SetBottomPadding(bottomPadding float64)
-	// Height return
 	Height() float64
-	// SetHeight set
 	SetHeight(height float64)
-	// RowAlignment return
 	RowAlignment() GridRowAlignment
-	// SetRowAlignment set
 	SetRowAlignment(rowAlignment GridRowAlignment)
-	// YPlacement return
 	YPlacement() GridCellPlacement
-	// SetYPlacement set
 	SetYPlacement(yPlacement GridCellPlacement)
-	// GridView return
 	GridView() GridView
-	// CellAtIndex
 	CellAtIndex(index int) GridCell
-	// MergeCellsInRange
 	MergeCellsInRange(r foundation.Range)
 }
 

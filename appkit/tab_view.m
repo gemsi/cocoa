@@ -23,7 +23,7 @@
 @end
 void TabView_RegisterDelegate(void *ptr, long goID) {
 	NSTabView* tabView = (NSTabView*)ptr;
-	GoNSTabViewDelegate* delegate = [[[GoNSTabViewDelegate alloc] init] autorelease];
+	GoNSTabViewDelegate* delegate = [[GoNSTabViewDelegate alloc] init];
 	[delegate setGoID:goID];
 	[tabView setDelegate:delegate];
 }

@@ -6,6 +6,7 @@ package appkit
 import "C"
 
 import (
+	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -16,17 +17,11 @@ type TabView interface {
 
 	// NumberOfTabViewItems return the number of items in the tab view’s array of tab view items
 	NumberOfTabViewItems() int
-	// TabViewType return
 	TabViewType() TabViewType
-	// SetTabViewType set
 	SetTabViewType(tabViewType TabViewType)
-	// TabPosition return
 	TabPosition() TabPosition
-	// SetTabPosition set
 	SetTabPosition(tabPosition TabPosition)
-	// TabViewBorderType return
 	TabViewBorderType() TabViewBorderType
-	// SetTabViewBorderType set
 	SetTabViewBorderType(tabViewBorderType TabViewBorderType)
 	// AllowsTruncatedLabels return if the tab view allows truncating for labels that don’t fit on a tab
 	AllowsTruncatedLabels() bool
@@ -103,7 +98,7 @@ func (t *NSTabView) setDelegate() {
 	id := resources.NextId()
 	C.TabView_RegisterDelegate(t.Ptr(), C.long(id))
 	resources.Store(id, t)
-	foundation.AddDeallocHook(t, func() {
+	cocoa.AddDeallocHook(t, func() {
 		resources.Delete(id)
 	})
 }

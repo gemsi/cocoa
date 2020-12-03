@@ -50,6 +50,44 @@ type Menu interface {
 	UserInterfaceLayoutDirection() UserInterfaceLayoutDirection
 	// SetUserInterfaceLayoutDirection set the layout direction of menu items in the menu
 	SetUserInterfaceLayoutDirection(userInterfaceLayoutDirection UserInterfaceLayoutDirection)
+	// NumberOfItems return the number of menu items in the menu, including separator items
+	NumberOfItems() int
+	// ItemArray return an array containing the menu items in the menu
+	ItemArray() []MenuItem
+	// SetItemArray set an array containing the menu items in the menu
+	SetItemArray(itemArray []MenuItem)
+	// InsertItem inserts a menu item into the menu at a specific location
+	InsertItem(newItem MenuItem, index int)
+	// AddItem adds a menu item to the end of the menu
+	AddItem(newItem MenuItem)
+	// RemoveItem removes a menu item from the menu
+	RemoveItem(newItem MenuItem)
+	// RemoveItemAtIndex removes the menu item at a specified location in the menu
+	RemoveItemAtIndex(index int)
+	// RemoveAllItems removes all the menu items in the menu
+	RemoveAllItems()
+	// ItemAtIndex returns the menu item at a specific location of the menu
+	ItemAtIndex(index int) MenuItem
+	// ItemWithTitle returns the first menu item in the menu with a specified title
+	ItemWithTitle(title string) MenuItem
+	// ItemWithTag returns the first menu item in the menu with the specified tag
+	ItemWithTag(tag int) MenuItem
+	// IndexOfItem returns the index identifying the location of a specified menu item in the menu
+	IndexOfItem(item MenuItem) int
+	// IndexOfItemWithTitle returns the index of the first menu item in the menu that has a specified title
+	IndexOfItemWithTitle(title string) int
+	// IndexOfItemWithTag returns the index of the first menu item in the menu identified by a tag
+	IndexOfItemWithTag(tag int) int
+	// IndexOfItemWithSubmenu returns the index of the menu item in the menu with the given submenu
+	IndexOfItemWithSubmenu(subMenu Menu) int
+	// SetSubmenu assigns a menu to be a submenu of the menu controlled by a given menu item
+	SetSubmenu(subMenu Menu, item MenuItem)
+	// Update enables or disables the menu items of the menu based on the NSMenuValidation informal protocol and sizes the menu to fit its current menu items if necessary
+	Update()
+	// CancelTracking dismisses the menu and ends all menu tracking
+	CancelTracking()
+	// CancelTrackingWithoutAnimation dismisses the menu and ends all menu tracking without displaying the associated animation
+	CancelTrackingWithoutAnimation()
 }
 
 var _ Menu = (*NSMenu)(nil)
@@ -142,8 +180,108 @@ func (m *NSMenu) SetUserInterfaceLayoutDirection(userInterfaceLayoutDirection Us
 	C.Menu_SetUserInterfaceLayoutDirection(m.Ptr(), C.long(userInterfaceLayoutDirection))
 }
 
+func (m *NSMenu) NumberOfItems() int {
+	return int(C.Menu_NumberOfItems(m.Ptr()))
+}
+
+func (m *NSMenu) ItemArray() []MenuItem {
+	var cArray C.Array = C.Menu_ItemArray(m.Ptr())
+	defer C.free(cArray.data)
+	result := (*[1 << 28]unsafe.Pointer)(unsafe.Pointer(cArray.data))[:cArray.len:cArray.len]
+	var goResult = make([]MenuItem, len(result))
+	for idx, r := range result {
+		goResult[idx] = MakeMenuItem(r)
+	}
+	return goResult
+}
+
+func (m *NSMenu) SetItemArray(itemArray []MenuItem) {
+	cItemArrayData := make([]unsafe.Pointer, len(itemArray))
+	for idx, v := range itemArray {
+		cItemArrayData[idx] = v.Ptr()
+	}
+	cItemArray := C.Array{data: unsafe.Pointer(&cItemArrayData[0]), len: C.int(len(itemArray))}
+	C.Menu_SetItemArray(m.Ptr(), cItemArray)
+}
+
 func NewMenu(title string) Menu {
 	cTitle := C.CString(title)
 	defer C.free(unsafe.Pointer(cTitle))
 	return MakeMenu(C.Menu_NewMenu(cTitle))
+}
+
+func MenuBarVisible() bool {
+	return bool(C.Menu_MenuBarVisible())
+}
+
+func SetMenuBarVisible(visible bool) {
+	C.Menu_SetMenuBarVisible(C.bool(visible))
+}
+
+func (m *NSMenu) InsertItem(newItem MenuItem, index int) {
+	C.Menu_InsertItem(m.Ptr(), toPointer(newItem), C.long(index))
+}
+
+func (m *NSMenu) AddItem(newItem MenuItem) {
+	C.Menu_AddItem(m.Ptr(), toPointer(newItem))
+}
+
+func (m *NSMenu) RemoveItem(newItem MenuItem) {
+	C.Menu_RemoveItem(m.Ptr(), toPointer(newItem))
+}
+
+func (m *NSMenu) RemoveItemAtIndex(index int) {
+	C.Menu_RemoveItemAtIndex(m.Ptr(), C.long(index))
+}
+
+func (m *NSMenu) RemoveAllItems() {
+	C.Menu_RemoveAllItems(m.Ptr())
+}
+
+func (m *NSMenu) ItemAtIndex(index int) MenuItem {
+	return MakeMenuItem(C.Menu_ItemAtIndex(m.Ptr(), C.long(index)))
+}
+
+func (m *NSMenu) ItemWithTitle(title string) MenuItem {
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	return MakeMenuItem(C.Menu_ItemWithTitle(m.Ptr(), cTitle))
+}
+
+func (m *NSMenu) ItemWithTag(tag int) MenuItem {
+	return MakeMenuItem(C.Menu_ItemWithTag(m.Ptr(), C.long(tag)))
+}
+
+func (m *NSMenu) IndexOfItem(item MenuItem) int {
+	return int(C.Menu_IndexOfItem(m.Ptr(), toPointer(item)))
+}
+
+func (m *NSMenu) IndexOfItemWithTitle(title string) int {
+	cTitle := C.CString(title)
+	defer C.free(unsafe.Pointer(cTitle))
+	return int(C.Menu_IndexOfItemWithTitle(m.Ptr(), cTitle))
+}
+
+func (m *NSMenu) IndexOfItemWithTag(tag int) int {
+	return int(C.Menu_IndexOfItemWithTag(m.Ptr(), C.long(tag)))
+}
+
+func (m *NSMenu) IndexOfItemWithSubmenu(subMenu Menu) int {
+	return int(C.Menu_IndexOfItemWithSubmenu(m.Ptr(), toPointer(subMenu)))
+}
+
+func (m *NSMenu) SetSubmenu(subMenu Menu, item MenuItem) {
+	C.Menu_SetSubmenu(m.Ptr(), toPointer(subMenu), toPointer(item))
+}
+
+func (m *NSMenu) Update() {
+	C.Menu_Update(m.Ptr())
+}
+
+func (m *NSMenu) CancelTracking() {
+	C.Menu_CancelTracking(m.Ptr())
+}
+
+func (m *NSMenu) CancelTrackingWithoutAnimation() {
+	C.Menu_CancelTrackingWithoutAnimation(m.Ptr())
 }

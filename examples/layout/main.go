@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/appkit"
 	"github.com/hsiafan/cocoa/foundation"
 	"runtime"
@@ -12,8 +13,10 @@ func init() {
 	runtime.LockOSThread()
 }
 
-func main() {
-	appkit.Init()
+func initAndRun() {
+	app := appkit.InitSharedApplication()
+	app.SetActivationPolicy(appkit.ApplicationActivationPolicyRegular)
+	app.ActivateIgnoringOtherApps(true)
 	w := appkit.NewPlainWindow(foundation.MakeRect(150, 150, 600, 400))
 	w.SetTitle("Test Layout")
 
@@ -37,5 +40,12 @@ func main() {
 	w.MakeKeyAndOrderFront(nil)
 	w.Center()
 
-	appkit.Run()
+	app.Run()
+}
+
+func main() {
+	cocoa.WithAutoreleasePool(func() {
+		initAndRun()
+	})
+
 }

@@ -6,6 +6,7 @@ package appkit
 import "C"
 
 import (
+	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -38,13 +39,10 @@ type TextField interface {
 	BackgroundColor() Color
 	// SetBackgroundColor set the color of the background that the receiver’s cell draws behind the text.
 	SetBackgroundColor(backgroundColor Color)
-	// ControlTextDidChange
 	ControlTextDidChange(callback func(notification foundation.Notification))
 	_controlTextDidChange() func(notification foundation.Notification)
-	// ControlTextDidEndEditing
 	ControlTextDidEndEditing(callback func(notification foundation.Notification))
 	_controlTextDidEndEditing() func(notification foundation.Notification)
-	// ControlTextDidBeginEditing
 	ControlTextDidBeginEditing(callback func(notification foundation.Notification))
 	_controlTextDidBeginEditing() func(notification foundation.Notification)
 }
@@ -71,7 +69,7 @@ func (t *NSTextField) setDelegate() {
 	id := resources.NextId()
 	C.TextField_RegisterDelegate(t.Ptr(), C.long(id))
 	resources.Store(id, t)
-	foundation.AddDeallocHook(t, func() {
+	cocoa.AddDeallocHook(t, func() {
 		resources.Delete(id)
 	})
 }

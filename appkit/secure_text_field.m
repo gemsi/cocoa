@@ -7,7 +7,7 @@
 @end
 void SecureTextField_RegisterDelegate(void *ptr, long goID) {
 	NSSecureTextField* secureTextField = (NSSecureTextField*)ptr;
-	GoNSSecureTextFieldDelegate* delegate = [[[GoNSSecureTextFieldDelegate alloc] init] autorelease];
+	GoNSSecureTextFieldDelegate* delegate = [[GoNSSecureTextFieldDelegate alloc] init];
 	[delegate setGoID:goID];
 	[secureTextField setDelegate:delegate];
 }
