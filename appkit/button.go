@@ -29,14 +29,14 @@ type Button interface {
 	// SetButtonType sets the button’s type, which affects its user interface and behavior when clicked
 	SetButtonType(buttonType ButtonType)
 	// SetAction
-	SetAction(callback func(sender foundation.Object))
+	SetAction(handler ActionHandler)
 }
 
 var _ Button = (*NSButton)(nil)
 
 type NSButton struct {
 	NSControl
-	action func(sender foundation.Object)
+	action ActionHandler
 }
 
 // MakeButton create a Button from native pointer
@@ -93,8 +93,8 @@ func (b *NSButton) SetButtonType(buttonType ButtonType) {
 	C.Button_SetButtonType(b.Ptr(), C.ulong(buttonType))
 }
 
-func (b *NSButton) SetAction(callback func(sender foundation.Object)) {
-	b.action = callback
+func (b *NSButton) SetAction(handler ActionHandler) {
+	b.action = handler
 }
 
 //export Button_Target_Action

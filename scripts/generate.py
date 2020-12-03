@@ -533,69 +533,55 @@ class DelegateMethod:
 @dataclass
 class ActionMethod:
     name: str
-    params: List[Param] = field(default_factory=list)
     description: str = ''
-    return_value: Return = Return('')
 
     def __post_init__(self):
-        pass
+        self.return_value = Return('')
 
     def init_env(self, current_pkg: str, receiver_type: str):
-        if len(self.params) == 0:
-            self.params = [Param(name='sender', Type='foundation.Object')]
-
         self.current_pkg = current_pkg
         self.receiver_type = receiver_type
         self.receiver_name = receiver_type[0].lower()
         self.go_func_name = 'Set' + cap(self.name)
-        self.go_params_str = ', '.join([p.go_def_code(current_pkg) for p in self.params])
         self.cgo_export_func_name = f'{self.receiver_type}_Target_{cap(self.name)}'
         self.objc_func_name = 'on' + cap(self.name)
         self.callback_field_name = de_cap(self.name)
-        self.go_def_return = self.return_value.go_def_code(current_pkg)
-        if self.go_def_return:
-            self.go_def_return = ' ' + self.go_def_return
 
     def go_interface_code(self) -> List[str]:
         return [
             f'// {self.go_func_name} {self.description}',
-            self.go_func_name + '(callback func(' + self.go_params_str + ')' + self.go_def_return + ')',
+            self.go_func_name + '(handler ActionHandler)',
         ]
 
     def go_impl_code(self) -> List[str]:
         receiver_str = self.receiver_name + ' *NS' + self.receiver_type
         codes = [
-            'func (' + receiver_str + ') ' + self.go_func_name +
-            '(callback func(' + self.go_params_str + ')' + self.go_def_return + ')' + ' {',
-            f'\t{self.receiver_name}.{self.callback_field_name} = callback',
+            'func (' + receiver_str + ') ' + self.go_func_name + '(handler ActionHandler) {',
+            f'\t{self.receiver_name}.{self.callback_field_name} = handler',
             '}'
         ]
         return codes
 
     def go_callback_field_code(self) -> List[str]:
-        return [f'{self.callback_field_name} func({self.go_params_str})']
+        return [f'{self.callback_field_name} ActionHandler']
 
     def cgo_export_code(self) -> List[str]:
         param_name = de_cap(self.receiver_type)
-        params_def_str = ' '.join([param.cgo_export_def_code() for param in self.params])
-        args_str = ' '.join([param.cgo_export_to_go_code(self.current_pkg) for param in self.params])
         return [
             f'//export {self.cgo_export_func_name}',
-            f'func {self.cgo_export_func_name}(id int64, {params_def_str}) {{',
+            f'func {self.cgo_export_func_name}(id int64, sender unsafe.Pointer) {{',
             f'\t{param_name} := resources.Get(id).(*NS{self.receiver_type})',
             f'\tif {param_name}.{self.callback_field_name} != nil {{',
-            f'\t\t{param_name}.{self.callback_field_name}({args_str})',
+            f'\t\t{param_name}.{self.callback_field_name}(foundation.MakeObject(sender))',
             '\t}',
             '}'
         ]
 
     def objc_m_code(self) -> List[str]:
-        params_def_str = ' '.join([param.objc_def_code() for param in self.params])
-        args_str = ' '.join([param.objc_to_c_code() for param in self.params])
         # TODO: convert ns types to c types?
         return [
-            f'- ({self.return_value.objc_def_code()}){self.objc_func_name}:{params_def_str} {{',
-            f'\treturn {self.cgo_export_func_name}([self goID], {args_str});',
+            f'- (void){self.objc_func_name}:(NSObject*)sender {{',
+            f'\treturn {self.cgo_export_func_name}([self goID], sender);',
             '}',
         ]
 
