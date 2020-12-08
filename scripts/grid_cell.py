@@ -5,7 +5,6 @@ from generate import Component, Property, init_method, Param, Method, Return
 if __name__ == "__main__":
     w = Component(
         Type="appkit.GridCell",
-        objc_imports=['Appkit/NSGridView'],
         super_type='foundation.Object',
         description="an individual content area within a grid view, typically at the intersection of a row and a column",
         properties=[

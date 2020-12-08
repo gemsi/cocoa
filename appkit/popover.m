@@ -1,4 +1,4 @@
-#import <Appkit/NSPopover.h>
+#import <AppKit/AppKit.h>
 #import "popover.h"
 
 long Popover_Behavior(void* ptr) {

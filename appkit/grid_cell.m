@@ -1,4 +1,4 @@
-#import <Appkit/NSGridView.h>
+#import <AppKit/AppKit.h>
 #import "grid_cell.h"
 
 void* GridCell_Column(void* ptr) {

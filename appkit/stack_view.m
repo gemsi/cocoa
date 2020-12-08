@@ -1,4 +1,4 @@
-#import <Appkit/NSStackView.h>
+#import <AppKit/AppKit.h>
 #import "stack_view.h"
 
 Array StackView_Views(void* ptr) {

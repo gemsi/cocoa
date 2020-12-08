@@ -334,9 +334,10 @@ class Method:
         if not self.go_func_name:
             self.go_func_name = cap(self.name)
 
-    def init_env(self, has_delegate: bool, has_target: bool):
+    def init_env(self, has_delegate: bool, has_target: bool, has_custom_type: bool):
         self.has_delegate = has_delegate
         self.has_target = has_target
+        self.has_custom_type = has_custom_type
 
     def go_interface_code(self, current_pkg: str) -> List[str]:
         if self.do_alloc or self.static:
@@ -406,7 +407,10 @@ class Method:
             f'{self.return_value.c_def_code()} {receiver_type}_{self.go_func_name}({c_params_str}) {{',
         ]
         if self.do_alloc:
-            codes.append(f'\tNS{receiver_type}* {ns_var_name} = [NS{receiver_type} alloc];')
+            if self.has_custom_type:
+                codes.append(f'\tNS{receiver_type}* {ns_var_name} = [My{receiver_type} alloc];')
+            else:
+                codes.append(f'\tNS{receiver_type}* {ns_var_name} = [NS{receiver_type} alloc];')
         elif not self.static:
             codes.append(f'\tNS{receiver_type}* {ns_var_name} = (NS{receiver_type}*)ptr;')
         else:
@@ -643,16 +647,19 @@ class Component:
     action_methods: List[ActionMethod] = field(default_factory=list)
     extend_delegate: bool = False
     objc_imports: List[str] = field(default_factory=list)
+    override_methods: List[str] = field(default_factory=list)  # override cocoa component methods.
 
     def __post_init__(self):
         self.pkg, self.type_name = split_type(self.Type)
         self.file_name = camel_to_underscore(self.type_name)
         self.ns_type = 'NS' + self.type_name
         self.super_package, self.super_type_name = split_type(self.super_type)
+        if not self.objc_imports:
+            self.objc_imports = ['<AppKit/AppKit.h>']
         if self.delegate_type == '':
             self.delegate_type = type_part(self.Type) + 'Delegate'
         for method in self.methods:
-            method.init_env(self.delegate_methods or self.extend_delegate, self.action_methods)
+            method.init_env(self.delegate_methods or self.extend_delegate, self.action_methods, self.override_methods)
         for method in self.delegate_methods:
             pkg, type_name = split_type(self.Type)
             method.init_env(pkg, type_name)
@@ -872,11 +879,8 @@ class Component:
     def generate_objc_m_file(self):
         m_file_path = f'../{self.pkg}/{self.file_name}.m'
         with open(m_file_path, 'w+') as out:
-            if self.objc_imports:
-                for import_ in self.objc_imports:
-                    print(f'#import <{import_}.h>', file=out)
-            else:
-                print(f'#import <Appkit/{self.ns_type}.h>', file=out)
+            for import_ in self.objc_imports:
+                print(f'#import {import_}', file=out)
             print(f'#import "{self.file_name}.h"', file=out)
             if self.delegate_methods or self.extend_delegate or self.action_methods:
                 print(f'#import "{self.file_name}_delegate.h"', file=out)
@@ -901,6 +905,20 @@ class Component:
                         print(line, file=out)
                 print(file=out)
                 print(f'@end', file=out)
+
+            # custom override
+            if self.override_methods:
+                print(file=out)
+                print(f'@interface My{self.type_name} : NS{self.type_name} {{', file=out)
+                print('}', file=out)
+                print('@end', file=out)
+                print(file=out)
+                print(f'@implementation My{self.type_name}', file=out)
+                for method in self.override_methods:
+                    print(file=out)
+                    for line in method.split('\n'):
+                        print(line, file=out)
+                print('@end', file=out)
 
             # set delegate
             if self.delegate_methods or self.extend_delegate or self.action_methods:

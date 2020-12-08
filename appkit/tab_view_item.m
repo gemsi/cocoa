@@ -1,4 +1,4 @@
-#import <Appkit/NSTabViewItem.h>
+#import <AppKit/AppKit.h>
 #import "tab_view_item.h"
 
 const char* TabViewItem_Label(void* ptr) {

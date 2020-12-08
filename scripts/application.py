@@ -19,7 +19,6 @@ if __name__ == "__main__":
             Property(name='windows', Type='appkit.Window', readonly=True, array=True, description='an array of the app’s window objects'),
             Property(name='hidden', Type='bool', readonly=True, description='whether the app is hidden'),
             
-
         ],
         methods=[
             Method(name='run', description='starts the main event loop'),
@@ -40,7 +39,6 @@ if __name__ == "__main__":
             Method(name='setWindowsNeedUpdate', params=[Param(name='needUpdate', Type='bool')]),
             Method(name='arrangeInFront', params=[Param(name='sender', Type='foundation.Object')]),
             Method(name='preventWindowOrdering'),
-            
             
         ],
         delegate_methods=[

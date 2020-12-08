@@ -1,4 +1,4 @@
-#import <Appkit/NSSplitView.h>
+#import <AppKit/AppKit.h>
 #import "split_view.h"
 
 bool SplitView_ArrangesAllSubviews(void* ptr) {

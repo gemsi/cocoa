@@ -7,7 +7,6 @@ if __name__ == "__main__":
     w = Component(
         Type="appkit.LayoutAnchor",
         super_type='foundation.Object',
-        objc_imports=['Appkit/NSLayoutAnchor', 'Appkit/NSLayoutConstraint'],
         description="a factory class for creating layout constraint objects using a fluent API",
         properties=[
             Property(name='constraintsAffectingLayout', Type='appkit.LayoutConstraint', array=True, readonly=True,

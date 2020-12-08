@@ -6,7 +6,6 @@ if __name__ == "__main__":
     w = Component(
         Type="appkit.GridColumn",
         super_type='foundation.Object',
-        objc_imports=['Appkit/NSGridView'],
         description="a row within a grid view",
         properties=[
             Property(name='numberOfCells', Type='int', readonly=True, description=''),

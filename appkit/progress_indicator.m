@@ -1,4 +1,4 @@
-#import <Appkit/NSProgressIndicator.h>
+#import <AppKit/AppKit.h>
 #import "progress_indicator.h"
 
 bool ProgressIndicator_UsesThreadedAnimation(void* ptr) {

@@ -1,4 +1,4 @@
-#import <Appkit/NSPopUpButton.h>
+#import <AppKit/AppKit.h>
 #import "pop_up_button.h"
 
 bool PopUpButton_PullsDown(void* ptr) {

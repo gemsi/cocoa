@@ -1,4 +1,4 @@
-#import <Appkit/NSResponder.h>
+#import <AppKit/AppKit.h>
 #import "responder.h"
 
 bool Responder_AcceptsFirstResponder(void* ptr) {

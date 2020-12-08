@@ -1,4 +1,4 @@
-#import <Appkit/NSButton.h>
+#import <AppKit/AppKit.h>
 #import "button.h"
 #import "button_delegate.h"
 

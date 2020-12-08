@@ -1,4 +1,4 @@
-#import <Appkit/NSTextContainer.h>
+#import <AppKit/AppKit.h>
 #import "text_container.h"
 
 NSSize TextContainer_Size(void* ptr) {

@@ -1,4 +1,4 @@
-#import <Appkit/NSMenu.h>
+#import <AppKit/AppKit.h>
 #import "menu.h"
 
 double Menu_MenuBarHeight(void* ptr) {

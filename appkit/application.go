@@ -68,6 +68,8 @@ type Application interface {
 	// UpdateWindows sends an update message to each onscreen window
 	UpdateWindows()
 	SetWindowsNeedUpdate(needUpdate bool)
+	ArrangeInFront(sender foundation.Object)
+	PreventWindowOrdering()
 	// ApplicationWillFinishLaunching sent by the default notification center immediately before the application object is initialized
 	ApplicationWillFinishLaunching(callback func(notification foundation.Notification))
 	_applicationWillFinishLaunching() func(notification foundation.Notification)
@@ -223,6 +225,14 @@ func (a *NSApplication) UpdateWindows() {
 
 func (a *NSApplication) SetWindowsNeedUpdate(needUpdate bool) {
 	C.Application_SetWindowsNeedUpdate(a.Ptr(), C.bool(needUpdate))
+}
+
+func (a *NSApplication) ArrangeInFront(sender foundation.Object) {
+	C.Application_ArrangeInFront(a.Ptr(), toPointer(sender))
+}
+
+func (a *NSApplication) PreventWindowOrdering() {
+	C.Application_PreventWindowOrdering(a.Ptr())
 }
 
 func (a *NSApplication) ApplicationWillFinishLaunching(callback func(notification foundation.Notification)) {

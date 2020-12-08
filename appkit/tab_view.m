@@ -1,4 +1,4 @@
-#import <Appkit/NSTabView.h>
+#import <AppKit/AppKit.h>
 #import "tab_view.h"
 #import "tab_view_delegate.h"
 

@@ -14,6 +14,8 @@ import (
 type TextView interface {
 	Text
 
+	AllowsUndo() bool
+	SetAllowsUndo(allowsUndo bool)
 	// TextContainer return the receiver’s text container
 	TextContainer() TextContainer
 	// SetTextContainer set the receiver’s text container
@@ -36,6 +38,14 @@ func MakeTextView(ptr unsafe.Pointer) *NSTextView {
 	}
 }
 
+func (t *NSTextView) AllowsUndo() bool {
+	return bool(C.TextView_AllowsUndo(t.Ptr()))
+}
+
+func (t *NSTextView) SetAllowsUndo(allowsUndo bool) {
+	C.TextView_SetAllowsUndo(t.Ptr(), C.bool(allowsUndo))
+}
+
 func (t *NSTextView) TextContainer() TextContainer {
 	return MakeTextContainer(C.TextView_TextContainer(t.Ptr()))
 }
@@ -46,4 +56,8 @@ func (t *NSTextView) SetTextContainer(textContainer TextContainer) {
 
 func NewTextView(frame foundation.Rect) TextView {
 	return MakeTextView(C.TextView_NewTextView(toNSRect(frame)))
+}
+
+func ScrollableTextView() ScrollView {
+	return MakeScrollView(C.TextView_ScrollableTextView())
 }

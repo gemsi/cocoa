@@ -32,3 +32,5 @@ void Application_Unhide(void* ptr, void* sender);
 void Application_UnhideWithoutActivation(void* ptr);
 void Application_UpdateWindows(void* ptr);
 void Application_SetWindowsNeedUpdate(void* ptr, bool needUpdate);
+void Application_ArrangeInFront(void* ptr, void* sender);
+void Application_PreventWindowOrdering(void* ptr);

@@ -1,4 +1,4 @@
-#import <Appkit/NSEvent.h>
+#import <AppKit/AppKit.h>
 #import "event.h"
 
 NSPoint Event_LocationInWindow(void* ptr) {

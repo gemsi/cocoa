@@ -1,4 +1,4 @@
-#import <Appkit/NSLayoutAnchor.h>
+#import <AppKit/AppKit.h>
 #import "layout_x_axis_anchor.h"
 
 void* LayoutXAxisAnchor_ConstraintEqualToSystemSpacingAfterAnchor(void* ptr, void* anchor, double multiplier) {

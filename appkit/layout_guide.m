@@ -1,4 +1,4 @@
-#import <Appkit/NSLayoutGuide.h>
+#import <AppKit/AppKit.h>
 #import "layout_guide.h"
 
 NSRect LayoutGuide_Frame(void* ptr) {

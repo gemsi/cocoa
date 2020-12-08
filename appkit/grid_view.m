@@ -1,4 +1,4 @@
-#import <Appkit/NSGridView.h>
+#import <AppKit/AppKit.h>
 #import "grid_view.h"
 
 long GridView_NumberOfRows(void* ptr) {

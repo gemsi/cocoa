@@ -1,4 +1,4 @@
-#import <Appkit/NSControl.h>
+#import <AppKit/AppKit.h>
 #import "control.h"
 
 bool Control_IsEnabled(void* ptr) {

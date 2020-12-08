@@ -1,4 +1,4 @@
-#import <Appkit/NSScrollView.h>
+#import <AppKit/AppKit.h>
 #import "scroll_view.h"
 
 bool ScrollView_HasVerticalScroller(void* ptr) {

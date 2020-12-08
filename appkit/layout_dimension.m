@@ -1,4 +1,4 @@
-#import <Appkit/NSLayoutAnchor.h>
+#import <AppKit/AppKit.h>
 #import "layout_dimension.h"
 
 void* LayoutDimension_ConstraintEqualToConstant(void* ptr, double constant) {

@@ -1,4 +1,4 @@
-#import <Appkit/NSWindow.h>
+#import <AppKit/AppKit.h>
 #import "window.h"
 #import "window_delegate.h"
 

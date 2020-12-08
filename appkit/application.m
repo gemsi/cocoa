@@ -1,4 +1,4 @@
-#import <Appkit/NSApplication.h>
+#import <AppKit/AppKit.h>
 #import "application.h"
 #import "application_delegate.h"
 
@@ -170,4 +170,14 @@ void Application_UpdateWindows(void* ptr) {
 void Application_SetWindowsNeedUpdate(void* ptr, bool needUpdate) {
 	NSApplication* application = (NSApplication*)ptr;
 	[application setWindowsNeedUpdate:needUpdate];
+}
+
+void Application_ArrangeInFront(void* ptr, void* sender) {
+	NSApplication* application = (NSApplication*)ptr;
+	[application arrangeInFront:(NSObject*)sender];
+}
+
+void Application_PreventWindowOrdering(void* ptr) {
+	NSApplication* application = (NSApplication*)ptr;
+	[application preventWindowOrdering];
 }

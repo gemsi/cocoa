@@ -1,4 +1,4 @@
-#import <Appkit/NSText.h>
+#import <AppKit/AppKit.h>
 #import "text.h"
 
 const char* Text_String(void* ptr) {

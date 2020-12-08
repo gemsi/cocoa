@@ -7,7 +7,6 @@ if __name__ == "__main__":
     w = Component(
         Type="appkit.LayoutYAxisAnchor",
         super_type='appkit.LayoutAnchor',
-        objc_imports=['Appkit/NSLayoutAnchor'],
         description="a factory class for creating vertical layout constraint objects using a fluent API",
         properties=[],
         methods=[

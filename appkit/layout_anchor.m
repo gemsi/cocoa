@@ -1,5 +1,4 @@
-#import <Appkit/NSLayoutAnchor.h>
-#import <Appkit/NSLayoutConstraint.h>
+#import <AppKit/AppKit.h>
 #import "layout_anchor.h"
 
 Array LayoutAnchor_ConstraintsAffectingLayout(void* ptr) {

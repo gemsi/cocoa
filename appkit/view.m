@@ -1,5 +1,4 @@
-#import <Appkit/NSView.h>
-#import <Appkit/NSLayoutConstraint.h>
+#import <AppKit/AppKit.h>
 #import "view.h"
 
 NSRect View_Frame(void* ptr) {

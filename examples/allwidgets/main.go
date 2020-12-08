@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/appkit"
 	"github.com/hsiafan/cocoa/foundation"
@@ -58,7 +57,7 @@ func initAndRun() {
 	// password
 	stf := appkit.NewPlainSecureTextField(foundation.MakeRect(340, 100, 150, 25))
 	stf.ControlTextDidChange(func(notification foundation.Notification) {
-		fmt.Println(stf.StringValue())
+		label.SetStringValue(stf.StringValue())
 	})
 	w.ContentView().AddSubview(stf)
 
@@ -85,8 +84,15 @@ func initAndRun() {
 	}()
 
 	// text view & scroll view
-	sv := appkit.NewVerticallyScrollableTextView(foundation.MakeRect(10, 200, 200, 30))
+	sv := appkit.ScrollableTextView()
+	sv.SetFrame(foundation.MakeRect(10, 200, 200, 30))
+	appkit.MakeTextView(sv.DocumentView().Ptr()).SetAllowsUndo(true)
 	w.ContentView().AddSubview(sv)
+
+	sv2 := appkit.ScrollableTextView()
+	sv2.SetFrame(foundation.MakeRect(250, 200, 200, 30))
+	appkit.MakeTextView(sv2.DocumentView().Ptr()).SetAllowsUndo(true)
+	w.ContentView().AddSubview(sv2)
 
 	w.WindowDidMove(func(notification foundation.Notification) {
 		label.SetStringValue("moved!")
@@ -102,7 +108,7 @@ func initAndRun() {
 		})
 		testMenu := appkit.NewMenu("Name1")
 		testMenu.AddItem(appkit.NewMenuItem("test", "c", func(sender foundation.Object) {
-			fmt.Println("click")
+			label.SetStringValue("clicked")
 		}))
 		testMenuItem.SetSubmenu(testMenu)
 		menu.AddItem(testMenuItem)
@@ -111,7 +117,7 @@ func initAndRun() {
 		})
 		testMenu2 := appkit.NewMenu("Name2")
 		ii := appkit.NewMenuItem("test2", "d", func(sender foundation.Object) {
-			fmt.Println("click")
+			label.SetStringValue("clicked2")
 		})
 		testMenu2.AddItem(ii)
 		testMenuItem2.SetSubmenu(testMenu2)

@@ -1,4 +1,4 @@
-#import <Appkit/NSLayoutConstraint.h>
+#import <AppKit/AppKit.h>
 #import "layout_constraint.h"
 
 bool LayoutConstraint_IsActive(void* ptr) {
