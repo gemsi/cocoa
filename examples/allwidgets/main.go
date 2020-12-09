@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/appkit"
 	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/objc"
 	"runtime"
 	"time"
 )
@@ -46,7 +46,7 @@ func initAndRun() {
 	label := appkit.NewLabel(foundation.MakeRect(170, 100, 150, 25))
 	w.ContentView().AddSubview(label)
 	tf.ControlTextDidChange(func(foundation.Notification) {
-		cocoa.MainQueueAsync(func() {
+		objc.MainQueueAsync(func() {
 			label.SetStringValue(tf.StringValue())
 		})
 	})
@@ -69,16 +69,16 @@ func initAndRun() {
 	progressIndicator.SetDisplayedWhenStopped(false)
 	w.ContentView().AddSubview(progressIndicator)
 	go func() {
-		cocoa.MainQueueAsync(func() {
+		objc.MainQueueAsync(func() {
 			progressIndicator.StartAnimation(progressIndicator)
 		})
 		for i := 0; i < 10; i++ {
 			time.Sleep(1 * time.Second)
-			cocoa.MainQueueAsync(func() {
+			objc.MainQueueAsync(func() {
 				progressIndicator.SetDoubleValue(0.1 * float64(i))
 			})
 		}
-		cocoa.MainQueueAsync(func() {
+		objc.MainQueueAsync(func() {
 			progressIndicator.StopAnimation(progressIndicator)
 		})
 	}()
@@ -133,7 +133,7 @@ func initAndRun() {
 }
 
 func main() {
-	cocoa.WithAutoreleasePool(func() {
+	objc.WithAutoreleasePool(func() {
 		initAndRun()
 	})
 }

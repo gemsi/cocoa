@@ -6,7 +6,6 @@ package appkit
 import "C"
 
 import (
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -103,7 +102,7 @@ func (a *NSApplication) setDelegate() {
 	id := resources.NextId()
 	C.Application_RegisterDelegate(a.Ptr(), C.long(id))
 	resources.Store(id, a)
-	cocoa.AddDeallocHook(a, func() {
+	foundation.AddDeallocHook(a, func() {
 		resources.Delete(id)
 	})
 }

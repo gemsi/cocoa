@@ -1,11 +1,10 @@
-package cocoa
+package objc
 
 // #cgo CFLAGS: -x objective-c
 // #cgo LDFLAGS: -framework Cocoa
 // #import "base.h"
 import "C"
 import (
-	"github.com/hsiafan/cocoa/foundation"
 	"sync"
 )
 
@@ -34,19 +33,6 @@ func WithAutoreleasePool(task func()) {
 	tasks[id] = task
 	taskLock.Unlock()
 	C.Run_WithAutoreleasePool(C.long(id))
-}
-
-// AddDeallocHook add cocoa object dealloc hook
-func AddDeallocHook(obj foundation.Object, hook func()) {
-	if obj.Ptr() == nil {
-		panic("cocoa pointer is nil")
-	}
-	taskLock.Lock()
-	currentTaskId++
-	id := currentTaskId
-	tasks[id] = hook
-	taskLock.Unlock()
-	C.Dealloc_AddHook(obj.Ptr(), C.long(id))
 }
 
 //export runTask

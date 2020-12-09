@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/appkit"
 	"github.com/hsiafan/cocoa/foundation"
+	"github.com/hsiafan/cocoa/objc"
 	"runtime"
 )
 
@@ -44,7 +44,7 @@ func initAndRun() {
 }
 
 func main() {
-	cocoa.WithAutoreleasePool(func() {
+	objc.WithAutoreleasePool(func() {
 		initAndRun()
 	})
 

@@ -6,7 +6,6 @@ package appkit
 import "C"
 
 import (
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -94,7 +93,7 @@ func (m *NSMenuItem) setDelegate() {
 	id := resources.NextId()
 	C.MenuItem_RegisterDelegate(m.Ptr(), C.long(id))
 	resources.Store(id, m)
-	cocoa.AddDeallocHook(m, func() {
+	foundation.AddDeallocHook(m, func() {
 		resources.Delete(id)
 	})
 }
@@ -260,7 +259,7 @@ func NewMenuItem(title string, charCode string, handler ActionHandler) MenuItem 
 	instance := MakeMenuItem(C.MenuItem_NewMenuItem(cTitle, cCharCode, C.long(id)))
 	instance.action = handler
 	resources.Store(id, instance)
-	cocoa.AddDeallocHook(instance, func() {
+	foundation.AddDeallocHook(instance, func() {
 		resources.Delete(id)
 	})
 	//instance.setDelegate()

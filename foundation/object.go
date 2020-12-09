@@ -5,6 +5,7 @@ package foundation
 // #import "object.h"
 import "C"
 import (
+	"sync"
 	"unsafe"
 )
 
@@ -35,4 +36,35 @@ func MakeObject(ptr unsafe.Pointer) *NSObject {
 		return nil
 	}
 	return &NSObject{ptr}
+}
+
+var tasks = make(map[int64]func())
+var taskLock sync.RWMutex
+var currentTaskId int64
+
+// AddDeallocHook add cocoa object dealloc hook
+func AddDeallocHook(obj Object, hook func()) {
+	if obj.Ptr() == nil {
+		panic("cocoa pointer is nil")
+	}
+	taskLock.Lock()
+	currentTaskId++
+	id := currentTaskId
+	tasks[id] = hook
+	taskLock.Unlock()
+	C.Dealloc_AddHook(obj.Ptr(), C.long(id))
+}
+
+//export runDeallocTask
+func runDeallocTask(id int64) {
+
+	taskLock.RLock()
+	task := tasks[id]
+	taskLock.RUnlock()
+
+	task()
+
+	taskLock.Lock()
+	delete(tasks, id)
+	taskLock.Unlock()
 }

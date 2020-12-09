@@ -6,7 +6,6 @@ package appkit
 import "C"
 
 import (
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -35,7 +34,7 @@ func (s *NSSecureTextField) setDelegate() {
 	id := resources.NextId()
 	C.SecureTextField_RegisterDelegate(s.Ptr(), C.long(id))
 	resources.Store(id, s)
-	cocoa.AddDeallocHook(s, func() {
+	foundation.AddDeallocHook(s, func() {
 		resources.Delete(id)
 	})
 }

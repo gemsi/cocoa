@@ -762,7 +762,7 @@ class Component:
                 print('\tid := resources.NextId()', file=out)
                 print(f'\tC.{self.type_name}_RegisterDelegate({receiver}.Ptr(), C.long(id))', file=out)
                 print(f'\tresources.Store(id, {receiver})', file=out)
-                print(f'\tcocoa.AddDeallocHook({receiver}, func() {{', file=out)
+                print(f'\tfoundation.AddDeallocHook({receiver}, func() {{', file=out)
                 print('\t\tresources.Delete(id)', file=out)
                 print('\t})', file=out)
                 print('}', file=out)
@@ -821,7 +821,7 @@ class Component:
             if pkg != t_pkg:
                 imports.add(f'github.com/hsiafan/cocoa/{t_pkg}')
         if self.delegate_methods or self.extend_delegate or self.action_methods:
-            imports.add(f'github.com/hsiafan/cocoa')
+            imports.add(f'github.com/hsiafan/cocoa/foundation')
         return sorted(list(imports))
 
     def generate_c_header_file(self):

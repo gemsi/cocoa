@@ -6,7 +6,6 @@ package appkit
 import "C"
 
 import (
-	"github.com/hsiafan/cocoa"
 	"github.com/hsiafan/cocoa/foundation"
 	"unsafe"
 )
@@ -98,7 +97,7 @@ func (t *NSTabView) setDelegate() {
 	id := resources.NextId()
 	C.TabView_RegisterDelegate(t.Ptr(), C.long(id))
 	resources.Store(id, t)
-	cocoa.AddDeallocHook(t, func() {
+	foundation.AddDeallocHook(t, func() {
 		resources.Delete(id)
 	})
 }
